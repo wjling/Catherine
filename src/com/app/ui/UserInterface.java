@@ -1,5 +1,7 @@
-package com.app.catherine;
+package com.app.ui;
 
+import com.app.catherine.R;
+import com.app.catherine.R.id;
 import com.app.catherine.R.layout;
 
 import android.app.Activity;
