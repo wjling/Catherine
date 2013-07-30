@@ -18,37 +18,46 @@
             android:background="#ff0000"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/ui_menu_myevent"
+            <Button
+                android:id="@+id/ui_menu_myevents"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="My Events" />
+                android:text="My Events"
+                android:textColor="#000000"
+                android:textSize="25sp" />
 
-            <TextView
-                android:id="@+id/ui_menu_privateevent"
+            <Button
+                android:id="@+id/ui_menu_privateevents"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Private Event" />
+                android:text="Private Event"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ui_content"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="#00ff00"
+            android:background="#ffffff"
             android:orientation="vertical" >
 
             <Button
                 android:id="@+id/ui_content_menuBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="MENU"
+                android:textColor="#000000" />
 
-            <ListView
-                android:id="@+id/ui_content_contentlist"
+            <LinearLayout
+                android:id="@+id/ui_content_thecontent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            </ListView>
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

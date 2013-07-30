@@ -8,9 +8,13 @@ import android.app.Activity;
 import android.app.ActivityGroup;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.GestureDetector;
 import android.view.ViewTreeObserver;
@@ -19,10 +23,12 @@ import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class UserInterface extends Activity implements OnTouchListener,
 GestureDetector.OnGestureListener
 {
+	private static final int MENU_CLICKED = -2;
 	private LinearLayout contentLayout;
 	private LinearLayout menuLayout;
 	private LinearLayout UILayout;
@@ -38,13 +44,23 @@ GestureDetector.OnGestureListener
 	private boolean isMenuOpen = false;
 	private boolean hasMeasured = false;
 	
+	private Menu UI_Menu;
+	private myHandler uiHandler = new myHandler();
+	
+	
+	private Button myEvents;
+	private Button privateEvents;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.ui);
+		View v = LayoutInflater.from(getApplicationContext()).inflate(R.layout.ui, null);
+		setContentView(v);
 		init();
 		setLayout();
+		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
+		UI_Menu.setMenu();
 		
 	}
 	
@@ -54,6 +70,28 @@ GestureDetector.OnGestureListener
 		menuLayout = (LinearLayout)findViewById(R.id.ui_menu);
 		UILayout = (LinearLayout)findViewById(R.id.ui_myui);
 		menuButton = (Button)findViewById(R.id.ui_content_menuBtn);
+		
+		menuButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				jump();
+			}
+		});
+	}
+	
+	public void jump()
+	{
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
+		if(layoutParams.leftMargin>= 0)
+		{
+			new AsynMove().execute(-speed);
+		}
+		else
+		{
+			new AsynMove().execute(speed);
+		}
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -240,16 +278,16 @@ GestureDetector.OnGestureListener
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0) {
 		// TODO Auto-generated method stub
-		Log.i("myUI","onSingleTapUp");
-		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-		if(layoutParams.leftMargin>= 0)
-		{
-			new AsynMove().execute(-speed);
-		}
-		else
-		{
-			new AsynMove().execute(speed);
-		}
+//		Log.i("myUI","onSingleTapUp");
+//		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
+//		if(layoutParams.leftMargin>= 0)
+//		{
+//			new AsynMove().execute(-speed);
+//		}
+//		else
+//		{
+//			new AsynMove().execute(speed);
+//		}
 		return false;
 	}
 	
@@ -310,6 +348,26 @@ GestureDetector.OnGestureListener
 			super.onProgressUpdate(values);
 		}
 		
+	}
+	
+	public class myHandler extends Handler
+	{
+		public myHandler() {
+			// TODO Auto-generated constructor stub
+		}
+		
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			switch(msg.what)
+			{
+			case MENU_CLICKED:
+				jump();
+				break;
+				default: break;
+			}
+			super.handleMessage(msg);
+		}
 	}
 
 }
