@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.ActivityGroup;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -15,15 +16,17 @@ import android.view.GestureDetector;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnDrawListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-public class UserInterface extends ActivityGroup implements OnTouchListener,
+public class UserInterface extends Activity implements OnTouchListener,
 GestureDetector.OnGestureListener
 {
-
+	private LinearLayout contentLayout;
 	private LinearLayout menuLayout;
 	private LinearLayout UILayout;
+	private Button menuButton;
 	private GestureDetector UIGestureDetector;
 	private int window_width;
 	private static float FLIP_DISTANCE_X = 400;
@@ -47,8 +50,10 @@ GestureDetector.OnGestureListener
 	
 	public void init()
 	{
+		contentLayout = (LinearLayout)findViewById(R.id.ui_content);
 		menuLayout = (LinearLayout)findViewById(R.id.ui_menu);
-		UILayout = (LinearLayout)findViewById(R.id.ui_content);
+		UILayout = (LinearLayout)findViewById(R.id.ui_myui);
+		menuButton = (Button)findViewById(R.id.ui_content_menuBtn);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -71,11 +76,39 @@ GestureDetector.OnGestureListener
 				if(!hasMeasured)
 				{
 					window_width = getWindowManager().getDefaultDisplay().getWidth();
-					RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-					layoutParams.width = window_width;
-					UILayout.setLayoutParams(layoutParams);
-					hasMeasured = true;
+					RelativeLayout.LayoutParams layoutParams_UI = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
+//					RelativeLayout.LayoutParams layoutParams_menu = (RelativeLayout.LayoutParams)menuLayout.getLayoutParams();
+					LinearLayout.LayoutParams layoutParams_content = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
+//					layoutParams_menu.rightMargin = window_width;
+//					layoutParams_menu.width = RelativeLayout.LayoutParams.FILL_PARENT;
+					
+//					Log.i("myUI", "menu width: "+menuLayout.getWidth());
+//					Log.i("myUI", "menu height: "+layoutParams_menu.height);
+//					Log.i("myUI", "UI width: "+layoutParams_UI.width);
+//					Log.i("myUI", "UI height: "+layoutParams_UI.height);
+//					Log.i("myUI", "window width: "+window_width);
+					
 					menu_width = menuLayout.getWidth();
+//					layoutParams_menu.rightMargin = menu_width;
+//					layoutParams_menu.leftMargin = -menu_width;
+//					Log.i("myUI", "menu leftMargin: "+layoutParams_menu.leftMargin);
+//					Log.i("myUI", "menu rightMargin: "+layoutParams_menu.rightMargin);
+					
+					layoutParams_UI.width = window_width+menu_width;
+//					menuLayout.setLayoutParams(layoutParams_menu);
+					layoutParams_UI.leftMargin = -menu_width;
+//					layoutParams_UI.rightMargin = menu_width;
+					UILayout.setLayoutParams(layoutParams_UI);
+					
+					layoutParams_content.width = window_width;
+					
+					contentLayout.setLayoutParams(layoutParams_content);
+					Log.i("myUI", "UI width: "+UILayout.getWidth());
+					Log.i("myUI", "content width: "+contentLayout.getWidth());
+					UILayout.invalidate();
+					
+					hasMeasured = true;
+					
 				}
 				return true;
 			}
@@ -99,6 +132,7 @@ GestureDetector.OnGestureListener
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
 		// TODO Auto-generated method stub
+		Log.i("myUI","onFlip: arg2:"+arg2+", arg3: "+arg3);
 		int currentX = (int)arg1.getX();
 		int lastX = (int)arg0.getX();
 		if(isMenuOpen)
@@ -134,15 +168,15 @@ GestureDetector.OnGestureListener
 		// TODO Auto-generated method stub
 		if(isFinish)
 		{
-			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
+			RelativeLayout.LayoutParams layoutParams_UI = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
 			int currentSpeed = this.speed;
 			if(isMenuOpen)
 			{
 				currentSpeed = -currentSpeed;
 			}
 			
-			if(speedEnough || (!isMenuOpen && (layoutParams.leftMargin > window_width/2))
-					|| (isMenuOpen && layoutParams.leftMargin < window_width/2))
+			if(speedEnough || (!isMenuOpen && (layoutParams_UI.leftMargin > window_width/2- menu_width))
+					|| (isMenuOpen && layoutParams_UI.leftMargin < window_width/2 - menu_width))
 			{
 				new AsynMove().execute(currentSpeed);
 			}
@@ -165,6 +199,7 @@ GestureDetector.OnGestureListener
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
 		// TODO Auto-generated method stub
+		Log.i("myUI","onScroll: arg2:"+arg2+", arg3: "+arg3);
 		if(isFinish)
 		{
 			float distanceX = arg2;
@@ -177,23 +212,23 @@ GestureDetector.OnGestureListener
 		// TODO Auto-generated method stub
 		isScrolling = true;
 		mScrollX += distanceX;// distanceX: negative for right, positive for left
-		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-		layoutParams.leftMargin -= mScrollX;
-		layoutParams.rightMargin += mScrollX;
+		RelativeLayout.LayoutParams layoutParams_UI = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
+		layoutParams_UI.leftMargin -= mScrollX;
+//		layoutParams_UI.rightMargin += mScrollX;
 		
-		if(layoutParams.leftMargin <= 0)//向左拉过头
+		if(layoutParams_UI.leftMargin <= -menu_width)//向左拉过头
 		{
 			isScrolling = false;
-			layoutParams.leftMargin = 0;
-			layoutParams.rightMargin = 0;
+			layoutParams_UI.leftMargin = -menu_width;
+//			layoutParams_UI.rightMargin = 0;
 		}
-		else if(layoutParams.leftMargin >= menu_width)//向右拉过头
+		else if(layoutParams_UI.leftMargin  >= 0)//向右拉过头
 		{
 			isScrolling = false;
-			layoutParams.leftMargin = menu_width;
+			layoutParams_UI.leftMargin = 0;
 		}
-		UILayout.setLayoutParams(layoutParams);
-		menuLayout.invalidate();
+		UILayout.setLayoutParams(layoutParams_UI);
+//		menuLayout.invalidate();
 	}
 
 	@Override
@@ -205,8 +240,9 @@ GestureDetector.OnGestureListener
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0) {
 		// TODO Auto-generated method stub
+		Log.i("myUI","onSingleTapUp");
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-		if(layoutParams.leftMargin >= menu_width)
+		if(layoutParams.leftMargin>= 0)
 		{
 			new AsynMove().execute(-speed);
 		}
@@ -244,7 +280,7 @@ GestureDetector.OnGestureListener
 			// TODO Auto-generated method stub
 			isFinish = true;
 			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-			if(layoutParams.leftMargin >= menu_width)
+			if(layoutParams.leftMargin >= 0)
 			{
 				isMenuOpen = true;
 			}
@@ -259,18 +295,18 @@ GestureDetector.OnGestureListener
 		protected void onProgressUpdate(Integer... values) {
 			// TODO Auto-generated method stub
 			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-			if(values[0]>0)
+			if(values[0]>0)//右移
 			{
-				layoutParams.leftMargin = Math.min(layoutParams.leftMargin + values[0], menu_width);
-				layoutParams.rightMargin = Math.max(layoutParams.rightMargin - values[0], -menu_width);
+				layoutParams.leftMargin = Math.min(layoutParams.leftMargin + values[0], 0);
+//				layoutParams.rightMargin = Math.max(layoutParams.rightMargin - values[0], -menu_width);
 				
 			}
-			else
+			else//左移
 			{
-				layoutParams.leftMargin = Math.max(layoutParams.leftMargin + values[0], 0);
+				layoutParams.leftMargin = Math.max(layoutParams.leftMargin + values[0], -menu_width);
 			}
 			UILayout.setLayoutParams(layoutParams);
-			menuLayout.invalidate();
+//			menuLayout.invalidate();
 			super.onProgressUpdate(values);
 		}
 		
