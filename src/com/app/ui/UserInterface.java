@@ -6,6 +6,7 @@ import com.app.catherine.R.layout;
 
 import android.app.Activity;
 import android.app.ActivityGroup;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -103,6 +104,18 @@ GestureDetector.OnGestureListener
 		getMaxX();
 	}
 	
+	//单位从dip转化成px
+	public static int dip2px(Context context, float dpValue) {  
+        final float scale = context.getResources().getDisplayMetrics().density;  
+        return (int) (dpValue * scale + 0.5f);  
+    }  
+	
+	//单位从px转化成dip
+	public static int px2dip(Context context, float pxValue) {  
+        final float scale = context.getResources().getDisplayMetrics().density;  
+        return (int) (pxValue / scale + 0.5f);  
+    }  
+	
 	public void getMaxX()
 	{
 		ViewTreeObserver viewTreeObserver = UILayout.getViewTreeObserver();
@@ -115,35 +128,25 @@ GestureDetector.OnGestureListener
 				{
 					window_width = getWindowManager().getDefaultDisplay().getWidth();
 					RelativeLayout.LayoutParams layoutParams_UI = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-//					RelativeLayout.LayoutParams layoutParams_menu = (RelativeLayout.LayoutParams)menuLayout.getLayoutParams();
 					LinearLayout.LayoutParams layoutParams_content = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
-//					layoutParams_menu.rightMargin = window_width;
-//					layoutParams_menu.width = RelativeLayout.LayoutParams.FILL_PARENT;
+					LinearLayout.LayoutParams layoutParams_menu = (LinearLayout.LayoutParams)menuLayout.getLayoutParams();
+//					
+//					layoutParams_menu.width = (int) (window_width*0.6);
+					layoutParams_menu.width = dip2px(UserInterface.this, 200);
+					Log.i("myUI", "dp width: "+layoutParams_menu.width);
+					menuLayout.setLayoutParams(layoutParams_menu);
 					
-//					Log.i("myUI", "menu width: "+menuLayout.getWidth());
-//					Log.i("myUI", "menu height: "+layoutParams_menu.height);
-//					Log.i("myUI", "UI width: "+layoutParams_UI.width);
-//					Log.i("myUI", "UI height: "+layoutParams_UI.height);
-//					Log.i("myUI", "window width: "+window_width);
-					
-					menu_width = menuLayout.getWidth();
-//					layoutParams_menu.rightMargin = menu_width;
-//					layoutParams_menu.leftMargin = -menu_width;
-//					Log.i("myUI", "menu leftMargin: "+layoutParams_menu.leftMargin);
-//					Log.i("myUI", "menu rightMargin: "+layoutParams_menu.rightMargin);
-					
+					menu_width = layoutParams_menu.width;
 					layoutParams_UI.width = window_width+menu_width;
-//					menuLayout.setLayoutParams(layoutParams_menu);
 					layoutParams_UI.leftMargin = -menu_width;
-//					layoutParams_UI.rightMargin = menu_width;
 					UILayout.setLayoutParams(layoutParams_UI);
 					
 					layoutParams_content.width = window_width;
-					
 					contentLayout.setLayoutParams(layoutParams_content);
+					
 					Log.i("myUI", "UI width: "+UILayout.getWidth());
 					Log.i("myUI", "content width: "+contentLayout.getWidth());
-					UILayout.invalidate();
+//					UILayout.invalidate();
 					
 					hasMeasured = true;
 					
@@ -170,7 +173,7 @@ GestureDetector.OnGestureListener
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
 		// TODO Auto-generated method stub
-		Log.i("myUI","onFlip: arg2:"+arg2+", arg3: "+arg3);
+//		Log.i("myUI","onFlip: arg2:"+arg2+", arg3: "+arg3);
 		int currentX = (int)arg1.getX();
 		int lastX = (int)arg0.getX();
 		if(isMenuOpen)
@@ -237,7 +240,7 @@ GestureDetector.OnGestureListener
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
 		// TODO Auto-generated method stub
-		Log.i("myUI","onScroll: arg2:"+arg2+", arg3: "+arg3);
+//		Log.i("myUI","onScroll: arg2:"+arg2+", arg3: "+arg3);
 		if(isFinish)
 		{
 			float distanceX = arg2;
