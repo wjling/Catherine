@@ -13,6 +13,7 @@ import com.app.customwidget.PullUpDownView.onPullListener;
 import android.app.Activity;
 import android.app.ActivityGroup;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -68,6 +69,9 @@ GestureDetector.OnGestureListener
 	private MyEvents UI_myEvents;
 	private FriendsCenter UI_friendsCenter;
 	
+	private int userId = -1;
+	private String email;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -77,12 +81,17 @@ GestureDetector.OnGestureListener
 		
 		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
 		UI_Menu.setMenu();
+		
+		Intent intent = getIntent();
+		userId = intent.getIntExtra("userId", -1);
+		email = intent.getStringExtra("email");
 		init();
 		
 	}
 	
 	public void init()
 	{
+		
 		contentLayout = (LinearLayout)findViewById(R.id.ui_content);
 		menuLayout = (LinearLayout)findViewById(R.id.ui_menu);
 		UILayout = (LinearLayout)findViewById(R.id.ui_myui);
@@ -100,13 +109,13 @@ GestureDetector.OnGestureListener
 	{
 		UI_myEvents = new MyEvents(this, UI_Menu.getMyEventsView(), uiHandler);
 		UI_myEvents.init();
-		UI_myEvents.myEventsListView.setOnTouchListener(this);
+		UI_myEvents.myEventsListView.setOnTouchListener(this);	//非常重要的一步~聪明人秒懂
 		UI_myEvents.loadData();
 	}
 	
 	private void initFriendsCenter()
 	{
-		UI_friendsCenter = new FriendsCenter(this, UI_Menu.getFriendsCenterView());
+		UI_friendsCenter = new FriendsCenter(this, UI_Menu.getFriendsCenterView(), userId);
 		UI_friendsCenter.init();
 	}
 	

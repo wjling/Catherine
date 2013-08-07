@@ -515,7 +515,7 @@ public class loginAndreg extends Activity
 							//Ìø×ªµ½UserInterface.java
 							Intent intent = new Intent();
 							intent.setClass(loginAndreg.this, UserInterface.class);
-							intent.putExtra("userId", ""+userId);
+							intent.putExtra("userId", userId);
 							intent.putExtra("email", loginEmail);
 							startActivity(intent);
 							loginAndreg.this.finish();

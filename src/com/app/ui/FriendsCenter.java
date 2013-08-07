@@ -18,10 +18,11 @@ public class FriendsCenter {
 	
 	private int userId = -1;
 	
-	public FriendsCenter(Context context, View friendsCenterView) {
+	public FriendsCenter(Context context, View friendsCenterView, int userId) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.friendsCenterView = friendsCenterView;
+		this.userId = userId;
 	}
 	
 	
