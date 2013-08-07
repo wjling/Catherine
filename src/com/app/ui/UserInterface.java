@@ -86,7 +86,7 @@ GestureDetector.OnGestureListener
 		
 		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
 		UI_Menu.setMenu();
-		init();
+//		init();
 		
 	}
 	
