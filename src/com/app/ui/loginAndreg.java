@@ -517,7 +517,8 @@ public class loginAndreg extends Activity
 							intent.setClass(loginAndreg.this, UserInterface.class);
 							intent.putExtra("userId", ""+userId);
 							intent.putExtra("email", loginEmail);
-							startActivity(intent);		
+							startActivity(intent);
+							loginAndreg.this.finish();
 						}
 						else if (ReturnCode.PASSWD_NOT_CORRECT==cmdLogin)								
 							Toast.makeText(loginAndreg.this, "√‹¬Î¥ÌŒÛ£¨«Î÷ÿ–¬ ‰»Î", Toast.LENGTH_SHORT).show();								
