@@ -44,30 +44,27 @@ GestureDetector.OnGestureListener
 	private static final int MENU_CLICKED = -2;
 	private LinearLayout contentLayout;
 	private LinearLayout menuLayout;
-	private LinearLayout UILayout;
+	private LinearLayout UILayout; //UILayout分为左右两部分，左边是Menu,右边是Content
 	private LinearLayout showContentLayout;
 	private Button menuButton;
 	private GestureDetector UIGestureDetector;
 	private int window_width;
-	private static float FLIP_DISTANCE_X = 400;
-	private int speed = 30;
+	private static float FLIP_DISTANCE_X = 400;	//检测甩手动作时候的最低速度值
+	private int speed = 30;					//用于菜单栏自动回滚过程中的速度
 	private int menu_width = 0;
-	private int mScrollX;
-	private boolean isScrolling = false;
-	private boolean isFinish = true;
-	private boolean isMenuOpen = false;
+	private int mScrollX;		//Scroll过程中X轴方向的位移
+	private boolean isScrolling = false;	//是否滚动
+	private boolean isFinish = true;		//是否后台回滚完毕
+	private boolean isMenuOpen = false;		//是否显示了菜单栏
 	private boolean hasMeasured = false;
-	
-	private int motionLastX;
-	private int motionLastY;
-	
 	private Menu UI_Menu;
 	private myHandler uiHandler = new myHandler();
 	
 	//My Events 
-	private static final int MSG_WHAT_LOAD_DATA_DONE = -3;
-	private static final int MSG_WHAT_REFRESH_DONE = -4;
-	private static final int MSG_WHAT_GET_MORE_DONE = -5;
+	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
+	private static final int MSG_WHAT_LOAD_DATA_DONE = -4;
+	private static final int MSG_WHAT_REFRESH_DONE = -5;
+	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
 	private View myEventsView;
 	private PullUpDownView myEventsPullUpDownView;
@@ -77,6 +74,8 @@ GestureDetector.OnGestureListener
 	
 	private ArrayAdapter<String> myEventsAdapter;
 	private List<String> myEventsCards = new ArrayList<String>();
+	
+	private FriendsCenter UI_friendsCenter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,14 +87,6 @@ GestureDetector.OnGestureListener
 		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
 		UI_Menu.setMenu();
 		init();
-		setLayout();
-		Button newButton = new Button(this);
-		newButton.setText("xxxxx");
-		LinearLayout.LayoutParams buttonParams= new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-//		buttonParams.leftMargin = 30;
-		newButton.setFocusable(true);
-		newButton.setOnTouchListener(this);
-		menuLayout.addView(newButton,buttonParams);
 		
 	}
 	
@@ -108,6 +99,7 @@ GestureDetector.OnGestureListener
 		menuButton = (Button)findViewById(R.id.ui_content_menuBtn);
 		menuButton.setOnClickListener(menuButtonOnClickListener);
 		initMyEvents();
+		initFriendsCenter();
 	}
 	
 	private void initMyEvents()
@@ -134,7 +126,7 @@ GestureDetector.OnGestureListener
 					@Override
 					public void run() {
 						try {
-							Thread.sleep(2000);
+							Thread.sleep(1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}				
@@ -176,7 +168,16 @@ GestureDetector.OnGestureListener
 		myEventsAdapter = new ArrayAdapter<String>(this, R.layout.pulldown_item, myEventsCards);
 		myEventsListView.setAdapter(myEventsAdapter);
 		
+		UILayout.setOnTouchListener(this);
+		UIGestureDetector = new GestureDetector(this);
+		UIGestureDetector.setIsLongpressEnabled(false);
+		setParams();
 		loadData();
+	}
+	
+	private void initFriendsCenter()
+	{
+		UI_friendsCenter = new FriendsCenter(this, UI_Menu.getFriendsCenterView());
 	}
 	
 	
@@ -190,6 +191,7 @@ GestureDetector.OnGestureListener
 	};
 	public void jump()
 	{
+		
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
 		Log.i("myUI","In jump(): leftMargin = "+ layoutParams.leftMargin);
 		if(layoutParams.leftMargin>= 0)
@@ -202,14 +204,6 @@ GestureDetector.OnGestureListener
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void setLayout()
-	{
-		UILayout.setOnTouchListener(this);
-		UIGestureDetector = new GestureDetector(this);
-		UIGestureDetector.setIsLongpressEnabled(false);
-		getMaxX();
-	}
 	
 	//单位从dip转化成px
 	public static int dip2px(Context context, float dpValue) {  
@@ -223,7 +217,7 @@ GestureDetector.OnGestureListener
         return (int) (pxValue / scale + 0.5f);  
     }  
 	
-	public void getMaxX()
+	public void setParams()
 	{
 		ViewTreeObserver viewTreeObserver = UILayout.getViewTreeObserver();
 		viewTreeObserver.addOnPreDrawListener(new OnPreDrawListener() {
@@ -236,7 +230,7 @@ GestureDetector.OnGestureListener
 					window_width = getWindowManager().getDefaultDisplay().getWidth();
 					RelativeLayout.LayoutParams layoutParams_UI = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
 					LinearLayout.LayoutParams layoutParams_content = (LinearLayout.LayoutParams)contentLayout.getLayoutParams();
-					LinearLayout.LayoutParams layoutParams_menu = (LinearLayout.LayoutParams)menuLayout.getLayoutParams();
+//					LinearLayout.LayoutParams layoutParams_menu = (LinearLayout.LayoutParams)menuLayout.getLayoutParams();
 //					
 //					layoutParams_menu.width = (int) (window_width*0.6);
 //					layoutParams_menu.width = dip2px(UserInterface.this, 200);
@@ -265,7 +259,7 @@ GestureDetector.OnGestureListener
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
-		Log.i("myUI","UI onTouch: "+event.getAction());
+//		Log.i("myUI","UI onTouch: "+event.getAction());
 		return UIGestureDetector.onTouchEvent(event);
 	}
 
@@ -289,31 +283,31 @@ GestureDetector.OnGestureListener
 		int deltaY = (int) (arg1.getY() - arg0.getY());
 		if(Math.abs(deltaX) >= Math.abs(deltaY))
 		{
-		if(isMenuOpen)
-		{
-			if(!isScrolling && currentX - lastX >= 0)
+			if(isMenuOpen)
 			{
-				return false;
+				if(!isScrolling && currentX - lastX >= 0)
+				{
+					return false;
+				}
 			}
-		}
-		else
-		{
-			if(!isScrolling && currentX - lastX <= 0)
+			else
 			{
-				return false;
+				if(!isScrolling && currentX - lastX <= 0)
+				{
+					return false;
+				}
 			}
-		}
-		
-		boolean speedEnough = false;
-		if(arg2 > FLIP_DISTANCE_X || arg2 < -FLIP_DISTANCE_X)
-		{
-			speedEnough = true;
-		}
-		else
-		{
-			speedEnough = false;
-		}
-		doCloseScroll(speedEnough);
+			
+			boolean speedEnough = false;
+			if(arg2 > FLIP_DISTANCE_X || arg2 < -FLIP_DISTANCE_X)
+			{
+				speedEnough = true;
+			}
+			else
+			{
+				speedEnough = false;
+			}
+			doCloseScroll(speedEnough);
 		
 		}
 		else
@@ -336,7 +330,7 @@ GestureDetector.OnGestureListener
 				currentSpeed = -currentSpeed;
 			}
 			
-			Log.i("myUI", "In doCloseScroll: leftMargin = "+ layoutParams_UI.leftMargin);
+//			Log.i("myUI", "In doCloseScroll: leftMargin = "+ layoutParams_UI.leftMargin);
 			if(speedEnough || (!isMenuOpen && (layoutParams_UI.leftMargin > window_width/2- menu_width))
 					|| (isMenuOpen && layoutParams_UI.leftMargin < window_width/2 - menu_width))
 			{
@@ -493,7 +487,33 @@ GestureDetector.OnGestureListener
 			switch(msg.what)
 			{
 			case MENU_CLICKED:
-				jump();
+				View menu = (View) msg.obj;
+				jump(); // Jump to the corresponding page
+				// Something should be done corresponding menu button
+				switch(menu.getId())
+				{
+				case R.id.ui_menu_myevents:
+					loadData();
+					break;
+				case R.id.ui_menu_privateevents:
+					break;
+				case R.id.ui_menu_recommendedevents:
+					break;
+				case R.id.ui_menu_friendscenter:
+					
+					break;
+				case R.id.ui_menu_update:
+					break;
+				case R.id.ui_menu_settings:
+					break;
+				case R.id.ui_menu_exit:
+					UserInterface.this.finish();
+					break;
+					default: break;
+				}
+				break;
+			case MSG_WHAT_ON_LOAD_DATA:
+				myEventsPullUpDownView.notifyOnLoadData();
 				break;
 			case MSG_WHAT_LOAD_DATA_DONE:
 				if(msg.obj != null)
@@ -530,6 +550,9 @@ GestureDetector.OnGestureListener
 			
 			@Override
 			public void run() {
+				myEventsCards.clear();
+				Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
+				msg1.sendToTarget();
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
@@ -539,12 +562,13 @@ GestureDetector.OnGestureListener
 				for (String body : mStringArray) {
 					strings.add(body);
 				}
-				Message msg = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
-				msg.obj = strings;
-				msg.sendToTarget();
+				Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
+				msg2.obj = strings;
+				msg2.sendToTarget();
 			}
 		}).start();
 	}
+	
 	// 模拟数据
 	private String[] mStringArray = {
             "A", "B", "C", "D", "E"

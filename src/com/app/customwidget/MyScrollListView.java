@@ -17,42 +17,35 @@ public class MyScrollListView extends ListView{
 		// TODO Auto-generated constructor stub
 	}
 	
+	/**
+	 * @author WJL
+	 * 初始话自定义listview，包括正数第listTopPosition个位置为最前的位置
+	 * 和倒数第listBottomPosition个位置为最后的位置
+	 */
 	private void init() {
 		// TODO Auto-generated method stub
 		listTopPosition = 0;
 		listBottomPosition = 1;
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.widget.AbsListView#onTouchEvent(android.view.MotionEvent)
+	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		// TODO Auto-generated method stub
 		final int action = ev.getAction();
-		boolean forReturn = true;
 		final int motionCurrentY = (int)ev.getY();
-		final int motionCurrentX = (int) ev.getX();
-//		int deltaX = 0;
-//		int deltaY = 0;
 		
 		switch(action)
 		{
 		case MotionEvent.ACTION_DOWN:
-			Log.i("MyScrollListView","ACTION_DOWN");
-//			int deltaX = motionCurrentX - motionLastX;
-			
+//			Log.i("MyScrollListView","ACTION_DOWN");
 			motionLastY = motionCurrentY;
-			motionLastX = motionCurrentX;
-			boolean isMotionDown = myScrollListViewListner.onMotionDown(ev);
-//			if(isMotionDown)
-//			{
-//				motionLastX = motionCurrentX;
-//				motionLastY = motionCurrentY;
-//				return isMotionDown;
-//			}
-			forReturn = true;
-//			return true;
+			myScrollListViewListner.onMotionDown(ev);
 			break;
 		case MotionEvent.ACTION_MOVE:
-			Log.i("MyScrollListView","ACTION_MOVE");
+//			Log.i("MyScrollListView","ACTION_MOVE");
 			
 			final int childCount = getChildCount();//当前页面可见的child的个数
 			if(childCount == 0) return super.onTouchEvent(ev);
@@ -64,73 +57,36 @@ public class MyScrollListView extends ListView{
 			float listEnd = getHeight() - getListPaddingBottom();
 			
 			int totalItemCount = getAdapter().getCount() - listBottomPosition;
-//			deltaX = motionCurrentX - motionLastX;
 			int deltaY = motionCurrentY - motionLastY;
-//			Log.i("SLV", "Move: dx= "+ deltaX + ", dy = "+ deltaY);
-//			if( Math.abs(deltaX) < Math.abs(deltaY))
-//			{
 			int firstVisiblePosition = getFirstVisiblePosition();
 			Log.i("MyScrollListView", "dy = "+deltaY);
-			boolean isMotionMoveHandled = myScrollListViewListner.onMotionMove(ev, deltaY);
-			boolean isOnListOnTopAndPullDownHandled;
-			boolean isOnListOnBottomAndPullUpHandled;
+			myScrollListViewListner.onMotionMove(ev, deltaY);
 			
 			if(firstVisiblePosition <= listTopPosition && firstItemTop >= listBegin && deltaY > 0)
 			{
 				Log.i("MyScrollListView", "---------------Pull Down");
-				isOnListOnTopAndPullDownHandled = myScrollListViewListner.onListViewTopAndPullDown(deltaY);
-				motionLastX = motionCurrentX;
+				myScrollListViewListner.onListViewTopAndPullDown(deltaY);
 				motionLastY = motionCurrentY;
-//				return isMotionMoveHandled && isOnListOnTopAndPullDownHandled;
 			}
 			
 			if(firstVisiblePosition + childCount >= totalItemCount && lastItemBottom <= listEnd && deltaY < 0)
 			{
 				Log.i("MyScrollListView", "---------------Pull Up");
-				isOnListOnBottomAndPullUpHandled = myScrollListViewListner.onListViewBottomAndPullUp(deltaY);
-				motionLastX = motionCurrentX;
+				myScrollListViewListner.onListViewBottomAndPullUp(deltaY);
 				motionLastY = motionCurrentY;
-//				return isMotionMoveHandled && isOnListOnBottomAndPullUpHandled;
 			}
-//			}
-			forReturn = false;
+
 			break;
 		case MotionEvent.ACTION_UP:
-			Log.i("MyScrollListView","ACTION_UP");
-//			deltaX = motionCurrentX - motionLastX;
-//			deltaY = motionCurrentY - motionLastY;
-//			Log.i("SLV", "Up: dx= "+ deltaX + ", dy = "+ deltaY);
-//			if( Math.abs(deltaX) < Math.abs(deltaY))
-//			{
-//			motionLastX = motionCurrentX;
-//			motionLastY = motionCurrentY;
-			
-			boolean isMotionUp = myScrollListViewListner.onMotionUp(ev);
-//			if(isMotionUp)
-//			{
-//				motionLastY = motionCurrentY;
-//				return isMotionUp;
-//			}
-//			return true;
-//			}
-//			else
-//			{
-//			motionLastX = motionCurrentX;
-//			motionLastY = motionCurrentY;
-//			return false;
-//			}
-			forReturn = false;
+//			Log.i("MyScrollListView","ACTION_UP");
+			motionLastY = motionCurrentY;
+			myScrollListViewListner.onMotionUp(ev);
 			break;
 			default: break;
 		}
-		motionLastY = motionCurrentY;
-		super.onTouchEvent(ev);
-//		forReturn = super.onTouchEvent(ev);
-//		Log.i("MyScrollListView","onTouchEvent(ev): "+forReturn);
-		Log.i("MyScrollListView", "forReturn: "+ forReturn);
-//		return super.onTouchEvent(ev);
 		
-		return forReturn;
+		return super.onTouchEvent(ev);
+		
 	}
 	
 	/**
@@ -170,6 +126,12 @@ public class MyScrollListView extends ListView{
 		}
 	};
 	
+	/**
+	 * @author WJL
+	 * 将myScrollListViewListener设置成具体实现的listener
+	 * 
+	 * @param listener 具体实现的listener
+	 */
 	public void setOnScrollListViewListener(onScrollListViewListener listener)
 	{
 		myScrollListViewListner = listener;

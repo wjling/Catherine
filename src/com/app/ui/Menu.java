@@ -35,6 +35,10 @@ public class Menu {
 	private View view;	//基础ui布局界面
 	private View myEventsView;
 	private View privateEventsView;
+	private View recommendedEventsView;
+	private View friendsCenterView;
+	private View updateView;
+	private View settingsView;
 	private View currentUI;
 	private Handler handler;
 	
@@ -47,14 +51,25 @@ public class Menu {
 		this.handler = handler;
 	}
 	
+	
 	public View getCurrentUI()
 	{
 		return currentUI;
 	}
 	
+	/**
+	 * @author WJL
+	 * @description Return View of My Events
+	 * @return
+	 */
 	public View getMyEventsView()
 	{
 		return myEventsView;
+	}
+	
+	public View getFriendsCenterView()
+	{
+		return friendsCenterView;
 	}
 	
 	public void setMenu()
@@ -84,13 +99,16 @@ public class Menu {
 		
 		currentMenuView = myEventsBtn;
 		currentMenuView.setTag(1);
-//		currentMenuIndex = 1;
 		
 		myEventsView = LayoutInflater.from(context).inflate(R.layout.menu_my_events, null);
+		privateEventsView = LayoutInflater.from(context).inflate(R.layout.menu_private_events, null);
+		recommendedEventsView = LayoutInflater.from(context).inflate(R.layout.menu_recommended_events, null);
+		friendsCenterView = LayoutInflater.from(context).inflate(R.layout.menu_friends_center, null);
+		updateView = LayoutInflater.from(context).inflate(R.layout.menu_update, null);
+		settingsView = LayoutInflater.from(context).inflate(R.layout.menu_settings, null);
+		
 		currentUI = myEventsView;
 		
-//		myEventsBtn.setOnClickListener(menuOnClickListener);
-//		privateEventsBtn.setOnClickListener(menuOnClickListener);
 		myEventsBtn.setOnTouchListener(menuOnTouchListener);
 		privateEventsBtn.setOnTouchListener(menuOnTouchListener);
 		recommendEventsBtn.setOnTouchListener(menuOnTouchListener);
@@ -111,45 +129,46 @@ public class Menu {
 			{
 			case R.id.ui_menu_myevents:
 				buttonBackGroundChange(v,event,1);
-				currentUI = LayoutInflater.from(context).inflate(R.layout.menu_my_events, null);
+				currentUI = myEventsView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
-				Toast.makeText(context, "My Events", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(context, "My Events", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.ui_menu_privateevents:
 				buttonBackGroundChange(v,event,2);
-				currentUI = LayoutInflater.from(context).inflate(R.layout.menu_private_events, null);
+				currentUI = privateEventsView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
-				Toast.makeText(context, "Private Events", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(context, "Private Events", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.ui_menu_recommendedevents:
 				buttonBackGroundChange(v,event,3);
-				currentUI = LayoutInflater.from(context).inflate(R.layout.menu_recommended_events, null);
+				currentUI = recommendedEventsView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
-				Toast.makeText(context, "Recommended Events", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(context, "Recommended Events", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.ui_menu_friendscenter:
 				buttonBackGroundChange(v,event,4);
-				currentUI = LayoutInflater.from(context).inflate(R.layout.menu_friends_center, null);
+				currentUI = friendsCenterView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
-				Toast.makeText(context, "Friends Center", Toast.LENGTH_SHORT).show();
+				ui_content.invalidate();
+//				Toast.makeText(context, "Friends Center", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.ui_menu_update:
 				buttonBackGroundChange(v,event,5);
-				currentUI = LayoutInflater.from(context).inflate(R.layout.menu_update, null);
+				currentUI = updateView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
-				Toast.makeText(context, "Update", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(context, "Update", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.ui_menu_settings:
 				buttonBackGroundChange(v,event,6);
-				currentUI = LayoutInflater.from(context).inflate(R.layout.menu_settings, null);
+				currentUI = settingsView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
-				Toast.makeText(context, "Settings", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(context, "Settings", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.ui_menu_exit:
 				buttonBackGroundChange(v,event,7);
@@ -185,6 +204,7 @@ public class Menu {
 			v.setBackgroundDrawable(resources.getDrawable(R_id));
 			Message msg = new Message(); 
 			msg.what = -2;
+			msg.obj = v;
 			handler.sendMessage(msg);
 			break;
 			default: break;

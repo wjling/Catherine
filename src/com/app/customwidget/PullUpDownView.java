@@ -27,29 +27,33 @@ import android.widget.LinearLayout.LayoutParams;
 
 public class PullUpDownView extends LinearLayout implements onScrollListViewListener{
 
-	private static final float PULL_DISTANCE_LIMIT = 50;
-	private static final float AUTO_INCREMENT = 10;
-	private static final int DEFAULT_HEADER_HEIGHT = 105;
+	private static final float PULL_DISTANCE_LIMIT = 50;	// The critical value of pull distance. If pull distance
+															// doesn't reach the value, we will ignore the pull action
+	private static final float AUTO_INCREMENT = 10;			// A unit height used for the change of the height
+	private static final int DEFAULT_HEADER_HEIGHT = 110;	// The default height of the header
 	
-	private static final int MSG_WHAT_LOAD_DATA_DONE = -2;
-	private static final int MSG_WHAT_ON_REFRESH = -3;
-	private static final int MSG_WHAT_REFRESH_DONE = -4;
-	private static final int MSG_WHAT_GET_MORE_DONE = -5;
-	private static final int MSG_WHAT_SET_HEADER_HEIGHT = -6;
+	private static final int MSG_WHAT_ON_LOAD_DATA = -1;	//msg.what: Before loading data
+	private static final int MSG_WHAT_LOAD_DATA_DONE = -2;	//msg.what: Loading data has been done 
+	private static final int MSG_WHAT_ON_REFRESH = -3;		//msg.what: Before refreshing
+	private static final int MSG_WHAT_REFRESH_DONE = -4;	//msg.what: Refreshing has been done
+	private static final int MSG_WHAT_GET_MORE_DONE = -5;	//msg.what: Getting more data has been done
+	private static final int MSG_WHAT_SET_HEADER_HEIGHT = -6;	//msg.what: set the height of the header
 	
-	private static final int HEADER_STATE_IDLE = 0;
-	private static final int HEADER_STATE_OVER_HEIGHT = 1;
-	private static final int HEADER_STATE_NOT_OVER_HEIGHT = 2;
+	// Header states
+	private static final int HEADER_STATE_IDLE = 0;	// State of idle
+	private static final int HEADER_STATE_OVER_HEIGHT = 1;	// State of over the default height
+	private static final int HEADER_STATE_NOT_OVER_HEIGHT = 2;	// State of not over the default height
 	
-	private int headerIncrement;
-	private int headerState = HEADER_STATE_IDLE;
-	private float motionDownY;
+	private int headerIncrement;		// Record the current height of the header
+	private int headerState = HEADER_STATE_IDLE;	// Initialize the state of the header
+	private float motionDownY;		// Record the Y-coordinate when touch action is DOWN
 	
-	private boolean isDown;
-	private boolean isRefreshing;
-	private boolean isGetingMore;
-	private boolean isPullBackDone;
+	private boolean isDown;		// If touch action is DOWN or not
+	private boolean isRefreshing;	// If is Refreshing or not
+	private boolean isGettingMore;	// If is Getting more data or not
+	private boolean isPullBackDone; // If executing operation of pull back or not
 	
+	// Something about views
 	private View headerView;
 	private LayoutParams headerViewParams;	
 	private TextView headerViewDateView;
@@ -62,11 +66,16 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 	private MyScrollListView myListView;
 	
 	private onPullListener myOnPullListener;
-	private RotateAnimation rotate0To180Animation;
-	private RotateAnimation rotate180To0Animation;
+	private RotateAnimation rotate0To180Animation;	// Animation that rotate from 0 degree to 180 degree
+	private RotateAnimation rotate180To0Animation;	// Animation that rotate from 180 degree to 0 degree
 
 	private myHandler viewHandler = new myHandler();
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm");
+	
+	/**
+	 * @author WJL
+	 * An interface to handle the pull events
+	 */
 	public interface onPullListener 
 	{
 		/**
@@ -82,45 +91,90 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		void GetMore();
 	}
 	
+	/**
+	 * @author WJL
+	 * a Constructor of PullUpDownView
+	 * @param context
+	 */
 	public PullUpDownView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 		initHeaderAndFooterAndListView(context);
 	}
 	
+	/**
+	 * @author WJL
+	 * a Constructor of PullUpDownView
+	 * @param context
+	 * @param attrs
+	 */
 	public PullUpDownView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
 		initHeaderAndFooterAndListView(context);
 	}
 	
+	/**
+	 * @author WJL
+	 * Notify before loading data
+	 */
+	public void notifyOnLoadData()
+	{
+		viewHandler.sendEmptyMessage(MSG_WHAT_ON_LOAD_DATA);
+	}
+	
+	/**
+	 * @author WJL
+	 * Notify if loading data is done
+	 */
 	public void notifyLoadDataDone()
 	{
 		viewHandler.sendEmptyMessage(MSG_WHAT_LOAD_DATA_DONE);
 	}
 	
+	/**
+	 * @author WJL
+	 * Notify if refreshing is done
+	 */
 	public void notifyRefreshDone()
 	{
 		viewHandler.sendEmptyMessage(MSG_WHAT_REFRESH_DONE);
 	}
 	
+	/**
+	 * @author WJL
+	 * Notify if getting more data is done
+	 */
 	public void notifyGetMoreDone()
 	{
 		viewHandler.sendEmptyMessage(MSG_WHAT_GET_MORE_DONE);
 	}
 	
+	/**
+	 * @author WJL
+	 * Set myOnPullListener
+	 * @param listener The definite listener
+	 */
 	public void setOnPullListener(onPullListener listener)
 	{
 		myOnPullListener = listener;
 	}
 	
+	/**
+	 * @author WJL
+	 * 
+	 * @return Return the ListView, which is instance of MyScrollListView
+	 */
 	public ListView getListView()
 	{
 		return myListView;
 	}
 	
-
-	
+	/**
+	 * @author WJL
+	 * Initialization of header, footer and listview
+	 * @param context
+	 */
 	private void initHeaderAndFooterAndListView(Context context)
 	{
 		setOrientation(LinearLayout.VERTICAL);
@@ -143,9 +197,9 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				if(!isGetingMore)
+				if(!isGettingMore)
 				{
-					isGetingMore = true;
+					isGettingMore = true;
 					footerLoadingView.setVisibility(View.VISIBLE);
 					myOnPullListener.GetMore();
 				}
@@ -186,16 +240,20 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		
 	}
 	
+	/**
+	 * @author WJL
+	 * Check the header state 
+	 */
 	private void checkHeaderViewState()
 	{
-		if(headerViewParams.height >= DEFAULT_HEADER_HEIGHT)
+		if(headerViewParams.height >= DEFAULT_HEADER_HEIGHT) // If the pull down distance is enough
 		{
 			if(headerState == HEADER_STATE_OVER_HEIGHT) return;
 			headerState = HEADER_STATE_OVER_HEIGHT;
 			headerTextView.setText("松开可以刷新");
 			headerArrowView.startAnimation(rotate0To180Animation);
 		}
-		else
+		else	// If the pull down distance is not enough
 		{
 			if(headerState == HEADER_STATE_NOT_OVER_HEIGHT || headerState == HEADER_STATE_IDLE) return;
 			headerState = HEADER_STATE_NOT_OVER_HEIGHT;
@@ -204,6 +262,11 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		}
 	}
 	
+	/**
+	 * @author WJL
+	 * Set the height of the header
+	 * @param height	Value of the new height of the header
+	 */
 	private void setHeaderHeight(int height)
 	{
 		headerIncrement = height;
@@ -211,23 +274,27 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		headerView.setLayoutParams(headerViewParams);
 	}
 	
+	/**
+	 * @author WJL
+	 * The TimerTask that realize the action of hiding the header,
+	 * under the circumstance of pulling down distance is not enough
+	 */
 	private class HideHeaderTimerTask extends TimerTask
 	{
 
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			if(!isDown)
+			if(!isDown)	// When is not under a touch event
 			{
-				headerIncrement -= AUTO_INCREMENT;
-				if(headerIncrement < 0)			//////
+				headerIncrement -= AUTO_INCREMENT;	// The current height of the header is slowing toward 0
+				if(headerIncrement < 0)			// If the current height of the header is less than 0
 				{
-					headerIncrement = 0;
+					headerIncrement = 0;	// Reset height of the header to 0
 					viewHandler.sendEmptyMessage(MSG_WHAT_SET_HEADER_HEIGHT);
-					cancel();
-					
+					cancel();	// The task is done
 				}
-				else
+				else	// Set height of the header and continue reduce the height of the header
 				{
 					viewHandler.sendEmptyMessage(MSG_WHAT_SET_HEADER_HEIGHT);
 				}
@@ -240,26 +307,30 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		
 	}
 	
+	/**
+	 * @author WJL
+	 * The TimeTask that realize the action of showing the header, 
+	 * under the circumstance of pulling down too much
+	 */
 	private class ShowHeaderTimerTask extends TimerTask
 	{
 
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			if(!isDown)
+			if(!isDown)	// When is not under a touch event
 			{
-				headerIncrement -= AUTO_INCREMENT;
-				if(headerIncrement <= DEFAULT_HEADER_HEIGHT)			//////
+				headerIncrement -= AUTO_INCREMENT;		// The current height of the header is slowing toward the default height
+				if(headerIncrement <= DEFAULT_HEADER_HEIGHT)			// If current height of the header is less than the default height
 				{
-					headerIncrement = DEFAULT_HEADER_HEIGHT;
+					headerIncrement = DEFAULT_HEADER_HEIGHT;			// Reset the height of the header
 					viewHandler.sendEmptyMessage(MSG_WHAT_SET_HEADER_HEIGHT);
-					if(!isRefreshing)
+					if(!isRefreshing)			// Judge if is handling refreshing. If not, do the refreshing
 					{
 						isRefreshing = true;
 						viewHandler.sendEmptyMessage(MSG_WHAT_ON_REFRESH);
 					}
 					cancel();
-					
 				}
 				else
 				{
@@ -274,6 +345,10 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		
 	}
 	
+	/**
+	 * @author WJL
+	 * Show the footerView
+	 */
 	private void showFooterView()
 	{
 		if(myListView.getFooterViewsCount() == 0 && isFillScreen())
@@ -283,20 +358,33 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		}
 	}
 	
+	/**
+	 * @author WJL
+	 * Judge if the visible items are full of the listview
+	 * @return
+	 */
 	private boolean isFillScreen()////////
 	{
-		int firstVisiblePosition = myListView.getFirstVisiblePosition();
-		int lastVisiblePosition = myListView.getLastVisiblePosition() - myListView.getFooterViewsCount();
-		int visibleItemsCount = lastVisiblePosition - firstVisiblePosition + 1;
-		int totalItemsCount = myListView.getCount() - myListView.getFooterViewsCount();
-		Log.i("PDV","visibleCount: "+visibleItemsCount+", totalCount: "+ totalItemsCount);
-		if(visibleItemsCount < totalItemsCount) return true;
+		int childCount = myListView.getChildCount();
+//		int firstVisiblePosition = myListView.getFirstVisiblePosition();
+//		int lastVisiblePosition = myListView.getLastVisiblePosition() - myListView.getFooterViewsCount();
+//		int visibleItemsCount = lastVisiblePosition - firstVisiblePosition + 1;
+//		int totalItemsCount = myListView.getCount() - myListView.getFooterViewsCount();
+//		Log.i("PDV","visibleCount: "+visibleItemsCount+", totalCount: "+ totalItemsCount);
+		int lastVisiblePositionBottom = footerView.getBottom();
+		int listEnd = myListView.getHeight() - myListView.getPaddingBottom();
+		if(lastVisiblePositionBottom <= listEnd) return true;
+//		if(visibleItemsCount < totalItemsCount) return true;
 //		int visibleLastItem = lastVisiblePosition + 1;
 //		int lastItem = myListView.getCount() - myListView.getFooterViewsCount();
 //		if(visibleLastItem < lastItem) return false;
 		else return false;
 	}
 	
+	/**
+	 * @author WJL
+	 * Custom handler
+	 */
 	private class myHandler extends Handler
 	{
 		public myHandler() {
@@ -308,6 +396,10 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 			// TODO Auto-generated method stub
 			switch(msg.what)
 			{
+			case MSG_WHAT_ON_LOAD_DATA:
+				footerLoadingView.setVisibility(VISIBLE);
+				footerTextView.setText("加载中...");
+				break;
 			case MSG_WHAT_LOAD_DATA_DONE:
 				headerViewParams.height = 0;
 				headerLoadingView.setVisibility(View.GONE);
@@ -334,8 +426,8 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 				showFooterView();
 				break;
 			case MSG_WHAT_GET_MORE_DONE:
-				isGetingMore = false;
-				footerTextView.setText("还有更多哦~~亲");
+				isGettingMore = false;
+				footerTextView.setText("点击我还有更多哦~~亲");
 				footerLoadingView.setVisibility(View.GONE);
 				break;
 			case MSG_WHAT_SET_HEADER_HEIGHT:
@@ -365,10 +457,10 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 	@Override
 	public boolean onListViewBottomAndPullUp(int deltaY) {
 		// TODO Auto-generated method stub
-		if(isGetingMore) return false;
+		if(isGettingMore) return false;
 		if(isFillScreen())
 		{
-			isGetingMore = true;
+			isGettingMore = true;
 			footerLoadingView.setVisibility(View.VISIBLE);
 			footerTextView.setText("加载中...");
 			myOnPullListener.GetMore();
@@ -436,18 +528,6 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 			return true;
 		}
 		return false;
-	}
-	
-//	@Override
-//	public boolean onTouchEvent(MotionEvent event) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		// TODO Auto-generated method stub
-		Log.i("PullUD", "onTouchEvent: event.action: "+ event.getAction());
-		return super.onTouchEvent(event);
 	}
 
 }
