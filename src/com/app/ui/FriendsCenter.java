@@ -22,7 +22,12 @@ public class FriendsCenter {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.friendsCenterView = friendsCenterView;
-		init();
+	}
+	
+	
+	public void init() {
+		// TODO Auto-generated method stub
+		setLayout();
 	}
 	
 	public void setLayout()
@@ -31,10 +36,6 @@ public class FriendsCenter {
 		addFriendsBtn.setOnClickListener(buttonsOnClickListener);
 	}
 
-	private void init() {
-		// TODO Auto-generated method stub
-		setLayout();
-	}
 	
 	OnClickListener buttonsOnClickListener = new OnClickListener() {
 		

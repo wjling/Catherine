@@ -45,7 +45,6 @@ GestureDetector.OnGestureListener
 	private LinearLayout contentLayout;
 	private LinearLayout menuLayout;
 	private LinearLayout UILayout; //UILayout分为左右两部分，左边是Menu,右边是Content
-	private LinearLayout showContentLayout;
 	private Button menuButton;
 	private GestureDetector UIGestureDetector;
 	private int window_width;
@@ -66,15 +65,7 @@ GestureDetector.OnGestureListener
 	private static final int MSG_WHAT_REFRESH_DONE = -5;
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
-	private View myEventsView;
-	private PullUpDownView myEventsPullUpDownView;
-	private ListView myEventsListView;
-	private onPullListener myEventsPullUpDownViewListener;
-	private OnItemClickListener myEventsListViewListener;
-	
-	private ArrayAdapter<String> myEventsAdapter;
-	private List<String> myEventsCards = new ArrayList<String>();
-	
+	private MyEvents UI_myEvents;
 	private FriendsCenter UI_friendsCenter;
 	
 	@Override
@@ -95,89 +86,28 @@ GestureDetector.OnGestureListener
 		contentLayout = (LinearLayout)findViewById(R.id.ui_content);
 		menuLayout = (LinearLayout)findViewById(R.id.ui_menu);
 		UILayout = (LinearLayout)findViewById(R.id.ui_myui);
-		showContentLayout = (LinearLayout)findViewById(R.id.ui_content_thecontent);
 		menuButton = (Button)findViewById(R.id.ui_content_menuBtn);
 		menuButton.setOnClickListener(menuButtonOnClickListener);
+		UILayout.setOnTouchListener(this);
+		UIGestureDetector = new GestureDetector(this);
+		UIGestureDetector.setIsLongpressEnabled(false);
+		setParams();
 		initMyEvents();
 		initFriendsCenter();
 	}
 	
 	private void initMyEvents()
 	{
-		
-		
-		myEventsListViewListener = new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				// TODO Auto-generated method stub
-				Toast.makeText(getApplicationContext(), "点击的是第"+arg2+"个.", Toast.LENGTH_SHORT).show();
-			}
-		};
-		
-		myEventsPullUpDownViewListener = new onPullListener() {
-			
-			@Override
-			public void Refresh() {
-				// TODO Auto-generated method stub
-				new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}				
-						Message msg = uiHandler.obtainMessage(MSG_WHAT_REFRESH_DONE);
-						msg.obj = "After refresh " + System.currentTimeMillis();
-						msg.sendToTarget();
-					}
-				}).start();
-				
-			}
-			
-			@Override
-			public void GetMore() {
-				// TODO Auto-generated method stub
-				new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						try {
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}				
-						Message msg = uiHandler.obtainMessage(MSG_WHAT_GET_MORE_DONE);
-						msg.obj = "After more " + System.currentTimeMillis();
-						msg.sendToTarget();
-					}
-				}).start();
-			}
-		};
-		
-		
-		myEventsView = UI_Menu.getMyEventsView();
-		myEventsPullUpDownView = (PullUpDownView)myEventsView.findViewById(R.id.my_events_pull_up_down_view);
-		myEventsListView = myEventsPullUpDownView.getListView();
-		myEventsPullUpDownView.setOnPullListener(myEventsPullUpDownViewListener);
-		myEventsListView.setOnItemClickListener(myEventsListViewListener);
-		myEventsListView.setOnTouchListener(this);		//非常重要的一步，聪明人秒懂
-		myEventsAdapter = new ArrayAdapter<String>(this, R.layout.pulldown_item, myEventsCards);
-		myEventsListView.setAdapter(myEventsAdapter);
-		
-		UILayout.setOnTouchListener(this);
-		UIGestureDetector = new GestureDetector(this);
-		UIGestureDetector.setIsLongpressEnabled(false);
-		setParams();
-		loadData();
+		UI_myEvents = new MyEvents(this, UI_Menu.getMyEventsView(), uiHandler);
+		UI_myEvents.init();
+		UI_myEvents.myEventsListView.setOnTouchListener(this);
+		UI_myEvents.loadData();
 	}
 	
 	private void initFriendsCenter()
 	{
 		UI_friendsCenter = new FriendsCenter(this, UI_Menu.getFriendsCenterView());
+		UI_friendsCenter.init();
 	}
 	
 	
@@ -189,6 +119,12 @@ GestureDetector.OnGestureListener
 			jump();
 		}
 	};
+	
+	/**
+	 * @author WJL
+	 * @description Jump between menuLayout and contentLayout
+	 *
+	 */
 	public void jump()
 	{
 		
@@ -247,7 +183,6 @@ GestureDetector.OnGestureListener
 					
 					Log.i("myUI", "UI width: "+UILayout.getWidth());
 					Log.i("myUI", "content width: "+contentLayout.getWidth());
-//					UILayout.invalidate();
 					
 					hasMeasured = true;
 					
@@ -268,7 +203,7 @@ GestureDetector.OnGestureListener
 		// TODO Auto-generated method stub
 		mScrollX = 0;
 		isScrolling = false;
-		myEventsListView.onTouchEvent(arg0);
+		UI_myEvents.myEventsListView.onTouchEvent(arg0);
 		return true;
 	}
 
@@ -308,11 +243,10 @@ GestureDetector.OnGestureListener
 				speedEnough = false;
 			}
 			doCloseScroll(speedEnough);
-		
 		}
 		else
 		{
-			myEventsListView.onTouchEvent(arg1);
+			UI_myEvents.myEventsListView.onTouchEvent(arg1);
 			doCloseScroll(false);
 		}
 		
@@ -343,8 +277,6 @@ GestureDetector.OnGestureListener
 		}
 	}
 	
-	
-
 	@Override
 	public void onLongPress(MotionEvent arg0) {
 		// TODO Auto-generated method stub
@@ -355,7 +287,7 @@ GestureDetector.OnGestureListener
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
 		// TODO Auto-generated method stub
-		Log.i("myUI","onScroll: arg2:"+arg2+", arg3: "+arg3);
+//		Log.i("myUI","onScroll: arg2:"+arg2+", arg3: "+arg3);
 		if(Math.abs(arg2) >= Math.abs(arg3))
 		{
 			if(isFinish)
@@ -366,7 +298,7 @@ GestureDetector.OnGestureListener
 		}
 		else
 		{
-			myEventsListView.onTouchEvent(arg1);
+			UI_myEvents.myEventsListView.onTouchEvent(arg1);
 		}
 		return true;
 	}
@@ -377,13 +309,11 @@ GestureDetector.OnGestureListener
 		mScrollX += distanceX;// distanceX: negative for right, positive for left
 		RelativeLayout.LayoutParams layoutParams_UI = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
 		layoutParams_UI.leftMargin -= mScrollX;
-//		layoutParams_UI.rightMargin += mScrollX;
 		
 		if(layoutParams_UI.leftMargin <= -menu_width)//向左拉过头
 		{
 			isScrolling = false;
 			layoutParams_UI.leftMargin = -menu_width;
-//			layoutParams_UI.rightMargin = 0;
 		}
 		else if(layoutParams_UI.leftMargin  >= 0)//向右拉过头
 		{
@@ -391,7 +321,6 @@ GestureDetector.OnGestureListener
 			layoutParams_UI.leftMargin = 0;
 		}
 		UILayout.setLayoutParams(layoutParams_UI);
-//		menuLayout.invalidate();
 	}
 
 	@Override
@@ -403,16 +332,6 @@ GestureDetector.OnGestureListener
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0) {
 		// TODO Auto-generated method stub
-//		Log.i("myUI","onSingleTapUp");
-//		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-//		if(layoutParams.leftMargin>= 0)
-//		{
-//			new AsynMove().execute(-speed);
-//		}
-//		else
-//		{
-//			new AsynMove().execute(speed);
-//		}
 		return false;
 	}
 	
@@ -461,16 +380,14 @@ GestureDetector.OnGestureListener
 			if(values[0]>0)//右移
 			{
 				layoutParams.leftMargin = Math.min(layoutParams.leftMargin + values[0], 0);
-//				layoutParams.rightMargin = Math.max(layoutParams.rightMargin - values[0], -menu_width);
-				
 			}
 			else//左移
 			{
 				layoutParams.leftMargin = Math.max(layoutParams.leftMargin + values[0], -menu_width);
 			}
 			UILayout.setLayoutParams(layoutParams);
-//			menuLayout.invalidate();
 			super.onProgressUpdate(values);
+			
 		}
 		
 	}
@@ -493,7 +410,7 @@ GestureDetector.OnGestureListener
 				switch(menu.getId())
 				{
 				case R.id.ui_menu_myevents:
-					loadData();
+					UI_myEvents.loadData();
 					break;
 				case R.id.ui_menu_privateevents:
 					break;
@@ -513,7 +430,8 @@ GestureDetector.OnGestureListener
 				}
 				break;
 			case MSG_WHAT_ON_LOAD_DATA:
-				myEventsPullUpDownView.notifyOnLoadData();
+//				myEventsPullUpDownView.notifyOnLoadData();
+				UI_myEvents.myEventsPullUpDownView.notifyOnLoadData();
 				break;
 			case MSG_WHAT_LOAD_DATA_DONE:
 				if(msg.obj != null)
@@ -521,23 +439,23 @@ GestureDetector.OnGestureListener
 					List<String> strings = (List<String>) msg.obj;
 					if(!strings.isEmpty())
 					{
-						myEventsCards.addAll(strings);
-						myEventsAdapter.notifyDataSetChanged();
+						UI_myEvents.myEventsList.addAll(strings);
+						UI_myEvents.myEventsAdapter.notifyDataSetChanged();
 					}
-					myEventsPullUpDownView.notifyLoadDataDone();
+					UI_myEvents.myEventsPullUpDownView.notifyLoadDataDone();
 				}
 				break;
 			case MSG_WHAT_REFRESH_DONE:
 				String string1 = (String) msg.obj;
-				myEventsCards.add(0,string1);
-				myEventsAdapter.notifyDataSetChanged();
-				myEventsPullUpDownView.notifyRefreshDone();
+				UI_myEvents.myEventsList.add(0,string1);
+				UI_myEvents.myEventsAdapter.notifyDataSetChanged();
+				UI_myEvents.myEventsPullUpDownView.notifyRefreshDone();
 				break;
 			case MSG_WHAT_GET_MORE_DONE:
 				String string2 = (String) msg.obj;
-				myEventsCards.add(string2);
-				myEventsAdapter.notifyDataSetChanged();
-				myEventsPullUpDownView.notifyGetMoreDone();
+				UI_myEvents.myEventsList.add(string2);
+				UI_myEvents.myEventsAdapter.notifyDataSetChanged();
+				UI_myEvents.myEventsPullUpDownView.notifyGetMoreDone();
 				break;
 				default: break;
 			}
@@ -545,35 +463,6 @@ GestureDetector.OnGestureListener
 		}
 	}
 	
-	private void loadData(){
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				myEventsCards.clear();
-				Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
-				msg1.sendToTarget();
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				List<String> strings = new ArrayList<String>();
-				for (String body : mStringArray) {
-					strings.add(body);
-				}
-				Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
-				msg2.obj = strings;
-				msg2.sendToTarget();
-			}
-		}).start();
-	}
 	
-	// 模拟数据
-	private String[] mStringArray = {
-            "A", "B", "C", "D", "E"
-            ,"F", "G", "H", "I", "J", "K"
-//            ,"L", "M", "N", "O", "P"
-    };
 
 }
