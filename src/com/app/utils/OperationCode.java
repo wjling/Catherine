@@ -26,4 +26,5 @@ public class OperationCode {
     public static final int INVITE_FRIENDS = 21;             // 活动发起者邀请好友参加活动
     public static final int NOTE = 22;                                 // 记事本功能
     public static final int UPLOAD_AVATAR = 23;        // 上传头像
+    public static final int LOGOUT = 24;
 }

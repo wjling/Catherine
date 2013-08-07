@@ -9,7 +9,10 @@ import com.app.utils.RegUtils;
 import com.app.utils.ReturnCode;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,15 +30,12 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class loginAndreg extends Activity
@@ -59,6 +59,9 @@ public class loginAndreg extends Activity
 	
 	private MsgHandler handler;
 	private HttpSender sender;
+	private int userId;
+	private MyBroadcastReceiver broadcastReceiver;
+	private Intent serviceIntent = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,17 @@ public class loginAndreg extends Activity
 		init();
 	}
 	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		if( serviceIntent!=null )
+			stopService(serviceIntent);
+		
+//		logout();
+		
+		super.onDestroy();
+	}
+
 	private void init()
 	{
 		scrollView = (HorizontalScrollView)findViewById(R.id.testHorizonScro);
@@ -507,18 +521,26 @@ public class loginAndreg extends Activity
 								sp.edit().putString(loginEmail, loginPwd).commit();																			
 							
 							//获取用户id
-							int userId = respLoginJson.getInt("id");																	
+							userId = respLoginJson.getInt("id");																	
 							sp.edit().putString("id"+loginEmail, ""+userId);								
 							
 							Log.i("Login", "Login succeed");
 							
 							//跳转到UserInterface.java
-							Intent intent = new Intent();
-							intent.setClass(loginAndreg.this, UserInterface.class);
-							intent.putExtra("userId", userId);
-							intent.putExtra("email", loginEmail);
-							startActivity(intent);
-							loginAndreg.this.finish();
+							serviceIntent = new Intent("HeartbeatService");
+							serviceIntent.putExtra("uid", userId);
+							startService(serviceIntent);
+							
+							IntentFilter intentFilter = new IntentFilter();
+							intentFilter.addAction("connected");
+							broadcastReceiver = new MyBroadcastReceiver();
+							loginAndreg.this.registerReceiver( broadcastReceiver, intentFilter);
+							
+//								Intent intent = new Intent();
+//								intent.setClass(loginAndreg.this, UserInterface.class);
+//								intent.putExtra("userId", ""+userId);
+//								intent.putExtra("email", loginEmail);
+//								startActivity(intent);		
 						}
 						else if (ReturnCode.PASSWD_NOT_CORRECT==cmdLogin)								
 							Toast.makeText(loginAndreg.this, "密码错误，请重新输入", Toast.LENGTH_SHORT).show();								
@@ -526,10 +548,48 @@ public class loginAndreg extends Activity
 						e.printStackTrace();
 					}				
 					break;
+				case OperationCode.LOGOUT:
+						Toast.makeText(loginAndreg.this, "logout", Toast.LENGTH_SHORT).show();	
+					break;
 					default:
 						break;
 			}
 		}
+	}
+	
+	private class MyBroadcastReceiver extends BroadcastReceiver
+	{
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// TODO Auto-generated method stub
+			String action = intent.getAction();
+			
+			if ( "connected".equals(action) ) {
+				Log.i("test", "跳转啦");
+				Intent intent2 = new Intent();
+				intent2.setClass(loginAndreg.this, UserInterface.class);
+				intent2.putExtra("userId", userId);
+				intent2.putExtra("email", loginEmail);
+				startActivity(intent2);	
+				unregisterReceiver( broadcastReceiver);
+			}
+		}
+		
+	}
+	
+	public void logout()
+	{
+		try{
+			JSONObject params = new JSONObject();
+			params.put("uid", userId);
+			
+			sender.Httppost(OperationCode.LOGOUT, params, handler);
+		}
+		catch (JSONException e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 	
 }
