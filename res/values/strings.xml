@@ -4,5 +4,6 @@
     <string name="app_name">Catherine</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-
+<string name="signuphint">&lt;&lt;sign up</string>
+	<string name="loginhint">Login&gt;&gt;</string>
 </resources>

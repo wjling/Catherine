@@ -13,4 +13,8 @@ public class ReturnCode {
     public static final int POST_NOT_EXIST = 109;
     public static final int EVENT_NOT_EXIST = 110;
     public static final int ALREADY_IN_EVENT = 111;
+    public static final int DATABASE_ERROR = 112;
+    public static final int NO_AVATAR = 113;
+    public static final int PHOTO_NOT_EXIST = 114;
+    public static final int USER_ALREADY_ONLINE = 115;
 }
