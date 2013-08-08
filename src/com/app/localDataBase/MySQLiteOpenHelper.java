@@ -20,7 +20,8 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
 	private String TABLE_NAME2 = "notifications";
 	private String SQL_createTable2 = "CREATE TABLE "+TABLE_NAME2
 			+ " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ "status INTERGER, " 
+			+ "uid INTEGER, "
+			+ "status INTEGER, " 
 			+ "tag VARCHAR(50), " 
 			+ "msg TEXT)";
 	

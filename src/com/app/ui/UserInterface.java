@@ -1,8 +1,17 @@
 package com.app.ui;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
+import com.app.catherine.R;
+import com.app.catherine.R.id;
+import com.app.catherine.R.layout;
+import com.app.customwidget.PullUpDownView;
+import com.app.customwidget.PullUpDownView.onPullListener;
+import com.app.utils.MyBroadcastReceiver;
+
 import android.app.Activity;
+import android.app.ActivityGroup;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,20 +20,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.GestureDetector;
 import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnDrawListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
-
-import com.app.catherine.R;
-import com.app.utils.MyBroadcastReceiver;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 public class UserInterface extends Activity implements OnTouchListener,
 GestureDetector.OnGestureListener
@@ -60,6 +74,7 @@ GestureDetector.OnGestureListener
 	
 	private int userId = -1;
 	private String email;
+	private Intent serviceIntent = null;
 	
 	//add by luo
 	private MyBroadcastReceiver broadcastReceiver  = null;
@@ -78,6 +93,8 @@ GestureDetector.OnGestureListener
 		Intent intent = getIntent();
 		userId = intent.getIntExtra("userId", -1);
 		email = intent.getStringExtra("email");
+		serviceIntent = new Intent("HeartbeatService");
+		
 		init();
 		
 	}
@@ -87,6 +104,11 @@ GestureDetector.OnGestureListener
 		// TODO Auto-generated method stub
 		if( broadcastReceiver!=null )
 			unregisterReceiver(broadcastReceiver);
+		if( serviceIntent!=null){
+			stopService(serviceIntent);
+			Log.e("test", "ondestroy");
+		}
+		
 		super.onDestroy();
 	}
 
@@ -95,7 +117,7 @@ GestureDetector.OnGestureListener
 		//broadcast filter add by luo
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("postMsg");
-		broadcastReceiver = new MyBroadcastReceiver(this);
+		broadcastReceiver = new MyBroadcastReceiver(this, userId);
 		this.registerReceiver( broadcastReceiver, intentFilter);
 		
 		contentLayout = (LinearLayout)findViewById(R.id.ui_content);
