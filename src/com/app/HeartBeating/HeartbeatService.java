@@ -141,7 +141,6 @@ public class HeartbeatService extends Service implements Runnable {
 					{
 //						Log.i(TAG, "returnStr: " + returnStr);
 						returnJson = new JSONObject(returnStr);
-//						returnJson = new JSONObject("{'msg': {'confirm_msg': '\u4e0d\u8bb2\u7406\u56d6', 'gender': 1L, 'cmd': 999, 'id': 5, 'email': '123@qq.com', 'name': 'wjl'}, 'seq': '8'}");
 						String cmd = returnJson.optString("cmd");
 						//not sync, msg+seq
 						if ( cmd == "" ) 
@@ -173,7 +172,7 @@ public class HeartbeatService extends Service implements Runnable {
 //											}
 											
 											Intent intent = new Intent("postMsg");
-											intent.putExtra("postMsg", msg.obj.toString());
+											intent.putExtra("postMsg", returnMsgStr);
 											sendBroadcast(intent);	
 											
 											if ( MsgNum==0 ) 

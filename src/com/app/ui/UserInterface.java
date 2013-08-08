@@ -9,11 +9,13 @@ import com.app.catherine.R.id;
 import com.app.catherine.R.layout;
 import com.app.customwidget.PullUpDownView;
 import com.app.customwidget.PullUpDownView.onPullListener;
+import com.app.utils.MyBroadcastReceiver;
 
 import android.app.Activity;
 import android.app.ActivityGroup;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -72,6 +74,9 @@ GestureDetector.OnGestureListener
 	private int userId = -1;
 	private String email;
 	
+	//add by luo
+	private MyBroadcastReceiver broadcastReceiver  = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -89,8 +94,21 @@ GestureDetector.OnGestureListener
 		
 	}
 	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		if( broadcastReceiver!=null )
+			unregisterReceiver(broadcastReceiver);
+		super.onDestroy();
+	}
+
 	public void init()
 	{
+		//broadcast filter add by luo
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction("postMsg");
+		broadcastReceiver = new MyBroadcastReceiver(this);
+		this.registerReceiver( broadcastReceiver, intentFilter);
 		
 		contentLayout = (LinearLayout)findViewById(R.id.ui_content);
 		menuLayout = (LinearLayout)findViewById(R.id.ui_menu);
