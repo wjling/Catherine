@@ -28,7 +28,7 @@ public class NotificationTableAdapter
 		mySQLiteOpenHelper = new MySQLiteOpenHelper(mContext);
 	}
 	
-	public long insertData(int status, String tag, String msg)
+	public long insertData(int status, int uid, String tag, String msg)
 	{
 		long resultValue = 0;		
 		if ( findMsgFromDB(msg)==false) {			
@@ -36,6 +36,7 @@ public class NotificationTableAdapter
 				SQLiteDatabase db = mySQLiteOpenHelper.getWritableDatabase();
 		
 				ContentValues initValues = new ContentValues();
+					initValues.put("uid", uid);
 					initValues.put("status", status);
 					initValues.put("tag", tag);
 					initValues.put("msg", msg);
@@ -87,7 +88,7 @@ public class NotificationTableAdapter
 	}
 	
 	//返回_id和msg
-	public ArrayList<notificationObject> queryData(String tag)
+	public ArrayList<notificationObject> queryData(String tag, int uid)
 	{
 		Log.i(NotificationDB, "获取tag为"+tag+"的数据项");
 		SQLiteDatabase db = mySQLiteOpenHelper.getWritableDatabase();
@@ -96,7 +97,7 @@ public class NotificationTableAdapter
 				
 		if (db!=null) {
 					Cursor cursor = db.rawQuery(
-							"SELECT * FROM notifications WHERE tag=?", new String[]{tag});
+							"SELECT * FROM notifications WHERE uid = ? and tag=?", new String[]{uid+"", tag});
 	
 					if( cursor!=null )
 					{

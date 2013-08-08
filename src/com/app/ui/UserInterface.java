@@ -1,5 +1,6 @@
 package com.app.ui;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +75,7 @@ GestureDetector.OnGestureListener
 	
 	private int userId = -1;
 	private String email;
+	private Intent serviceIntent = null;
 	
 	//add by luo
 	private MyBroadcastReceiver broadcastReceiver  = null;
@@ -91,6 +93,8 @@ GestureDetector.OnGestureListener
 		Intent intent = getIntent();
 		userId = intent.getIntExtra("userId", -1);
 		email = intent.getStringExtra("email");
+		serviceIntent = new Intent("HeartbeatService");
+		
 		init();
 		
 	}
@@ -100,6 +104,11 @@ GestureDetector.OnGestureListener
 		// TODO Auto-generated method stub
 		if( broadcastReceiver!=null )
 			unregisterReceiver(broadcastReceiver);
+		if( serviceIntent!=null){
+			stopService(serviceIntent);
+			Log.e("test", "ondestroy");
+		}
+		
 		super.onDestroy();
 	}
 
@@ -108,7 +117,7 @@ GestureDetector.OnGestureListener
 		//broadcast filter add by luo
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("postMsg");
-		broadcastReceiver = new MyBroadcastReceiver(this);
+		broadcastReceiver = new MyBroadcastReceiver(this, userId);
 		this.registerReceiver( broadcastReceiver, intentFilter);
 		
 		contentLayout = (LinearLayout)findViewById(R.id.ui_content);

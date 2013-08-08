@@ -78,8 +78,8 @@ public class loginAndreg extends Activity
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		if( serviceIntent!=null )
-			stopService(serviceIntent);
+//		if( serviceIntent!=null )
+//			stopService(serviceIntent);
 		
 //		logout();
 		
@@ -568,11 +568,12 @@ public class loginAndreg extends Activity
 			if ( "connected".equals(action) ) {
 				Log.i("test", "Ìø×ªÀ²");
 				Intent intent2 = new Intent();
-				intent2.setClass(loginAndreg.this, UserInterface.class);
-				intent2.putExtra("userId", userId);
-				intent2.putExtra("email", loginEmail);
+					intent2.setClass(loginAndreg.this, UserInterface.class);
+					intent2.putExtra("userId", userId);
+					intent2.putExtra("email", loginEmail);				
 				startActivity(intent2);	
 				unregisterReceiver( broadcastReceiver);
+				loginAndreg.this.finish();
 			}
 		}
 		

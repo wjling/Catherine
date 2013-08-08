@@ -18,10 +18,12 @@ public class MyBroadcastReceiver extends BroadcastReceiver
 
 	protected static final String TAG = "NotificationUtil";
 	private Context context = null;
+	private int uid;
 	
-	public MyBroadcastReceiver( Context context)
+	public MyBroadcastReceiver( Context context, int uid)
 	{
 		this.context = context;
+		this.uid = uid;
 	}
 	
 	@Override
@@ -48,11 +50,11 @@ public class MyBroadcastReceiver extends BroadcastReceiver
 			 	switch (msgCMD) {
 			 			case 999:
 			 				//好友请求通知，写入数据库
-			 				adapter.insertData(1, "ADD_FRIEND_REQUEST", msg);
+			 				adapter.insertData(1, uid, "ADD_FRIEND_REQUEST", msg);
 			 				break;
 			 			case 998:
 			 				//同意或者拒绝添加，写入消息数据库
-			 				adapter.insertData(1, "ADD_FRIEND_VERIFY", msg);
+			 				adapter.insertData(1, uid,  "ADD_FRIEND_VERIFY", msg);
 			 				//如果同意，写入好友数据库
 			 				Boolean result = msgJson.getBoolean("result");
 							if(result.equals(true))
@@ -68,18 +70,18 @@ public class MyBroadcastReceiver extends BroadcastReceiver
 			 				break;
 			 			case 997:
 			 				//新活动邀请通知，写入消息数据库
-			 				adapter.insertData(1, "ADD_ACTIVITY_INVITATION", msg);
+			 				adapter.insertData(1,  uid, "ADD_ACTIVITY_INVITATION", msg);
 			 				break;
 			 			case 996:
-			 				adapter.insertData(1, "ADD_ACTIVITY_FEEDBACK", msg);
+			 				adapter.insertData(1,  uid, "ADD_ACTIVITY_FEEDBACK", msg);
 			 				break;
 			 			case 995:
 			 				//陌生人申请加入活动
-			 				adapter.insertData(1, "REQUEST_INTO_ACTIVITY", msg);
+			 				adapter.insertData(1,  uid, "REQUEST_INTO_ACTIVITY", msg);
 			 				break;
 			 			case 994:
 			 				//陌生人申请加入活动反馈
-			 				adapter.insertData(1, "RESPONSE_INTO_ACTIVITY", msg);
+			 				adapter.insertData(1,  uid, "RESPONSE_INTO_ACTIVITY", msg);
 			 				break;
 			 			default:
 			 				break;
