@@ -36,14 +36,14 @@ public class Menu {
 	private View myEventsView;
 	private View privateEventsView;
 	private View recommendedEventsView;
-	private View friendsCenterView;
+	private View friendCenterView;
 	private View updateView;
 	private View settingsView;
 	private View currentUI;
+	private View currentMenuView;
 	private Handler handler;
 	
-	private View currentMenuView;
-	private int currentMenuIndex;
+
 	public Menu(Context context, View v, Handler handler) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
@@ -69,8 +69,10 @@ public class Menu {
 	
 	public View getFriendsCenterView()
 	{
-		return friendsCenterView;
+		return friendCenterView;
 	}
+	
+//	public View get
 	
 	public void setMenu()
 	{
@@ -103,7 +105,7 @@ public class Menu {
 		myEventsView = LayoutInflater.from(context).inflate(R.layout.menu_my_events, null);
 		privateEventsView = LayoutInflater.from(context).inflate(R.layout.menu_private_events, null);
 		recommendedEventsView = LayoutInflater.from(context).inflate(R.layout.menu_recommended_events, null);
-		friendsCenterView = LayoutInflater.from(context).inflate(R.layout.menu_friends_center, null);
+		friendCenterView = LayoutInflater.from(context).inflate(R.layout.menu_friends_center, null);
 		updateView = LayoutInflater.from(context).inflate(R.layout.menu_update, null);
 		settingsView = LayoutInflater.from(context).inflate(R.layout.menu_settings, null);
 		
@@ -150,7 +152,7 @@ public class Menu {
 				break;
 			case R.id.ui_menu_friendscenter:
 				buttonBackGroundChange(v,event,4);
-				currentUI = friendsCenterView;
+				currentUI = friendCenterView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
 				ui_content.invalidate();

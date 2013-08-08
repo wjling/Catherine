@@ -57,7 +57,7 @@ GestureDetector.OnGestureListener
 	private boolean isFinish = true;		//是否后台回滚完毕
 	private boolean isMenuOpen = false;		//是否显示了菜单栏
 	private boolean hasMeasured = false;
-	private Menu UI_Menu;
+	
 	private myHandler uiHandler = new myHandler();
 	
 	//My Events 
@@ -66,8 +66,9 @@ GestureDetector.OnGestureListener
 	private static final int MSG_WHAT_REFRESH_DONE = -5;
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
+	private Menu UI_Menu;
 	private MyEvents UI_myEvents;
-	private FriendsCenter UI_friendsCenter;
+	private FriendCenter UI_friendsCenter;
 	
 	private int userId = -1;
 	private String email;
@@ -115,7 +116,7 @@ GestureDetector.OnGestureListener
 	
 	private void initFriendsCenter()
 	{
-		UI_friendsCenter = new FriendsCenter(this, UI_Menu.getFriendsCenterView(), uiHandler, userId);
+		UI_friendsCenter = new FriendCenter(this, UI_Menu.getFriendsCenterView(), uiHandler, userId);
 		UI_friendsCenter.init();
 	}
 	
@@ -149,6 +150,10 @@ GestureDetector.OnGestureListener
 		}
 	}
 	
+	public Menu getUIMenu()
+	{
+		return UI_Menu;
+	}
 	
 	//单位从dip转化成px
 	public static int dip2px(Context context, float dpValue) {  
