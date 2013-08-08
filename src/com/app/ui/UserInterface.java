@@ -1,18 +1,8 @@
 package com.app.ui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import com.app.catherine.R;
-import com.app.catherine.R.id;
-import com.app.catherine.R.layout;
-import com.app.customwidget.PullUpDownView;
-import com.app.customwidget.PullUpDownView.onPullListener;
-import com.app.utils.MyBroadcastReceiver;
-
 import android.app.Activity;
-import android.app.ActivityGroup;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,25 +11,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.GestureDetector;
 import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnDrawListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
+
+import com.app.catherine.R;
+import com.app.utils.MyBroadcastReceiver;
 
 public class UserInterface extends Activity implements OnTouchListener,
 GestureDetector.OnGestureListener
@@ -69,6 +54,7 @@ GestureDetector.OnGestureListener
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
 	private Menu UI_Menu;
+	private NotificationCenter notificationCenter;
 	private MyEvents UI_myEvents;
 	private FriendCenter UI_friendsCenter;
 	
@@ -87,6 +73,7 @@ GestureDetector.OnGestureListener
 		
 		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
 		UI_Menu.setMenu();
+		notificationCenter = new NotificationCenter(this,uiHandler, userId);
 		
 		Intent intent = getIntent();
 		userId = intent.getIntExtra("userId", -1);

@@ -43,10 +43,10 @@ public class NotificationCenter {
 	private ArrayList<HashMap<String, Object>> friendRequests = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<HashMap<String, Object>> friendRequestResults = new ArrayList<HashMap<String,Object>>();
 	
-	public NotificationCenter(Context context, View v, Handler uiHandler, int userId) {
+	public NotificationCenter(UserInterface UI, Handler uiHandler, int userId) {
 		// TODO Auto-generated constructor stub
-		this.context = context;
-		this.notificationCenterView = v;
+		this.context = UI;
+//		this.notificationCenterView = v;
 		this.uiHandler = uiHandler;
 		this.userId = userId;
 		init();

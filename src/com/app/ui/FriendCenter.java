@@ -20,7 +20,7 @@ public class FriendCenter {
 	
 	private int userId = -1;
 	private Handler uiHandler;
-	private NotificationCenter notificationCenter;
+//	private NotificationCenter notificationCenter;
 	
 	public FriendCenter(Context context, View friendsCenterView, Handler uiHandler, int userId) {
 		// TODO Auto-generated constructor stub
@@ -33,7 +33,7 @@ public class FriendCenter {
 	
 	public void init() {
 		// TODO Auto-generated method stub
-		notificationCenter = new NotificationCenter(context, friendCenterView, uiHandler, userId);
+//		notificationCenter = new NotificationCenter(context, friendCenterView, uiHandler, userId);
 		setLayout();
 	}
 	
@@ -41,6 +41,7 @@ public class FriendCenter {
 	{
 		addFriendsBtn = (Button)friendCenterView.findViewById(R.id.menu_friends_center_addfriendsBtn);
 		showFriendListBtn = (Button)friendCenterView.findViewById(R.id.menu_friends_center_friendlistBtn);
+		searchFriendBtn = (Button)friendCenterView.findViewById(R.id.menu_friends_center_searchfriendBtn);
 		addFriendsBtn.setOnClickListener(buttonsOnClickListener);
 	}
 
