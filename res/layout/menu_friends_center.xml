@@ -10,10 +10,45 @@
         android:layout_height="wrap_content"
         android:text="朋友中心" />
 
-    <Button
-        android:id="@+id/menu_friends_center_addfriendsBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="添加好友" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/menu_friends_center_addfriendsBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加好友"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/menu_friends_center_friendlistBtn"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="好友列表"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/button2"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="搜索好友"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/menu_friends_center_friendslist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+
+    <ListView
+        android:id="@+id/menu_friends_center_requestresult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </LinearLayout>

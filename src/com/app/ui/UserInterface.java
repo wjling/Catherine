@@ -115,7 +115,7 @@ GestureDetector.OnGestureListener
 	
 	private void initFriendsCenter()
 	{
-		UI_friendsCenter = new FriendsCenter(this, UI_Menu.getFriendsCenterView(), userId);
+		UI_friendsCenter = new FriendsCenter(this, UI_Menu.getFriendsCenterView(), uiHandler, userId);
 		UI_friendsCenter.init();
 	}
 	
