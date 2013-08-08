@@ -56,6 +56,9 @@ public class NotificationCenter {
 	
 	private void init() {
 		// TODO Auto-generated method stub
+		getNotificationFromDB();
+		showFriendRequests();
+		showRequestResult();
 		
 	}
 	
@@ -188,7 +191,7 @@ public class NotificationCenter {
 		
 	}
 
-	private void showFriendRequests()
+	public void showFriendRequests()
 	{
 		int length = requests.size();
 		friendRequests.clear();
@@ -367,7 +370,7 @@ public class NotificationCenter {
 		}
 	};
 	
-	private void showRequestResult()
+	public void showRequestResult()
 	{
 		//valifications.addAll(valificationsData());
 		ListView lv = (ListView)notificationCenterView.findViewById(R.id.menu_friends_center_requestresults);
