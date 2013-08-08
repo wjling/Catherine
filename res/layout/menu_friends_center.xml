@@ -40,13 +40,13 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/menu_friends_center_friendslist"
+        android:id="@+id/menu_friends_center_friendrequests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>
 
     <ListView
-        android:id="@+id/menu_friends_center_requestresult"
+        android:id="@+id/menu_friends_center_requestresults"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>

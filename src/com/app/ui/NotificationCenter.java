@@ -7,11 +7,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.app.adapters.AdapterForRequest;
-import com.app.addFriendPack.searchFriend;
 import com.app.catherine.R;
 import com.app.localDataBase.FriendStruct;
 import com.app.localDataBase.NotificationTableAdapter;
 import com.app.localDataBase.TableFriends;
+import com.app.localDataBase.notificationObject;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 
@@ -19,72 +19,175 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class FriendsCenter {
-
+public class NotificationCenter {
+	
+	private final String TAG = "NotificationCenter";
 	private Context context;
-	private View friendsCenterView;
-	private Button addFriendsBtn;
+	private View notificationCenterView;
 	
-	private int userId = -1;
+	private int userId;
 	private Handler uiHandler;
-	
+
 	private ArrayList<JSONObject> requests = new ArrayList<JSONObject>();
-	private ArrayList<JSONObject> valifications = new ArrayList<JSONObject>();
+	private ArrayList<JSONObject> verifications = new ArrayList<JSONObject>();
 	private SimpleAdapter friendRequestAdapter;
 	private ArrayList<HashMap<String, Object>> friendRequests = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<HashMap<String, Object>> friendRequestResults = new ArrayList<HashMap<String,Object>>();
 	
-	public FriendsCenter(Context context, View friendsCenterView, Handler uiHandler, int userId) {
+	public NotificationCenter(Context context, View v, Handler uiHandler, int userId) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
-		this.friendsCenterView = friendsCenterView;
-		this.userId = userId;
+		this.notificationCenterView = v;
 		this.uiHandler = uiHandler;
+		this.userId = userId;
+		init();
 	}
 	
 	
-	public void init() {
+	
+	private void init() {
 		// TODO Auto-generated method stub
-		setLayout();
-	}
-	
-	public void setLayout()
-	{
-		addFriendsBtn = (Button)friendsCenterView.findViewById(R.id.menu_friends_center_addfriendsBtn);
-		addFriendsBtn.setOnClickListener(buttonsOnClickListener);
-	}
-
-	
-	OnClickListener buttonsOnClickListener = new OnClickListener() {
 		
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			switch(v.getId())
-			{
-			case R.id.menu_friends_center_addfriendsBtn:
-				Intent intent = new Intent();
-				intent.setClass(context, searchFriend.class);
-				intent.putExtra("userId", userId);
-				context.startActivity(intent);
-				break;
-				default: break;
+	}
+	
+	//读取数据表数据
+	public void getNotificationFromDB()
+	{
+		
+		NotificationTableAdapter adapter = new NotificationTableAdapter(context);
+		ArrayList<notificationObject> addFriendRequestList = adapter.queryData("ADD_FRIEND_REQUEST");
+		ArrayList<notificationObject> addFriendVerifyList = adapter.queryData("ADD_FRIEND_VERIFY");
+		ArrayList<notificationObject> addActivityRequestList = adapter.queryData("ADD_ACTIVITY_INVITATION");
+		ArrayList<notificationObject> addActivityFeedBackList = adapter.queryData("ADD_ACTIVITY_FEEDBACK");
+		ArrayList<notificationObject> requestIntoActivityList = adapter.queryData("REQUEST_INTO_ACTIVITY");
+		ArrayList<notificationObject> responseIntoActivityList = adapter.queryData("RESPONSE_INTO_ACTIVITY");
+		
+		requests.clear();
+		for (notificationObject item : addFriendRequestList) {
+			String msg = item.msg;
+			int id = item.item_ID;
+			try {
+				JSONObject msgJson = new JSONObject(msg);
+					msgJson.put("item_id", id);
+					msgJson.put("tag", "ADD_FRIEND_REQUEST");
+				requests.add(msgJson);
+				Log.i(TAG, "数据表中存放的好友请求是："+msgJson.toString());
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 		}
-	};
-	
+		
+		for (notificationObject item : addActivityRequestList) {
+			String msg = item.msg;
+			int id = item.item_ID;
+			try {
+				JSONObject msgJson = new JSONObject(msg);
+					msgJson.put("item_id", id);
+					msgJson.put("tag", "ADD_ACTIVITY_INVITATION");
+				requests.add(msgJson);
+				Log.i(TAG, "数据表中存放的活动邀请是："+msgJson.toString());
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		for (notificationObject item : requestIntoActivityList) {
+			String msg = item.msg;
+			int id = item.item_ID;
+			try {
+				JSONObject msgJson = new JSONObject(msg);
+					msgJson.put("item_id", id);
+					msgJson.put("tag", "REQUEST_INTO_ACTIVITY");
+				requests.add(msgJson);
+				Log.i(TAG, "数据表中存放的活动申请加入消息是："+msgJson.toString());
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		verifications.clear();
+		for (notificationObject itemVerify : addFriendVerifyList) {
+			String msg = itemVerify.msg;
+			int id = itemVerify.item_ID;
+			try {
+				JSONObject msgJson = new JSONObject(msg);
+				Boolean result = msgJson.getBoolean("result");
+				String userName = msgJson.getString("name");
+				JSONObject outputJson = new JSONObject();
+				if (result.equals(true)) {//处理同意添加//把消息写到数组供显示
+					outputJson.put("item_id", id);
+					outputJson.put("content", "添加"+userName+"成功！");
+				}
+				else//处理拒绝添加
+				{
+					outputJson.put("item_id", id);
+					outputJson.put("content", "添加"+userName+"失败@_@");				
+				}
+				verifications.add(outputJson);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		for (notificationObject item : addActivityFeedBackList) {
+			String msg = item.msg;
+			int itemID = item.item_ID;
+			String inviteeName;
+			Boolean result;
+			int eventID;
+			try {
+				JSONObject msgJson = new JSONObject(msg);
+				result = msgJson.getBoolean("result");
+				inviteeName = msgJson.getString("name");
+				eventID = msgJson.getInt("event_id");
+				JSONObject outputJson = new JSONObject();
+				if (result.equals(true)) {
+					outputJson.put("item_id", itemID);
+					outputJson.put("content", inviteeName + "同意参加活动:" + eventID);
+				}
+				else {
+					outputJson.put("item_id", itemID);
+					outputJson.put("content", inviteeName + "居然拒绝了参加活动:" + eventID);
+				}
+				verifications.add(outputJson);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		for (notificationObject item : responseIntoActivityList) {
+			String msg = item.msg;
+			int itemID = item.item_ID;
+			Boolean result;
+			String subject;
+			Integer launcherID;
+			try {
+				JSONObject msgJson = new JSONObject(msg);
+				result = msgJson.getBoolean("result");
+				subject = msgJson.getString("subject");
+				launcherID = msgJson.getInt("launcher");
+				JSONObject outputJson = new JSONObject();
+				outputJson.put("item_id", itemID);
+				if (result.equals(true)) 				
+					outputJson.put("content", launcherID + "同意你参加活动:" + subject);		
+				else 
+					outputJson.put("content", launcherID + "居然拒绝了让你参加活动:" + subject);
+				
+				verifications.add(outputJson);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
 	private void showFriendRequests()
 	{
 		int length = requests.size();
@@ -150,7 +253,7 @@ public class FriendsCenter {
 			}	
 			
 		}
-		ListView lv1 = (ListView)friendsCenterView.findViewById(R.id.menu_friends_center_friendslist);
+		ListView lv1 = (ListView)notificationCenterView.findViewById(R.id.menu_friends_center_friendrequests);
 		friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
 				R.layout.friend_request, 
 				new String[]{"fname","gender","email","confirm_msg"}, 
@@ -267,14 +370,14 @@ public class FriendsCenter {
 	private void showRequestResult()
 	{
 		//valifications.addAll(valificationsData());
-		ListView lv = (ListView)friendsCenterView.findViewById(R.id.menu_friends_center_requestresult);
-		int size = valifications.size();
+		ListView lv = (ListView)notificationCenterView.findViewById(R.id.menu_friends_center_requestresults);
+		int size = verifications.size();
 		HashMap<String, Object> map;
 		friendRequestResults.clear();
 		
 		for(int i=0;i<size;i++)
 		{
-			JSONObject jo = valifications.get(i);
+			JSONObject jo = verifications.get(i);
 			try {
 				map = new HashMap<String, Object>();
 //				String itemId = jo.getString("item_id");
