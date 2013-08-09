@@ -32,7 +32,8 @@ public class NotificationCenter {
 	
 	private final String TAG = "NotificationCenter";
 	private Context context;
-	private View notificationCenterView;
+	private Menu UI_Menu;
+//	private View notificationCenterView;
 	
 	private int userId;
 	private Handler uiHandler;
@@ -43,10 +44,10 @@ public class NotificationCenter {
 	private ArrayList<HashMap<String, Object>> friendRequests = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<HashMap<String, Object>> friendRequestResults = new ArrayList<HashMap<String,Object>>();
 	
-	public NotificationCenter(UserInterface UI, Handler uiHandler, int userId) {
+	public NotificationCenter(Context context, Menu UI_Menu, Handler uiHandler, int userId) {
 		// TODO Auto-generated constructor stub
-		this.context = UI;
-//		this.notificationCenterView = v;
+		this.context = context;
+		this.UI_Menu = UI_Menu;
 		this.uiHandler = uiHandler;
 		this.userId = userId;
 		init();
@@ -256,7 +257,7 @@ public class NotificationCenter {
 			}	
 			
 		}
-		ListView lv1 = (ListView)notificationCenterView.findViewById(R.id.menu_friends_center_friendrequests);
+		ListView lv1 = (ListView)UI_Menu.getFriendsCenterView().findViewById(R.id.menu_friends_center_friendrequests);
 		friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
 				R.layout.friend_request, 
 				new String[]{"fname","gender","email","confirm_msg"}, 
@@ -373,7 +374,7 @@ public class NotificationCenter {
 	public void showRequestResult()
 	{
 		//valifications.addAll(valificationsData());
-		ListView lv = (ListView)notificationCenterView.findViewById(R.id.menu_friends_center_requestresults);
+		ListView lv = (ListView)UI_Menu.getFriendsCenterView().findViewById(R.id.menu_friends_center_requestresults);
 		int size = verifications.size();
 		HashMap<String, Object> map;
 		friendRequestResults.clear();

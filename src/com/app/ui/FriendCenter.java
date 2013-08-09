@@ -43,6 +43,8 @@ public class FriendCenter {
 		showFriendListBtn = (Button)friendCenterView.findViewById(R.id.menu_friends_center_friendlistBtn);
 		searchFriendBtn = (Button)friendCenterView.findViewById(R.id.menu_friends_center_searchfriendBtn);
 		addFriendsBtn.setOnClickListener(buttonsOnClickListener);
+		showFriendListBtn.setOnClickListener(buttonsOnClickListener);
+		searchFriendBtn.setOnClickListener(buttonsOnClickListener);
 	}
 
 	
@@ -54,10 +56,18 @@ public class FriendCenter {
 			switch(v.getId())
 			{
 			case R.id.menu_friends_center_addfriendsBtn:
-				Intent intent = new Intent();
-				intent.setClass(context, searchFriend.class);
-				intent.putExtra("userId", userId);
-				context.startActivity(intent);
+				Intent intent1 = new Intent();
+				intent1.setClass(context, searchFriend.class);
+				intent1.putExtra("userId", userId);
+				context.startActivity(intent1);
+				break;
+			case R.id.menu_friends_center_searchfriendBtn:
+				break;
+			case R.id.menu_friends_center_friendlistBtn:
+				Intent intent2 = new Intent();
+				intent2.putExtra("userId", userId);
+				intent2.setClass(context, FriendList.class);
+				context.startActivity(intent2);
 				break;
 				default: break;
 			}

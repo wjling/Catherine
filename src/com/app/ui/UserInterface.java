@@ -88,12 +88,13 @@ GestureDetector.OnGestureListener
 		
 		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
 		UI_Menu.setMenu();
-		notificationCenter = new NotificationCenter(this,uiHandler, userId);
+		
 		
 		Intent intent = getIntent();
 		userId = intent.getIntExtra("userId", -1);
 		email = intent.getStringExtra("email");
 		serviceIntent = new Intent("HeartbeatService");
+		
 		
 		init();
 		
@@ -131,6 +132,7 @@ GestureDetector.OnGestureListener
 		setParams();
 		initMyEvents();
 		initFriendsCenter();
+		notificationCenter = new NotificationCenter(getApplicationContext(), this.UI_Menu,uiHandler, userId);
 	}
 	
 	private void initMyEvents()
@@ -176,11 +178,11 @@ GestureDetector.OnGestureListener
 			new AsynMove().execute(speed);
 		}
 	}
-	
-	public Menu getUIMenu()
-	{
-		return UI_Menu;
-	}
+//	
+//	public Menu getUIMenu()
+//	{
+//		return UI_Menu;
+//	}
 	
 	//单位从dip转化成px
 	public static int dip2px(Context context, float dpValue) {  
