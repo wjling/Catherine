@@ -132,7 +132,7 @@ GestureDetector.OnGestureListener
 		setParams();
 		initMyEvents();
 		initFriendsCenter();
-		notificationCenter = new NotificationCenter(getApplicationContext(), this.UI_Menu,uiHandler, userId);
+		notificationCenter = new NotificationCenter(this, this.UI_Menu,uiHandler, userId);
 	}
 	
 	private void initMyEvents()
