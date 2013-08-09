@@ -88,7 +88,7 @@ GestureDetector.OnGestureListener
 		
 		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
 		UI_Menu.setMenu();
-		
+		//hello
 		
 		Intent intent = getIntent();
 		userId = intent.getIntExtra("userId", -1);
