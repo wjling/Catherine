@@ -3,6 +3,7 @@ package com.app.ui;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import com.app.addActivityPack.AddActivity;
 import com.app.catherine.R;
 import com.app.catherine.R.id;
 import com.app.catherine.R.layout;
@@ -47,7 +48,7 @@ GestureDetector.OnGestureListener
 	private LinearLayout contentLayout;
 	private LinearLayout menuLayout;
 	private LinearLayout UILayout; //UILayout分为左右两部分，左边是Menu,右边是Content
-	private Button menuButton;
+	private Button menuButton, addActivityBtn;
 	private GestureDetector UIGestureDetector;
 	private int window_width;
 	private static float FLIP_DISTANCE_X = 400;	//检测甩手动作时候的最低速度值
@@ -126,6 +127,9 @@ GestureDetector.OnGestureListener
 		UILayout = (LinearLayout)findViewById(R.id.ui_myui);
 		menuButton = (Button)findViewById(R.id.ui_content_menuBtn);
 		menuButton.setOnClickListener(menuButtonOnClickListener);
+		addActivityBtn = (Button)findViewById(R.id.ui_addActivityBtn);
+		addActivityBtn.setOnClickListener(addActivityListener);
+		
 		UILayout.setOnTouchListener(this);
 		UIGestureDetector = new GestureDetector(this);
 		UIGestureDetector.setIsLongpressEnabled(false);
@@ -134,6 +138,20 @@ GestureDetector.OnGestureListener
 		initFriendsCenter();
 		notificationCenter = new NotificationCenter(this, this.UI_Menu,uiHandler, userId);
 	}
+	
+	//add by luo
+	private OnClickListener addActivityListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			Intent intent = new Intent();
+			intent.setClass(UserInterface.this, AddActivity.class);
+			intent.putExtra("userId", userId);
+			intent.putExtra("email", email);
+			startActivity(intent);
+		}
+	};
 	
 	private void initMyEvents()
 	{

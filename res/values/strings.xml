@@ -6,4 +6,17 @@
     <string name="hello_world">Hello world!</string>
 <string name="signuphint">&lt;&lt;sign up</string>
 	<string name="loginhint">Login&gt;&gt;</string>
+	<string name="addActivity">发起活动</string>
+    <string name="activityTheme">活动主题</string>
+    <string name="activityThemeHint">请输入活动主题</string>
+    <string name="activityTime">活动时间:</string>
+    <string name="activityLocation">活动地点:</string>
+    <string name="activityParticipant">活动参与者:</string>
+    <string name="activityDuration">请输入活动持续时长/天</string>
+    <string name="activityVisibility">活动是否公开</string>
+    <string name="activityremarks">可添加备注</string>
+    <string name="addActivityTime">添加活动时间</string>
+    <string name="addActivityLocation">添加活动地点</string>
+    <string name="addActivityParticipant">添加参与活动的好友</string>
+    <string name="submitActivityBtn">提交活动</string>
 </resources>

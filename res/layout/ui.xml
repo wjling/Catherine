@@ -87,13 +87,24 @@
             android:layout_height="fill_parent"
             android:background="#ffffff"
             android:orientation="vertical" >
-
-            <Button
-                android:id="@+id/ui_content_menuBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="MENU"
-                android:textColor="#000000" />
+			<RelativeLayout 
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content">
+			     <Button
+	                android:id="@+id/ui_content_menuBtn"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:text="MENU"
+	                android:textColor="#000000" />
+			     <Button
+			         android:id="@+id/ui_addActivityBtn"
+			         android:layout_width="wrap_content"
+			         android:layout_height="wrap_content"
+			         android:text="添加活动"
+			         android:layout_alignParentRight="true"
+			         android:textColor="#00ffff"/>
+			</RelativeLayout>
+           
 
             <LinearLayout
                 android:id="@+id/ui_content_thecontent"
