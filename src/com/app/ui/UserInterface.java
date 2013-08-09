@@ -460,7 +460,7 @@ GestureDetector.OnGestureListener
 				case R.id.ui_menu_recommendedevents:
 					break;
 				case R.id.ui_menu_friendscenter:
-					UI_friendsCenter.init();
+					notificationCenter.init();
 					break;
 				case R.id.ui_menu_update:
 					break;

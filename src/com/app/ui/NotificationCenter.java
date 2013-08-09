@@ -55,7 +55,7 @@ public class NotificationCenter {
 	
 	
 	
-	private void init() {
+	public void init() {
 		// TODO Auto-generated method stub
 		getNotificationFromDB();
 		showFriendRequests();
