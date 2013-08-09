@@ -9,5 +9,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="程序设置" />
+    
+         <ImageView android:id="@+id/avatar"
+        android:layout_width="fill_parent"
+        android:layout_height="200dp"
+        />
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+         
+    <Button
+        android:id="@+id/uploadbyphotos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="uploadbyphotos" />
+    
+    <Button 
+        android:id="@+id/uploadbycamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="uploadbycamera" />"
+
+    </LinearLayout>
 
 </LinearLayout>
