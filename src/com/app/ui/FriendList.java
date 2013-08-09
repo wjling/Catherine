@@ -4,11 +4,15 @@ import com.app.catherine.R;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 public class FriendList extends Activity{
 	
+	private final String TAG = "Friend List";
 	private Button searchMyFriendBtn;
 	private Button recommendFriendBtn;
 	private EditText searchMyFriend;
@@ -26,6 +30,11 @@ public class FriendList extends Activity{
 		searchMyFriend = (EditText)findViewById(R.id.friend_list_searchmyfriend);
 		searchMyFriendBtn = (Button)findViewById(R.id.friend_list_searchmyfriendBtn);
 		recommendFriendBtn = (Button)findViewById(R.id.friend_list_recommendfriendBtn);
+		LinearLayout.LayoutParams searchMyFriendBtnParams = (LayoutParams) searchMyFriendBtn.getLayoutParams();
+		LinearLayout.LayoutParams searchMyFriendParams = (LayoutParams) searchMyFriend.getLayoutParams();
+		Log.i(TAG,"origin: "+searchMyFriendParams.height+", now: "+ searchMyFriendBtnParams.height);
+		searchMyFriendParams.height = searchMyFriendBtnParams.height;
+		searchMyFriend.setLayoutParams(searchMyFriendParams);
 	}
 	
 	
