@@ -28,4 +28,5 @@ public class OperationCode {
     public static final int UPLOAD_AVATAR = 23;        // 上传头像
     public static final int GET_AVATAR = 24;                 // 获取头像
     public static final int LOGOUT = 25;                              // 登出
+    public static final int GET_USER_INFO = 26;            // 获取单个用户信息(用id)
 }

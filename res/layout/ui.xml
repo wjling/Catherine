@@ -23,7 +23,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="     我的活动"
-                android:textSize="15sp" />
+                android:textSize="15sp" 
+                android:textColor="@color/white"/>
 
             <Button
                 android:id="@+id/ui_menu_privateevents"
@@ -31,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="     有关活动"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/ui_menu_recommendedevents"
@@ -39,7 +41,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="     推荐活动"
-                android:textSize="15sp" />
+                android:textSize="15sp" 
+                android:textColor="@color/white"/>
 
             <Button
                 android:id="@+id/ui_menu_friendscenter"
@@ -47,7 +50,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="     好友中心"
-                android:textSize="15sp" />
+                android:textSize="15sp" 
+                android:textColor="@color/white"/>
 
             <ImageView
                 android:id="@+id/imageView1"
@@ -61,7 +65,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="     版本更新"
-                android:textSize="15sp" />
+                android:textSize="15sp" 
+                android:textColor="@color/white"/>
 
             <Button
                 android:id="@+id/ui_menu_settings"
@@ -69,7 +74,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="     程序设置"
-                android:textSize="15sp" />
+                android:textSize="15sp" 
+                android:textColor="@color/white"/>
 
             <Button
                 android:id="@+id/ui_menu_exit"
@@ -77,7 +83,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
                 android:text="     退出程序"
-                android:textSize="15sp" />
+                android:textSize="15sp" 
+                android:textColor="@color/white"/>
 
         </LinearLayout>
 
