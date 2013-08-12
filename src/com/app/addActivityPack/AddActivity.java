@@ -19,13 +19,14 @@ import com.app.utils.HttpSender;
 import com.app.utils.ListViewUtility;
 import com.app.utils.OperationCode;
 import com.app.utils.ReturnCode;
-
 import android.R.bool;
 import android.R.integer;
 import android.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,30 +52,20 @@ import android.widget.Toast;
 public class AddActivity extends Activity
 {
 	private static final String ADD_ACTIVITY_TAG = "AddActivity";
-	
-	private Button addTimeBtn;
-	private Button addLocationBtn;
-	private Button addPaticipantBtn;
-	private Button submitActivityBtn;
-	private EditText themeEditText;
-	private EditText durationEditText;
-	private EditText remarkEditText;
-	private CheckBox visibilityCheckBox;
-	
+
+	private View submitActivityBtn, cancelActivityBtn, addparticipantBlock;
+	private EditText themeEditText, locEditText, remarkEditText;
+	private TextView dateTextView;
+	private CheckBox canjoinCheckBox;
 	private Calendar calendar;
-	private String outputList = "";
-	private String outputLocList = "";
-	
-	private String activityTheme = "";
-	private Set<TimeStruct> dateList = new HashSet<TimeStruct>();
-	private AlertDialog dialogAddLocation;
-	private Set<String> locationList = new HashSet<String>();
+	private boolean canjoin;
+
 	private ListView participantList;
 	private AdapterForPaticipantList adapter;
 	private Vector<String> participantSet = new Vector<String>();
-	private int duration;
+	
+	private String activityTheme, activityLoc="", activityDate="";	
 	private String remarkStr;
-	private boolean visibility;
 	
 	private int userId;
 	private String email;
@@ -87,26 +78,28 @@ public class AddActivity extends Activity
 	{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.addactivity);
+		setContentView(R.layout.addactivity_main);
+		
+		CircularImage join = (CircularImage)findViewById(R.id.addParticipantBtn);
+		join.setImageResource(R.drawable.join);
 		
 		calendar = Calendar.getInstance();
-		addTimeBtn = (Button)findViewById(R.id.addTime);
-		addTimeBtn.setOnClickListener(addTimeListener);
-		
-		addLocationBtn = (Button)findViewById(R.id.addLocation);
-		addLocationBtn.setOnClickListener(addLocationListener);
-		
-		addPaticipantBtn = (Button)findViewById(R.id.addParticipant);
-		addPaticipantBtn.setOnClickListener(addPaticipantListener);
-		
-		submitActivityBtn = (Button)findViewById(R.id.submitActivityBtn);
-		submitActivityBtn.setOnClickListener(submitActivityListener);
 		
 		themeEditText = (EditText)findViewById(R.id.activityTheme);
-		durationEditText = (EditText)findViewById(R.id.activityDuration);
-		remarkEditText = (EditText)findViewById(R.id.activityRemarks);
-		visibilityCheckBox = (CheckBox)findViewById(R.id.activityVisibility);
-		visibilityCheckBox.setChecked(true);
+		dateTextView = (TextView)findViewById(R.id.activityDate);
+		dateTextView.setOnClickListener( addTimeListener );
+		locEditText = (EditText)findViewById(R.id.activityLoc);
+		remarkEditText = (EditText)findViewById(R.id.backup);
+		
+		addparticipantBlock = (View)findViewById(R.id.addParticipantBlock);
+		addparticipantBlock.setOnClickListener(addPaticipantListener);
+		
+		canjoinCheckBox = (CheckBox)findViewById(R.id.canjoin);
+		
+		submitActivityBtn = (View)findViewById(R.id.submitActivity);
+		submitActivityBtn.setOnClickListener(submitActivityListener);
+		cancelActivityBtn = (View)findViewById(R.id.cancelActivity);
+		cancelActivityBtn.setOnClickListener(submitActivityListener);
 		
 		userId = getIntent().getIntExtra("userId", 0);
 		email = getIntent().getStringExtra("email");
@@ -121,57 +114,67 @@ public class AddActivity extends Activity
 		@Override
 		public void onClick(View v)
 		{
-			String hint = "请输入完整信息：";
-			activityTheme = themeEditText.getText().toString().trim();
-			boolean getDurationFlag = getDuration();
-			remarkStr = remarkEditText.getText().toString().trim();
-			visibility = visibilityCheckBox.isChecked();
-			
-			if ("".equals(activityTheme))
+			if( v.getId() == R.id.submitActivity)
 			{
-				hint += "活动主题";
-				Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
+				String hint = "请输入完整信息：";
+				activityTheme = themeEditText.getText().toString().trim();
+				activityLoc = locEditText.getText().toString().trim();
+				canjoin = canjoinCheckBox.isChecked();
+				remarkStr = remarkEditText.getText().toString().trim();
+				
+				if ("".equals(activityTheme))
+				{
+					hint += "活动主题";
+					Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
+				}
+				else if ( participantSet.size()==0 )
+				{
+					hint += "选择参与者";
+					Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
+				}
+				else {
+					hint = "发起活动信息完整，正在发送请求...";
+					Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
+					sendRequest();
+				}
 			}
-			else if( dateList.size()==0)
+			else if( v.getId() == R.id.cancelActivity)
 			{
-				hint += "活动时间";
-				Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
-			}
-			else if( locationList.size()==0)
-			{
-				hint += "活动地点";
-				Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
-			}
-			else if( participantSet.size()==0)
-			{
-				hint += "参与者";
-				Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
-			}
-			else if ( getDurationFlag==false) {
-				hint += "活动持续时间";
-				Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
-			}
-			else {
-				hint = "发起活动信息完整，正在发送请求...";
-				Toast.makeText(AddActivity.this, hint, Toast.LENGTH_SHORT).show();
-				sendRequest();
+				cancelDialog();
 			}
 		}
 	};
 	
-	private boolean getDuration()
+	private void cancelDialog()
 	{
-		duration = -1;
-		String str = durationEditText.getText().toString().trim();
-		if (str.length()==0 ) 
-			return false;
-		else {
-			duration = Integer.parseInt( str );
-			if ( duration<0 ) 
-				return false;
-			else 
-				return true;			
-		}
+		Builder dialog = new AlertDialog.Builder(AddActivity.this)
+			.setTitle("提示")
+			.setMessage("确定要取消活动吗？")
+			.setPositiveButton("是", 
+					new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							//跳回到主页面userinterface
+							Intent intent = new Intent();
+								intent.setClass(AddActivity.this, UserInterface.class);
+								intent.putExtra("userId", userId);
+								intent.putExtra("email", email);
+								startActivity(intent);
+							finish();
+						}
+					})
+			.setNegativeButton("否", 
+					new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							//啥都不做
+						}
+					});
+		dialog.show();
 	}
 	
 	/**
@@ -194,31 +197,10 @@ public class AddActivity extends Activity
 		{
 			paramsAddActivity.put("id", userId);
 			paramsAddActivity.put("subject", activityTheme);		
-			
-			paramsAddActivity.put("time", dateList.iterator().next().toString());
-//			paramsAddActivity.put("time_count", dateList.size());
-//			Log.i(ADD_ACTIVITY_TAG, "时间数："+dateList.size());		
-//			int i = 0;
-//			for (TimeStruct dateItem : dateList)
-//			{
-//				i++;
-//				paramsAddActivity.put("time"+i, dateItem.toString());				
-//				Log.i(ADD_ACTIVITY_TAG, "time"+i+":"+dateItem.toString());
-//			}
-			paramsAddActivity.put("location", locationList.iterator().next().toString());
-//			paramsAddActivity.put("location_count", locationList.size());
-//			Log.i(ADD_ACTIVITY_TAG, "地点数："+locationList.size());
-//			
-//			int k = 0;
-//			for(String loc : locationList)
-//			{
-//				k++;	
-//				paramsAddActivity.put("location"+k, loc);
-//				Log.i(ADD_ACTIVITY_TAG, "location"+k+":"+loc);
-//			}
-			
-			paramsAddActivity.put("duration", duration);
-			paramsAddActivity.put("visibility", visibility);
+			paramsAddActivity.put("time", activityDate);
+			paramsAddActivity.put("location", activityLoc);
+			paramsAddActivity.put("duration", 0);
+			paramsAddActivity.put("visibility", canjoin);
 			paramsAddActivity.put("status", 0);
 			paramsAddActivity.put("remark", remarkStr);
 			
@@ -226,17 +208,6 @@ public class AddActivity extends Activity
 			for ( String participant : participantSet) 
 				participantsParam.add( Integer.parseInt(participant) );
 			paramsAddActivity.put("friends", participantsParam);
-			
-//			paramsAddActivity.put("friends_count", participantSet.size());
-//			Log.i(ADD_ACTIVITY_TAG, "朋友数："+participantSet.size());
-			
-//			int m=0;
-//			for(String participant : participantSet)
-//			{
-//				m++;
-//				paramsAddActivity.put("friend"+m, participant);
-//				Log.i(ADD_ACTIVITY_TAG, "friend"+m+":"+participant);
-//			}
 			
 			//response
 			Log.i("AddActivity params:", paramsAddActivity.toString());
@@ -306,7 +277,7 @@ public class AddActivity extends Activity
 				}
 			}
 			
-			TextView participantTV = (TextView)findViewById(R.id.participantList);
+			TextView participantTV = (TextView)findViewById(R.id.showparticipant);
 			participantTV.setText(output);
 		}
 	};
@@ -328,62 +299,6 @@ public class AddActivity extends Activity
 		}
 		
 	};
-	
-	private OnClickListener addLocationListener = new OnClickListener()
-	{	
-		@Override
-		public void onClick(View v)
-		{
-
-			LayoutInflater factory = LayoutInflater.from(AddActivity.this);
-			//得到自定义对话框
-			final View dialogView = factory.inflate(R.layout.addlocation, null);
-			
-			dialogAddLocation = new AlertDialog.Builder(AddActivity.this)
-				.setTitle("创建活动")
-				.setMessage("请输入活动地点：")
-				.setView(dialogView)
-				.setPositiveButton("确定", addLocationPositiveListener)
-				.setNegativeButton("取消", null)
-				.create();
-			
-			dialogAddLocation.show();
-	
-		}
-	};
-	
-	private DialogInterface.OnClickListener addLocationPositiveListener = new DialogInterface.OnClickListener()
-	{
-		private EditText newLocationET;
-		private String newLocationStr;
-		
-		@Override
-		public void onClick(DialogInterface dialog, int which)
-		{
-			// TODO Auto-generated method stub
-			newLocationET = (EditText)dialogAddLocation.findViewById(R.id.addLocationText);
-			newLocationStr = newLocationET.getText().toString().trim();
-			if( !"".equals(newLocationStr) )
-			{
-				locationList.add(newLocationStr);
-				displayLocationList();
-			}
-			//Toast.makeText(AddActivity.this, "添加了："+newLocationStr, Toast.LENGTH_SHORT).show();
-		}
-	};
-	
-	private void displayLocationList()
-	{
-		outputLocList = "";
-		TextView locListTV = (TextView)findViewById(R.id.locationList);
-		
-		for (String location : locationList)
-		{
-			outputLocList += location + "\n";
-		}
-		
-		locListTV.setText(outputLocList);
-	}
 	
 	private OnClickListener addTimeListener = new OnClickListener()
 	{		
@@ -435,35 +350,11 @@ public class AddActivity extends Activity
 					public void onTimeSet(TimePicker view, int hourOfDay, int minute)
 					{
 							timeStruct.setTime(hourOfDay, minute);
-							dateList.add(timeStruct);
-							displayDateList();						
+							dateTextView.setText(timeStruct.toString());
+							activityDate = timeStruct.toString();
 					}
 				};
 	};
-	
-	private void displayDateList()
-	{
-		ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String,Object>>();
-		ListView lv = (ListView)findViewById(R.id.timeList);
-		
-		for (TimeStruct dateItem : dateList)			
-		{
-			Log.i("AddActivity date:", dateItem.toString());
-			HashMap<String, Object> map = new HashMap<String, Object>();		
-			map.put("activityDate", dateItem);
-			map.put("content", dateItem.toString());
-			list.add(map);
-		}
-	
-		AdapterForTimeItem adapter = new AdapterForTimeItem(this, list, 
-				R.layout.time, 
-				new String[] {"content"}, 
-				new int[] {R.id.timeContent}, 
-				dateList,
-				R.id.timeList);
-		lv.setAdapter(adapter);
-		new ListViewUtility().setListViewHeightBasedOnChildren(lv);
-	}
 	
 	class MessageHandler extends Handler
 	{
@@ -499,6 +390,7 @@ public class AddActivity extends Activity
 								intent.putExtra("userId", userId);
 								intent.putExtra("email", email);
 								startActivity(intent);
+								finish();
 							}
 							else {
 								Toast.makeText(AddActivity.this, "发起活动失败，请重试", Toast.LENGTH_SHORT).show();

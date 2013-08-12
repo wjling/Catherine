@@ -19,4 +19,6 @@
     <string name="addActivityLocation">添加活动地点</string>
     <string name="addActivityParticipant">添加参与活动的好友</string>
     <string name="submitActivityBtn">提交活动</string>
+    <string name="activitytime">&#160;&#160;时&#160;&#160;&#160;&#160;间&#160;&#160; </string>
+    <string name="activityLoc">&#160;&#160;地&#160;&#160;&#160;&#160;点&#160;&#160; </string>
 </resources>
