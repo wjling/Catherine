@@ -60,6 +60,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver
 							if(result.equals(true))
 							{
 								Log.i(TAG, "同意添加我，那我把好友信息加入数据库"+msg);
+								msgJson.put("uid", uid);
 								FriendStruct newFriend = new FriendStruct(msgJson);
 								TableFriends tableFriends = new TableFriends(context);
 								tableFriends.add(newFriend);

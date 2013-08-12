@@ -19,6 +19,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
@@ -26,7 +27,7 @@ import android.widget.ListView;
 public class FriendList extends Activity{
 	
 	private final String TAG = "Friend List";
-	private Button searchMyFriendBtn;
+	private TextView searchMyFriendBtn;
 	private Button recommendFriendBtn;
 	private EditText searchMyFriend;
 	private ListView friendListView;
@@ -63,7 +64,7 @@ public class FriendList extends Activity{
 		userId = intent.getIntExtra("userId", -1);
 		
 		searchMyFriend = (EditText)findViewById(R.id.friend_list_searchmyfriend);
-		searchMyFriendBtn = (Button)findViewById(R.id.friend_list_searchmyfriendBtn);
+		searchMyFriendBtn = (TextView)findViewById(R.id.friend_list_searchmyfriendBtn);
 		recommendFriendBtn = (Button)findViewById(R.id.friend_list_recommendfriendBtn);
 		friendListView = (ListView)findViewById(R.id.friend_list_friendlist);
 		friendListAdapter = new AdapterForFriendList(this, friendList, 
@@ -91,21 +92,24 @@ public class FriendList extends Activity{
 		else
 		{
 			for (FriendStruct fs : friends) {
-				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put("fname", fs.fname);
-				int gender = Integer.parseInt(fs.gender);
-				if(gender == 0)
+				if(fs.uid == userId)
 				{
-					map.put("gender", "ÄÐ");
+					HashMap<String, Object> map = new HashMap<String, Object>();
+					map.put("fname", fs.fname);
+					int gender = Integer.parseInt(fs.gender);
+					if(gender == 1)
+					{
+						map.put("gender", "ÄÐ");
+					}
+					else
+					{
+						map.put("gender", "Å®");
+					}
+	//				map.put("gender", fs.gender);
+					map.put("email", fs.email);
+					map.put("fid",fs.fid);
+					friendList.add(map);
 				}
-				else
-				{
-					map.put("gender", "Å®");
-				}
-//				map.put("gender", fs.gender);
-				map.put("email", fs.email);
-				map.put("fid",fs.fid);
-				friendList.add(map);
 			}
 		}
 		Collections.sort(friendList, myComparator);

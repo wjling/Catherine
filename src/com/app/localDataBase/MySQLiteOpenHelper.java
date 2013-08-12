@@ -11,7 +11,8 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
 	
 	private String TABLE_NAME1 = "friends";
 	private String SQL_createTable1 = "CREATE TABLE "+TABLE_NAME1+
-			" (fid INTEGER PRIMARY KEY, " +
+			" (uid INTEGER PRIMARY KEY,"+
+			"fid INTEGER, " +
 			"fname varchar(20), " +
 			"gender varchar(20), " +
 			"email varchar(30))";

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class FriendStruct {
+	public int uid;
 	public int fid;
 	public String fname;
 	public String gender;
@@ -13,6 +14,7 @@ public class FriendStruct {
 	
 	public FriendStruct() {
 		// TODO Auto-generated constructor stub
+		uid = -1;
 		fid = -1;
 		fname = null;
 		gender = null;
@@ -22,6 +24,7 @@ public class FriendStruct {
 	public FriendStruct(JSONObject jo)
 	{
 		try {
+			uid = jo.getInt("uid");
 			fid = jo.getInt("id");
 			fname =  jo.getString("name");
 			gender = jo.getString("gender");
@@ -36,6 +39,7 @@ public class FriendStruct {
 	{
 		FriendStruct fs = new FriendStruct();
 		try {
+			fs.uid = jo.getInt("uid");
 			fs.fid = jo.getInt("id");
 			Log.v("friends","fs.fid "+fs.fid);
 			fs.fname = jo.getString("name");

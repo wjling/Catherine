@@ -100,9 +100,10 @@ public class AdapterForFriendList extends BaseAdapter{
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				String uid = list.get(pos).get("uid").toString();
 				String fid = list.get(pos).get("fid").toString();
 				TableFriends tf = new TableFriends(context);
-				tf.delete(fid);
+				tf.delete(uid,fid);
 				list.remove(pos);
 				AdapterForFriendList.this.notifyDataSetChanged();
 			}

@@ -32,6 +32,7 @@ public class TableFriends {
 			{
 				FriendStruct fs = friends.get(i);
 				ContentValues turple = new ContentValues();
+				turple.put("uid", fs.uid);
 				turple.put("fid", fs.fid);
 				turple.put("fname", fs.fname);
 				turple.put("gender", fs.gender);
@@ -48,55 +49,61 @@ public class TableFriends {
 		if(db.isOpen())
 		{
 				ContentValues turple = new ContentValues();
-					turple.put("fid", fs.fid);
-					turple.put("fname", fs.fname);
-					turple.put("gender", fs.gender);
-					turple.put("email", fs.email);
-					db.insert("friends", null, turple);
+				turple.put("uid", fs.uid);
+				turple.put("fid", fs.fid);
+				turple.put("fname", fs.fname);
+				turple.put("gender", fs.gender);
+				turple.put("email", fs.email);
+				db.insert("friends", null, turple);
 				db.close();
 		}
 	}
 	
-	public void delete(String fid)
+	public void delete(String uid, String fid)
 	{
 		SQLiteDatabase db = myHelper.getWritableDatabase();
 		if(db.isOpen())
 		{
-			db.delete("friends", "fid = ?", new String[]{fid});
+			db.delete("friends", "uid = ? AND fid=?", new String[]{uid,fid});
 			db.close();
 		}
 	}
 	
-	public void update(String oldFid, FriendStruct fs)
+	public void update(String uid, String oldFid, FriendStruct fs)
 	{
 		SQLiteDatabase db = myHelper.getWritableDatabase();
 		if(db.isOpen())
 		{
 			ContentValues turple = new ContentValues();
+			turple.put("uid", fs.uid);
 			turple.put("fid", fs.fid);
 			turple.put("fname", fs.fname);
 			turple.put("gender", fs.gender);
 			turple.put("email", fs.email);
-			db.update("friends", turple, "fid=?", new String[]{oldFid});
+			db.update("friends", turple, "uid=? AND fid=?", new String[]{uid,oldFid});
 			db.close();
 		}
 	}
 	
-	public FriendStruct query(String fid)
+	public FriendStruct query(String uid, String fid)
 	{
 		FriendStruct fs = new FriendStruct();
 		SQLiteDatabase db = myHelper.getWritableDatabase();
 		if(db.isOpen())
 		{
-			Cursor cr = db.query("friends", null, "fid=?", new String[]{fid}, null, null, null);
+			Cursor cr = db.query("friends", null, "uid=? AND fid=?", new String[]{uid,fid}, null, null, null);
 			if(cr.moveToFirst())
 			{
-				fs.fid = cr.getInt(0);
-				fs.fname = cr.getString(1);
-				fs.gender = cr.getString(2);
-				fs.email = cr.getString(3);
+				fs.uid = cr.getInt(0);
+				fs.fid = cr.getInt(1);
+				fs.fname = cr.getString(2);
+				fs.gender = cr.getString(3);
+				fs.email = cr.getString(4);
 			}
-			Toast.makeText(context, "没有该条记录...", Toast.LENGTH_SHORT).show();
+			else
+			{
+				Toast.makeText(context, "没有该条记录...", Toast.LENGTH_SHORT).show();
+			}
 			db.close();
 		}
 		return fs;
@@ -113,10 +120,11 @@ public class TableFriends {
 			while(cr.moveToNext())
 			{
 				FriendStruct fs = new FriendStruct();
-				fs.fid = cr.getInt(0);
-				fs.fname = cr.getString(1);
-				fs.gender = cr.getString(2);
-				fs.email = cr.getString(3);
+				fs.uid = cr.getInt(0);
+				fs.fid = cr.getInt(1);
+				fs.fname = cr.getString(2);
+				fs.gender = cr.getString(3);
+				fs.email = cr.getString(4);
 				friendArray.add(fs);
 			}
 			db.close();
