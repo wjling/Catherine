@@ -15,6 +15,7 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
+import android.graphics.Region.Op;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -83,23 +84,29 @@ public class HttpSender {
         case OperationCode.SEARCH_EVENT:
             httpUrl += "search_event";
             break;
-        case OperationCode.GET_EVENT_POST:
-            httpUrl += "get_posts";
+        case OperationCode.GET_MY_EVENTS:
+            httpUrl += "get_my_events";
             break;
-        case OperationCode.ADD_POST:
-            httpUrl += "add_post";
+        case OperationCode.GET_RELEVANT_EVENTS:
+            httpUrl += "get_relevant_events";
             break;
-        case OperationCode.DELETE_POST:
-            httpUrl += "delete_post";
+        case OperationCode.GET_RECOM_EVENTS:
+            httpUrl += "get_recom_events";
             break;
-        case OperationCode.GET_POST_COMMENT:
-            httpUrl += "get_comments";
+        case OperationCode.GET_IMPORTANT_INFO:
+            httpUrl += "get_important_info";
             break;
         case OperationCode.ADD_COMMENT:
             httpUrl += "add_comment";
             break;
         case OperationCode.DELETE_COMMENT:
             httpUrl += "delete_comment";
+            break;
+        case OperationCode.GET_COMMENTS:
+            httpUrl += "get_comments";
+            break;
+        case OperationCode.ADD_GOOD:
+            httpUrl += "add_good";
             break;
         case OperationCode.INVITE_FRIENDS:
         	httpUrl += "invite_friends";
@@ -110,6 +117,9 @@ public class HttpSender {
         case OperationCode.UPLOAD_AVATAR:
         case OperationCode.GET_AVATAR:
             httpUrl += "avatar";
+            break;
+        case OperationCode.LOGOUT:
+            httpUrl += "logout";
             break;
         default:
             httpUrl += "json";

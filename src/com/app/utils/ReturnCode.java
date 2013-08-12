@@ -1,5 +1,7 @@
 package com.app.utils;
 
+import android.R.integer;
+
 public class ReturnCode {
     public static final int NORMAL_REPLY = 100;
     public static final int USER_NOT_FOUND = 101;
@@ -17,4 +19,13 @@ public class ReturnCode {
     public static final int NO_AVATAR = 113;
     public static final int PHOTO_NOT_EXIST = 114;
     public static final int USER_ALREADY_ONLINE = 115;
+    public static final int USER_LOGOUT_SUC = 116;
+    
+    public static final int ADD_FRIEND_NOTIFICATION = 999;
+    public static final int ADD_FRIEND_RESULT = 998;
+    public static final int NEW_EVENT_NOTIFICATION = 997;
+    public static final int EVENT_INVITE_RESPONSE = 996;
+    public static final int REQUEST_EVENT = 995;
+    public static final int REQUEST_EVENT_RESPONSE = 994;
+    
 }
