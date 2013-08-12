@@ -1,18 +1,8 @@
 package com.app.ui;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
-import com.app.addActivityPack.AddActivity;
-import com.app.catherine.R;
-import com.app.catherine.R.id;
-import com.app.catherine.R.layout;
-import com.app.customwidget.PullUpDownView;
-import com.app.customwidget.PullUpDownView.onPullListener;
-import com.app.utils.MyBroadcastReceiver;
-
 import android.app.Activity;
-import android.app.ActivityGroup;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,25 +11,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.GestureDetector;
 import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnDrawListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
+
+import com.app.addActivityPack.AddActivity;
+import com.app.catherine.R;
+import com.app.ui.menu.FriendCenter.FriendCenter;
+import com.app.utils.MyBroadcastReceiver;
 
 public class UserInterface extends Activity implements OnTouchListener,
 GestureDetector.OnGestureListener
@@ -86,8 +73,7 @@ GestureDetector.OnGestureListener
 		super.onCreate(savedInstanceState);
 		View v = LayoutInflater.from(getApplicationContext()).inflate(R.layout.ui, null);
 		setContentView(v);
-		
-		UI_Menu = new Menu(getApplicationContext(),v,uiHandler);
+		UI_Menu = new Menu(this,v,uiHandler);
 		UI_Menu.setMenu();
 		//hello
 		
@@ -186,7 +172,7 @@ GestureDetector.OnGestureListener
 	{
 		
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)UILayout.getLayoutParams();
-		Log.i("myUI","In jump(): leftMargin = "+ layoutParams.leftMargin);
+//		Log.i("myUI","In jump(): leftMargin = "+ layoutParams.leftMargin);
 		if(layoutParams.leftMargin>= 0)
 		{
 			new AsynMove().execute(-speed);
