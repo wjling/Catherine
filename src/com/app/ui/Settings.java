@@ -88,12 +88,15 @@ public class Settings{
         gender = (EditText)settingsView.findViewById(R.id.settings_gender);
         gender.setFocusable(false);
         gender.setFocusableInTouchMode(false);
+        gender.setLongClickable(false);
         location = (EditText)settingsView.findViewById(R.id.settings_location);
         location.setFocusable(false);
         location.setFocusableInTouchMode(false);
+        location.setLongClickable(false);
         description = (EditText)settingsView.findViewById(R.id.settings_description);
         description.setFocusable(false);
         description.setFocusableInTouchMode(false);
+        description.setLongClickable(false);
         myName = (TextView)settingsView.findViewById(R.id.settings_name);
         myEmail = (TextView)settingsView.findViewById(R.id.settings_email);
         handler = new MessageHandler(Looper.myLooper());
