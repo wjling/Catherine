@@ -72,6 +72,11 @@ public class Menu {
 		return friendCenterView;
 	}
 	
+	public View getSettingsView()
+	  {
+	      return settingsView;
+	  }
+	
 //	public View get
 	
 	public void setMenu()

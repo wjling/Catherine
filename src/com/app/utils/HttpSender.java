@@ -108,7 +108,8 @@ public class HttpSender {
             httpUrl += "note";
             break;
         case OperationCode.UPLOAD_AVATAR:
-            httpUrl += "upload_avatar";
+        case OperationCode.GET_AVATAR:
+            httpUrl += "avatar";
             break;
         default:
             httpUrl += "json";

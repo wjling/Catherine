@@ -22,6 +22,7 @@ import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.app.addActivityPack.AddActivity;
 import com.app.catherine.R;
@@ -59,6 +60,7 @@ GestureDetector.OnGestureListener
 	private NotificationCenter notificationCenter;
 	private MyEvents UI_myEvents;
 	private FriendCenter UI_friendsCenter;
+	private Settings UI_settings;
 	
 	private int userId = -1;
 	private String email;
@@ -122,6 +124,7 @@ GestureDetector.OnGestureListener
 		setParams();
 		initMyEvents();
 		initFriendsCenter();
+		initSettings();
 		notificationCenter = new NotificationCenter(this, this.UI_Menu,uiHandler, userId);
 	}
 	
@@ -153,6 +156,10 @@ GestureDetector.OnGestureListener
 		UI_friendsCenter.init();
 	}
 	
+	private void initSettings()
+    {
+        UI_settings = new Settings(this, UI_Menu.getSettingsView(), userId);
+    }
 	
 	OnClickListener menuButtonOnClickListener = new OnClickListener() {
 		
@@ -510,6 +517,21 @@ GestureDetector.OnGestureListener
 		}
 	}
 	
+	 @Override
+	 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	      // TODO Auto-generated method stub
+	      if (requestCode == UI_settings.CASE_PHOTO && resultCode == RESULT_OK && null != data)
+	      {
+	          UI_settings.onAvatarsetFromPhoto(data);
+	      }
+	      else if (requestCode == UI_settings.CASE_CAMERA && resultCode == RESULT_OK && null != data)
+	      {
+	          UI_settings.onAvatarsetFromCamera(data);
+	      }
+	      else {
+	          Toast.makeText(this, "请重新选择头像", Toast.LENGTH_SHORT);
+	      }
+	 }
 	
 
 }
