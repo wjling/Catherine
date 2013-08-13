@@ -265,8 +265,10 @@ public class NotificationCenter {
 			}	
 			
 		}
+		Log.i("NotificationCenter","notificationView的id为： "+ notificationView.getId());
 		if(notificationView.getId() == R.layout.friend_center_notification)
 		{
+			Log.i("NotificationCenter","显示朋友通知： "+friendRequests.toString());
 			ListView lv1 = (ListView)notificationView.findViewById(R.id.friend_center_notification_friendrequests);
 			friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
 					R.layout.friend_request, 
@@ -277,6 +279,7 @@ public class NotificationCenter {
 		}
 		else if(notificationView.getId() == R.layout.my_events_notification)
 		{
+			Log.i("NotificationCenter","显示活动通知： "+eventInvitations.toString());
 			ListView lv2 = (ListView)notificationView.findViewById(R.id.my_events_notification_eventsRequests);
 			eventInvitationAdapter = new SimpleAdapter(context, eventInvitations, 
 					R.layout.activity_request_item, 

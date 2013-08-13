@@ -19,6 +19,7 @@ public class MyEventsNotification extends Activity{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		contentView = LayoutInflater.from(this).inflate(R.layout.my_events_notification, null);
+		contentView.setId(R.layout.my_events_notification);
 		setContentView(contentView);
 		init();
 	}
