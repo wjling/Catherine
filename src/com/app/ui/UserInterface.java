@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.app.addActivityPack.AddActivity;
+import com.app.addFriendPack.searchFriend;
 import com.app.catherine.R;
 import com.app.ui.menu.FriendCenter.FriendCenter;
 import com.app.utils.MyBroadcastReceiver;
@@ -37,6 +38,7 @@ GestureDetector.OnGestureListener
 	private LinearLayout menuLayout;
 	private LinearLayout UILayout; //UILayout分为左右两部分，左边是Menu,右边是Content
 	private Button menuButton, addActivityBtn;
+	private Button addFriendBtn;
 	private GestureDetector UIGestureDetector;
 	private int window_width;
 	private static float FLIP_DISTANCE_X = 400;	//检测甩手动作时候的最低速度值
@@ -117,6 +119,9 @@ GestureDetector.OnGestureListener
 		menuButton.setOnClickListener(menuButtonOnClickListener);
 		addActivityBtn = (Button)findViewById(R.id.ui_addActivityBtn);
 		addActivityBtn.setOnClickListener(addActivityListener);
+		addFriendBtn = (Button)findViewById(R.id.ui_content_addFriendBtn);
+		addFriendBtn.setOnClickListener(ui_ButtonClickListener);
+		addFriendBtn.setVisibility(View.GONE);
 		
 		UILayout.setOnTouchListener(this);
 		UIGestureDetector = new GestureDetector(this);
@@ -126,8 +131,25 @@ GestureDetector.OnGestureListener
 		initFriendsCenter();
 		initSettings();
 		notificationCenter = new NotificationCenter(this, this.UI_Menu,uiHandler, userId);
+		notificationCenter.getNotifications();
 	}
-	
+	private OnClickListener ui_ButtonClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			switch(v.getId())
+			{
+			case R.id.ui_content_addFriendBtn:
+				Intent intent1 = new Intent();
+				intent1.setClass(UserInterface.this, searchFriend.class);
+				intent1.putExtra("userId", userId);
+				UserInterface.this.startActivity(intent1);
+				break;
+				default: break;
+			}
+		}
+	};
 	//add by luo
 	private OnClickListener addActivityListener = new OnClickListener() {
 
@@ -464,18 +486,30 @@ GestureDetector.OnGestureListener
 				switch(menu.getId())
 				{
 				case R.id.ui_menu_myevents:
+					addActivityBtn.setVisibility(View.VISIBLE);
+					addFriendBtn.setVisibility(View.GONE);
 					UI_myEvents.loadData();
 					break;
 				case R.id.ui_menu_privateevents:
+					addActivityBtn.setVisibility(View.GONE);
+					addFriendBtn.setVisibility(View.GONE);
 					break;
 				case R.id.ui_menu_recommendedevents:
+					addActivityBtn.setVisibility(View.GONE);
+					addFriendBtn.setVisibility(View.GONE);
 					break;
 				case R.id.ui_menu_friendscenter:
-					notificationCenter.init();
+					addActivityBtn.setVisibility(View.GONE);
+					addFriendBtn.setVisibility(View.VISIBLE);
+//					notificationCenter.init();
 					break;
 				case R.id.ui_menu_update:
+					addActivityBtn.setVisibility(View.GONE);
+					addFriendBtn.setVisibility(View.GONE);
 					break;
 				case R.id.ui_menu_settings:
+					addActivityBtn.setVisibility(View.GONE);
+					addFriendBtn.setVisibility(View.GONE);
 					break;
 				case R.id.ui_menu_exit:
 					UserInterface.this.finish();

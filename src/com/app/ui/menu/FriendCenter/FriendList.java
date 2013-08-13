@@ -84,7 +84,7 @@ public class FriendList extends Activity{
 	{
 		friendList.clear();
 		TableFriends tf = new TableFriends(this);
-		friends = tf.getAllFriends();
+		friends = tf.getAllFriends(userId+"");
 		if(friends.size() == 0)
 		{
 			Toast.makeText(this, "你暂时还没有好友哦", Toast.LENGTH_SHORT).show();
@@ -92,8 +92,8 @@ public class FriendList extends Activity{
 		else
 		{
 			for (FriendStruct fs : friends) {
-				if(fs.uid == userId)
-				{
+//				if(fs.uid == userId)
+//				{
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put("fname", fs.fname);
 					int gender = Integer.parseInt(fs.gender);
@@ -109,7 +109,7 @@ public class FriendList extends Activity{
 					map.put("email", fs.email);
 					map.put("fid",fs.fid);
 					friendList.add(map);
-				}
+//				}
 			}
 		}
 		Collections.sort(friendList, myComparator);

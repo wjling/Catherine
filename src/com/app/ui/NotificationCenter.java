@@ -50,12 +50,11 @@ public class NotificationCenter {
 		this.UI_Menu = UI_Menu;
 		this.uiHandler = uiHandler;
 		this.userId = userId;
-		init();
 	}
 	
 	
 	
-	public void init() {
+	public void getNotifications() {
 		// TODO Auto-generated method stub
 		getNotificationFromDB();
 		showFriendRequests();

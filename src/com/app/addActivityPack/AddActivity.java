@@ -234,7 +234,7 @@ public class AddActivity extends Activity
 			dialogView = factory.inflate(R.layout.showcontactlist, null);
 			
 			participantList = (ListView)dialogView.findViewById(R.id.show_contact_list);
-			adapter = new AdapterForPaticipantList(AddActivity.this);
+			adapter = new AdapterForPaticipantList(AddActivity.this,userId);
 			
 			participantList.setAdapter(adapter);
 			participantList.setItemsCanFocus(false);
