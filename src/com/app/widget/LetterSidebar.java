@@ -1,5 +1,6 @@
 package com.app.widget;
 
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -49,17 +50,21 @@ public class LetterSidebar extends View{
         int singleHeight = height / letterTable.length;
         for (int i = 0; i < letterTable.length; i++)
         {
-            //paint.setTextSize(19) ;
+            paint.setTextSize(15) ;
             paint.setColor(Color.BLACK);
             //paint.setTypeface(Typeface.DEFAULT_BOLD);          
             paint.setAntiAlias(true);
             float xPos = width / 2 - paint.measureText(letterTable[i]) / 2;
-            float yPos = singleHeight * i + singleHeight;
+            float yPos = singleHeight * i + singleHeight + paint.measureText(letterTable[i]) / 2;
             
             if (i == choose)
             {
                 paint.setColor(Color.GRAY);
-                canvas.drawRect(0, singleHeight * i, width, singleHeight * (i+1), paint);
+                float radius = width/2;
+                if (width > singleHeight)
+                    radius = singleHeight/2;
+                canvas.drawCircle(width/2, singleHeight*i + singleHeight, radius, paint);
+                //canvas.drawRect(0, singleHeight * i, width, singleHeight * (i+1), paint);
                 paint.setColor(Color.WHITE);
                 paint.setFakeBoldText(true);
             }
@@ -85,7 +90,7 @@ public class LetterSidebar extends View{
             showBkg = true;
             if (oldChoose != c && listener != null)
             {
-                if (c > 0 && c < letterTable.length)
+                if (c >= 0 && c < letterTable.length)
                 {
                     listener.onTouchingLetterChanged(letterTable[c]);
                     choose = c;
@@ -97,7 +102,7 @@ public class LetterSidebar extends View{
         case MotionEvent.ACTION_MOVE:
             if (oldChoose != c && listener != null)
             {
-                if (c > 0 && c < letterTable.length)
+                if (c >= 0 && c < letterTable.length)
                 {
                     listener.onTouchingLetterChanged(letterTable[c]);
                     choose = c;
@@ -107,9 +112,9 @@ public class LetterSidebar extends View{
             break;
         case MotionEvent.ACTION_UP:
             showBkg = false;
-            if (oldChoose != c && listener != null)
+            if (listener != null)
             {
-                if (c > 0 && c < letterTable.length)
+                if (c >= 0 && c < letterTable.length)
                 {
                     listener.onTouchingLetterChanged(letterTable[c]);
                     choose = c;

@@ -34,6 +34,9 @@ import com.app.ui.NotificationCenter;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 import com.app.utils.ReturnCode;
+import com.app.widget.LetterSidebar;
+import com.app.widget.LetterSidebar.OnTouchingLetterChangedListener;
+
 
 public class FriendCenter {
 
@@ -43,6 +46,7 @@ public class FriendCenter {
 	private Button recommendedFriendsBtn;
 	private Button notificationBtn;
 	private ListView friendListView;
+	private LetterSidebar sidebar;
 	
 	private int userId = -1;
 	private Handler uiHandler;
@@ -95,8 +99,21 @@ public class FriendCenter {
 				new int[] {R.id.friend_list_item_fname,R.id.friend_list_item_gender,R.id.friend_list_item_email});
 		
 		friendListView.setAdapter(friendListAdapter);
+		sidebar=(LetterSidebar)friendCenterView.findViewById(R.id.lettersidebar);
+        sidebar.setOnTouchingLetterChangedListener(letterChangedListener);
+        
 	}
 
+	OnTouchingLetterChangedListener letterChangedListener = new OnTouchingLetterChangedListener() {
+	   
+	    @Override
+        public void onTouchingLetterChanged(String s) {
+            // TODO Auto-generated method stub
+            Log.i("Letter Sidebar letter is : ", s);
+            int position = s.charAt(0) - 'A';
+            Log.i("Letter Sidebar position is : ", position + "");
+        }
+	};
 	
 	OnClickListener buttonsOnClickListener = new OnClickListener() {
 		
