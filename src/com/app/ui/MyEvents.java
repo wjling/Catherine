@@ -167,6 +167,7 @@ public class MyEvents {
 				//get data from server
 				try {
 					getActivities();  
+					
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
