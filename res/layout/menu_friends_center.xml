@@ -48,27 +48,22 @@
             android:text="好友推荐" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/menu_friend_center_friendlist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
+    <Button
+        android:id="@+id/menu_friend_center_notificationBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="通知" />
 
-    <ListView
-        android:id="@+id/menu_friends_center_friendrequests"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-    </ListView>
 
-    <ListView
-        android:id="@+id/menu_friends_center_requestresults"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
-    
-    <com.app.widget.LetterSidebar
-        android:layout_width="25dp"
-        android:layout_height="match_parent"
-        android:layout_marginRight="2dp" />
+        <ListView
+            android:id="@+id/menu_friend_center_friendlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+
+    </RelativeLayout>
 
 </LinearLayout>

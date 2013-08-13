@@ -16,6 +16,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -34,7 +36,9 @@ public class FriendCenter {
 
 	private Context context;
 	private View friendCenterView;
+	private View friendNotificationView;
 	private Button recommendedFriendsBtn;
+	private Button notificationBtn;
 	private ListView friendListView;
 	
 	private int userId = -1;
@@ -75,7 +79,12 @@ public class FriendCenter {
 	
 	public void setLayout()
 	{
+		friendNotificationView = LayoutInflater.from(context).inflate(R.layout.friend_center_notification, null);
 		recommendedFriendsBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_recommendfriendBtn);
+		notificationBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_notificationBtn);
+		
+		recommendedFriendsBtn.setOnClickListener(buttonsOnClickListener);
+		notificationBtn.setOnClickListener(buttonsOnClickListener);
 		friendListView = (ListView)friendCenterView.findViewById(R.id.menu_friend_center_friendlist);
 		friendListAdapter = new AdapterForFriendList(context, friendList, 
 				R.layout.friend_list_item, 
@@ -91,24 +100,22 @@ public class FriendCenter {
 		@Override
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
-//			switch(v.getId())
-//			{
-//			case R.id.menu_friends_center_addfriendsBtn:
+			switch(v.getId())
+			{
+			case R.id.menu_friend_center_recommendfriendBtn:
 //				Intent intent1 = new Intent();
 //				intent1.setClass(context, searchFriend.class);
 //				intent1.putExtra("userId", userId);
 //				context.startActivity(intent1);
-//				break;
-//			case R.id.menu_friends_center_searchfriendBtn:
-//				break;
-//			case R.id.menu_friends_center_friendlistBtn:
-//				Intent intent2 = new Intent();
-//				intent2.putExtra("userId", userId);
-//				intent2.setClass(context, FriendList.class);
-//				context.startActivity(intent2);
-//				break;
-//				default: break;
-//			}
+				break;
+			case R.id.menu_friend_center_notificationBtn:
+				Intent intent2 = new Intent();
+				intent2.setClass(context, FriendNotification.class);
+				intent2.putExtra("userId", userId);
+				context.startActivity(intent2);
+				break;
+				default: break;
+			}
 		}
 	};
 	
@@ -126,7 +133,7 @@ public class FriendCenter {
 			e.printStackTrace();
 		}
 		HttpSender httpSender = new HttpSender();
-		httpSender.Httppost(OperationCode.SYNCHRONIZE, params, uiHandler);
+		httpSender.Httppost(OperationCode.SYNCHRONIZE, params, fcHandler);
 	}
 	
 	public void showFriendList()
@@ -144,6 +151,7 @@ public class FriendCenter {
 //				if(fs.uid == userId)
 //				{
 					HashMap<String, Object> map = new HashMap<String, Object>();
+					Log.i("FriendCenter","fs.gender: "+fs.gender);
 					map.put("fname", fs.fname);
 					int gender = Integer.parseInt(fs.gender);
 					if(gender == 1)
@@ -180,6 +188,7 @@ public class FriendCenter {
 			ArrayList<FriendStruct> friends = new ArrayList<FriendStruct>();
 			JSONObject jsResponse = new JSONObject(msg.obj.toString());
 			int cmd = jsResponse.getInt("cmd");
+			Log.i("FriendCenter", "同步好友收到的json: "+jsResponse);
 			if(cmd == ReturnCode.NORMAL_REPLY)
 			{
 				JSONArray jsArray = jsResponse.getJSONArray("friend_list");
@@ -194,8 +203,10 @@ public class FriendCenter {
 					for(int i=0;i<length;i++)
 					{
 						JSONObject jo = jsArray.getJSONObject(i);
+						Log.i("FriendCenter", "a jsonObject: "+jo.toString());
 						FriendStruct fs = new FriendStruct();
 						fs = FriendStruct.getFromJSON(jo);
+						fs.uid = userId;
 						friends.add(fs);
 					}
 					tbFriends.add(friends);	//add to the friends table of the local database
@@ -230,7 +241,7 @@ public class FriendCenter {
 			{
 			case OperationCode.SYNCHRONIZE:
 				sychronizeFriendsList(msg);
-				showFriendList();
+//				showFriendList();
 				break;
 				default: break;
 			}
@@ -238,7 +249,15 @@ public class FriendCenter {
 		}
 	}
 	
+	public View getFriendCenterView()
+	{
+		return friendCenterView;
+	}
 	
+	public View getFriendNotificationView()
+	{
+		return friendNotificationView;
+	}
 	
 	
 }
