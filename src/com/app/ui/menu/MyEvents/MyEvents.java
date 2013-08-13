@@ -11,12 +11,15 @@ import com.app.customwidget.PullUpDownView.onPullListener;
 import com.app.utils.cardAdapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -26,6 +29,7 @@ public class MyEvents {
 	public View myEventsView;
 	public PullUpDownView myEventsPullUpDownView;
 	public ListView myEventsListView;
+	private Button notificationBtn;
 	private onPullListener myEventsPullUpDownViewListener;
 	private OnItemClickListener myEventsListViewListener;
 	
@@ -34,6 +38,7 @@ public class MyEvents {
 	
 	private Handler uiHandler;
 	private int screenWidth;
+	private int userId;
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
@@ -41,13 +46,33 @@ public class MyEvents {
 	private static final int MSG_WHAT_REFRESH_DONE = -5;
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
-	public MyEvents(Context context, View myEventsView, Handler uiHandler, int screenWidth) {
+	private OnClickListener buttonsOnClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			switch(v.getId())
+			{
+			case R.id.menu_my_events_notificationBtn:
+				Intent intent = new Intent();
+				intent.putExtra("userId", userId);
+				intent.setClass(context, MyEventsNotification.class);
+				context.startActivity(intent);
+				break;
+				default: break;
+			}
+		}
+	};
+	
+	public MyEvents(Context context, View myEventsView, Handler uiHandler, int screenWidth, int userId) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.myEventsView = myEventsView;
 		this.uiHandler = uiHandler;
 		this.screenWidth = screenWidth;
+		this.userId = userId;
 	}
+	
 
 	public void init() {
 		// TODO Auto-generated method stub
@@ -103,6 +128,9 @@ public class MyEvents {
 			}
 		};
 		
+		
+		notificationBtn = (Button)myEventsView.findViewById(R.id.menu_my_events_notificationBtn);
+		notificationBtn.setOnClickListener(buttonsOnClickListener);
 		myEventsPullUpDownView = (PullUpDownView)myEventsView.findViewById(R.id.my_events_pull_up_down_view);
 		myEventsListView = myEventsPullUpDownView.getListView();
 		myEventsPullUpDownView.setOnPullListener(myEventsPullUpDownViewListener);
@@ -179,11 +207,6 @@ public class MyEvents {
 		}).start();
 	}
 	
-	// Ä£ÄâÊý¾Ý
-	private String[] mStringArray = {
-            "A", "B", "C", "D", "E"
-            ,"F", "G", "H", "I", "J", "K"
-//            ,"L", "M", "N", "O", "P"
-    };
+	
 	
 }

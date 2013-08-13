@@ -51,6 +51,11 @@
             android:theme="@style/AppTheme" 
             android:label="@string/app_name">
         </activity>
+        <activity 
+            android:name="com.app.ui.menu.MyEvents.MyEventsNotification" 
+            android:theme="@style/AppTheme" 
+            android:label="@string/app_name">
+        </activity>
         <service 
              android:name="com.app.HeartBeating.HeartbeatService"
            		>

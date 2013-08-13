@@ -3,6 +3,7 @@ package com.app.ui;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +22,7 @@ import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,13 +40,18 @@ public class NotificationCenter {
 //	private View notificationCenterView;
 	
 	private int userId;
+	private int deletePositionOfActivityResultList;
 	private Handler uiHandler;
+	private myHandler ncHandler = new myHandler();
 
 	private ArrayList<JSONObject> requests = new ArrayList<JSONObject>();
 	private ArrayList<JSONObject> verifications = new ArrayList<JSONObject>();
-	private SimpleAdapter friendRequestAdapter;
 	private ArrayList<HashMap<String, Object>> friendRequests = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<HashMap<String, Object>> friendRequestResults = new ArrayList<HashMap<String,Object>>();
+	private ArrayList<HashMap<String, Object>> eventInvitations = new ArrayList<HashMap<String,Object>>();
+	
+	private SimpleAdapter friendRequestAdapter;
+	private SimpleAdapter eventInvitationAdapter;
 	
 	public NotificationCenter(Context context, FriendCenter UI_friendCenter, Handler uiHandler, int userId) {
 		// TODO Auto-generated constructor stub
@@ -258,22 +265,27 @@ public class NotificationCenter {
 			}	
 			
 		}
-		ListView lv1 = (ListView)notificationView.findViewById(R.id.friend_center_notification_friendrequests);
-		friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
-				R.layout.friend_request, 
-				new String[]{"fname","gender","email","confirm_msg"}, 
-				new int[]{R.id.friend_name,R.id.friend_gender,R.id.friend_email,R.id.confirm_msg});
-		lv1.setAdapter(friendRequestAdapter);
-		lv1.setOnItemClickListener(friendRequestItemListener);
-		
-//		ListView lv2 = (ListView)findViewById(R.id.activity_invitations);
-//		activityInvitationAdapter = new SimpleAdapter(this, activityInvitations, 
-//				R.layout.activity_request_item, 
-//				new String[]{"subject","time","launcher"}, 
-//				new int[]{R.id.activity_request_subject,R.id.activity_request_time,R.id.activity_request_launcher});
-//		
-//		lv2.setAdapter(activityInvitationAdapter);
-//		lv2.setOnItemClickListener(activityRequestItemListener);
+		if(notificationView.getId() == R.layout.friend_center_notification)
+		{
+			ListView lv1 = (ListView)notificationView.findViewById(R.id.friend_center_notification_friendrequests);
+			friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
+					R.layout.friend_request, 
+					new String[]{"fname","gender","email","confirm_msg"}, 
+					new int[]{R.id.friend_name,R.id.friend_gender,R.id.friend_email,R.id.confirm_msg});
+			lv1.setAdapter(friendRequestAdapter);
+			lv1.setOnItemClickListener(friendRequestItemListener);
+		}
+		else if(notificationView.getId() == R.layout.my_events_notification)
+		{
+			ListView lv2 = (ListView)notificationView.findViewById(R.id.my_events_notification_eventsRequests);
+			eventInvitationAdapter = new SimpleAdapter(context, eventInvitations, 
+					R.layout.activity_request_item, 
+					new String[]{"subject","time","launcher"}, 
+					new int[]{R.id.activity_request_subject,R.id.activity_request_time,R.id.activity_request_launcher});
+			
+			lv2.setAdapter(eventInvitationAdapter);
+			lv2.setOnItemClickListener(activityRequestItemListener);
+		}
 //		
 //		
 //		ListView lv3 = (ListView)findViewById(R.id.into_activity_request);
@@ -368,14 +380,71 @@ public class NotificationCenter {
 			}
 			Log.i("FriendsCenter", "我同意或者拒绝时，给服务器发送的是："+params.toString());
 			HttpSender http = new HttpSender();
-			http.Httppost(OperationCode.ADD_FRIEND, params, uiHandler);
+			http.Httppost(OperationCode.ADD_FRIEND, params, ncHandler);
+		}
+	};
+	
+	private OnItemClickListener activityRequestItemListener = new OnItemClickListener() {
+
+		HashMap<String, Object> selectedItem;
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+				long arg3) {
+			// TODO Auto-generated method stub
+			deletePositionOfActivityResultList = -1;
+			final int position = arg2;
+			selectedItem = eventInvitations.get(arg2);
+			AlertDialog.Builder builder = new Builder(context);
+			
+			builder.setTitle("活动验证").setIcon(R.drawable.ic_launcher).setMessage("是否同意加入活动").create();
+			builder.setPositiveButton("同意", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					// TODO Auto-generated method stub
+					JSONObject params = new JSONObject();
+					try {
+						params.put("cmd", 997);
+						params.put("id", userId);
+						params.put("event_id",selectedItem.get("event_id"));
+						params.put("result", 1);
+						deletePositionOfActivityResultList = position;
+						HttpSender httpSender = new HttpSender();
+						httpSender.Httppost(OperationCode.PARTICIPATE_EVENT, params, ncHandler);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+			builder.setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					JSONObject params = new JSONObject();
+					try {
+						params.put("cmd", 997);
+						params.put("id", userId);
+						params.put("event_id",selectedItem.get("event_id"));
+						params.put("result", 0);
+						HttpSender httpSender = new HttpSender();
+						httpSender.Httppost(OperationCode.PARTICIPATE_EVENT, params, ncHandler);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+			builder.show();
+			
 		}
 	};
 	
 	public void showRequestResult()
 	{
 		//valifications.addAll(valificationsData());
-		ListView lv = (ListView)notificationView.findViewById(R.id.friend_center_notification_requestresults);
+		
 		int size = verifications.size();
 		HashMap<String, Object> map;
 		friendRequestResults.clear();
@@ -397,13 +466,44 @@ public class NotificationCenter {
 				e.printStackTrace();
 			}
 		}
+		ListView lv = new ListView(context);
+		if(notificationView.getId() == R.layout.friend_center_notification)
+		{
+			lv = (ListView)notificationView.findViewById(R.id.friend_center_notification_requestresults);
+			
+		}
+		else if(notificationView.getId() == R.layout.my_events_notification)
+		{
+			lv = (ListView)notificationView.findViewById(R.id.my_events_notification_eventsRequestResults);
+		}
+		
 		AdapterForRequest adapter = new AdapterForRequest(context, friendRequestResults, 
 				R.layout.request_result_item, 
 				new String[]{"content"}, 
 				new int[]{R.id.request_result_msg});
 		lv.setAdapter(adapter);
 		
+	}
+	
+	public class myHandler extends Handler
+	{
+		public myHandler() {
+			// TODO Auto-generated constructor stub
+		}
 		
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
+			switch(msg.what)
+			{
+			case OperationCode.ADD_FRIEND:
+				break;
+			case OperationCode.PARTICIPATE_EVENT:
+				break;
+				default: break;
+			}
+		}
 	}
 	
 	

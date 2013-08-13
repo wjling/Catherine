@@ -168,7 +168,7 @@ GestureDetector.OnGestureListener
 	private void initMyEvents()
 	{
 		int width = getWindowManager().getDefaultDisplay().getWidth();
-		UI_myEvents = new MyEvents(this, UI_Menu.getMyEventsView(), uiHandler, width);
+		UI_myEvents = new MyEvents(this, UI_Menu.getMyEventsView(), uiHandler, width, userId);
 		UI_myEvents.init();
 		UI_myEvents.myEventsListView.setOnTouchListener(this);	//非常重要的一步~聪明人秒懂
 		UI_myEvents.loadData();

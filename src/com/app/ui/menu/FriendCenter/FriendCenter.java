@@ -112,6 +112,7 @@ public class FriendCenter {
             Log.i("Letter Sidebar letter is : ", s);
             int position = s.charAt(0) - 'A';
             Log.i("Letter Sidebar position is : ", position + "");
+            
         }
 	};
 	
