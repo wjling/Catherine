@@ -173,7 +173,8 @@ public class FriendCenter {
 //				if(fs.uid == userId)
 //				{
 					HashMap<String, Object> map = new HashMap<String, Object>();
-					Log.i("FriendCenter","fs.gender: "+fs.gender);
+//					Log.i("FriendCenter","fs.gender: "+fs.gender);
+					map.put("uid", userId);
 					map.put("fname", fs.fname);
 					int gender = Integer.parseInt(fs.gender);
 					if(gender == 1)
