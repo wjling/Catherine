@@ -512,6 +512,7 @@ GestureDetector.OnGestureListener
 				case R.id.ui_menu_settings:
 					addActivityBtn.setVisibility(View.GONE);
 					addFriendBtn.setVisibility(View.GONE);
+					UI_settings.initData();
 					break;
 				case R.id.ui_menu_exit:
 					UserInterface.this.finish();
