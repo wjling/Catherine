@@ -65,5 +65,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>
+    
+    <com.app.widget.LetterSidebar
+        android:layout_width="25dp"
+        android:layout_height="match_parent"
+        android:layout_marginRight="2dp" />
 
 </LinearLayout>
