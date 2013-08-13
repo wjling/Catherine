@@ -28,6 +28,7 @@ import com.app.addActivityPack.AddActivity;
 import com.app.addFriendPack.searchFriend;
 import com.app.catherine.R;
 import com.app.ui.menu.FriendCenter.FriendCenter;
+import com.app.ui.menu.MyEvents.MyEvents;
 import com.app.utils.MyBroadcastReceiver;
 
 public class UserInterface extends Activity implements OnTouchListener,

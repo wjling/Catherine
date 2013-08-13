@@ -1,4 +1,4 @@
-package com.app.ui;
+package com.app.ui.menu.MyEvents;
 
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.app.adapters.AdapterForFriendList;
 import com.app.addFriendPack.searchFriend;
 import com.app.catherine.R;
 import com.app.localDataBase.FriendStruct;
