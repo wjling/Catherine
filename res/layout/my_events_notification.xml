@@ -4,19 +4,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/menu_my_events_notificationBtn"
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="活动通知" />
-    
-    <com.app.customwidget.PullUpDownView
-        android:id="@+id/my_events_pull_up_down_view"
+
+    <ListView
+        android:id="@+id/my_events_notification_eventsRequests"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white" >
-	    
-	</com.app.customwidget.PullUpDownView>
-    
+        android:layout_height="wrap_content" >
+    </ListView>
+
+    <ListView
+        android:id="@+id/my_events_notification_eventsRequestResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </LinearLayout>

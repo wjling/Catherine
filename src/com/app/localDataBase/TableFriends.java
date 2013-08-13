@@ -109,14 +109,13 @@ public class TableFriends {
 		return fs;
 	}
 	
-	public ArrayList<FriendStruct> getAllFriends()
+	public ArrayList<FriendStruct> getAllFriends(String uid)
 	{
-		Log.i("getAllFriends", "get all friends");
 		ArrayList<FriendStruct> friendArray = new ArrayList<FriendStruct>();
 		SQLiteDatabase db = myHelper.getWritableDatabase();
 		if(db.isOpen())
 		{
-			Cursor cr = db.query("friends", null, null, null, null, null, null);
+			Cursor cr = db.query("friends", null, "uid=?", new String[]{uid}, null, null, null);
 			while(cr.moveToNext())
 			{
 				FriendStruct fs = new FriendStruct();
@@ -129,6 +128,7 @@ public class TableFriends {
 			}
 			db.close();
 		}
+		Log.i("TableFriends","Get all friends: "+friendArray.toString());
 		return friendArray;
 	}
 	

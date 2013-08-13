@@ -22,13 +22,15 @@ public class AdapterForPaticipantList extends BaseAdapter
 
 	private LayoutInflater mInflater;
 	private List<FriendInfor> mData;
+	private int userId;
 	public static Map<Integer, Boolean> isSelected;
 	private Context context;
 	
-	public AdapterForPaticipantList (Context context)
+	public AdapterForPaticipantList (Context context, int userId)
 	{
 		this.context = context;
 		mInflater = LayoutInflater.from(context);
+		this.userId = userId;
 		init();
 	}
 	
@@ -36,7 +38,7 @@ public class AdapterForPaticipantList extends BaseAdapter
 	{
 		mData = new ArrayList<FriendInfor>();
 		TableFriends tbFriends = new TableFriends(context);
-		ArrayList<FriendStruct> friendsList = tbFriends.getAllFriends();
+		ArrayList<FriendStruct> friendsList = tbFriends.getAllFriends(userId+"");
 		for (FriendStruct friendStruct : friendsList) 
 			mData.add( new FriendInfor(friendStruct.fid+"", friendStruct.fname) );
 		

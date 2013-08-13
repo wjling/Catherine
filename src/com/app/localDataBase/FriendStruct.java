@@ -39,12 +39,12 @@ public class FriendStruct {
 	{
 		FriendStruct fs = new FriendStruct();
 		try {
-			fs.uid = jo.getInt("uid");
 			fs.fid = jo.getInt("id");
-			Log.v("friends","fs.fid "+fs.fid);
+//			Log.v("friends","fs.fid "+fs.fid);
 			fs.fname = jo.getString("name");
 			fs.gender = jo.getString("gender");
 			fs.email = jo.getString("email");
+			fs.uid = jo.getInt("uid");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

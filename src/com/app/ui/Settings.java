@@ -64,6 +64,7 @@ public class Settings{
     private AvatarDialog avatarDialog;
     int userId;
     private MessageHandler handler;
+    private boolean isFirstVisit;
     public final int CASE_PHOTO = 0;
     public final int CASE_CAMERA = 1;
     
@@ -74,6 +75,7 @@ public class Settings{
         this.userId = userId;
         individualInfoState = false;
         accountInfoState = false;
+        isFirstVisit = true;
         init();
     }
     
@@ -105,6 +107,13 @@ public class Settings{
     private void init() {
         // TODO Auto-generated method stub
         setLayout();
+    }
+    
+    public void initData() {
+        if (!isFirstVisit)
+        {
+            return;
+        }
         JSONObject params = new JSONObject();
         try {
             params.put("id", userId);
@@ -120,6 +129,7 @@ public class Settings{
             e.printStackTrace();
         }
         new HttpSender().Httppost(OperationCode.GET_AVATAR, params, handler);
+        isFirstVisit = false;
     }
     
     
@@ -250,7 +260,7 @@ public class Settings{
                 .setPositiveButton(R.string.ack, null).show();
                 ImageView big_avatar = (ImageView)layout.findViewById(R.id.big_avatar);
                 avatar.setDrawingCacheEnabled(true);
-                Bitmap bigAvatar = scaleBitmap(Bitmap.createBitmap(avatar.getDrawingCache()), 200, 200);
+                Bitmap bigAvatar = scaleBitmap(Bitmap.createBitmap(avatar.getDrawingCache()), 300, 300);
                 big_avatar.setImageBitmap(bigAvatar);
                 //big_avatar.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_launcher));
                 avatar.setDrawingCacheEnabled(false);
@@ -296,7 +306,7 @@ public class Settings{
         try {
             if(temp!=null){
                 Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);
-                Bitmap new_bitmap = scaleBitmap(bitmap, 80, 80);
+                Bitmap new_bitmap = scaleBitmap(bitmap, 100, 100);
                 avatar.setImageBitmap(new_bitmap);
             }
         } catch (Exception e) {
@@ -402,7 +412,7 @@ public class Settings{
                     else 
                     {
                         Bitmap bitmap = getBitmapFromResources(R.drawable.ic_launcher);
-                        Bitmap new_bitmap = scaleBitmap(bitmap, 80, 80);
+                        Bitmap new_bitmap = scaleBitmap(bitmap, 100, 100);
                         avatar.setImageBitmap(new_bitmap);
                     }
                 }catch (JSONException e) {

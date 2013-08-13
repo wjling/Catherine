@@ -1,4 +1,4 @@
-package com.app.ui.menu.FriendCenter;
+package com.app.adapters;
 
 import java.util.ArrayList;
 import java.util.HashMap;

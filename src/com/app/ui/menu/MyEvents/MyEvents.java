@@ -1,4 +1,4 @@
-package com.app.ui;
+package com.app.ui.menu.MyEvents;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
