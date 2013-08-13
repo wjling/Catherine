@@ -502,6 +502,7 @@ GestureDetector.OnGestureListener
 				case R.id.ui_menu_friendscenter:
 					addActivityBtn.setVisibility(View.GONE);
 					addFriendBtn.setVisibility(View.VISIBLE);
+					
 //					notificationCenter.init();
 					break;
 				case R.id.ui_menu_update:
