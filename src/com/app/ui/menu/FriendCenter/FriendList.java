@@ -52,7 +52,7 @@ public class FriendList extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.friend_list);
+//		setContentView(R.layout.friend_list);
 		init();
 		showFriendList();
 	}
@@ -60,19 +60,19 @@ public class FriendList extends Activity{
 	private void init() 
 	{
 		// TODO Auto-generated method stub
-		Intent intent = getIntent();
-		userId = intent.getIntExtra("userId", -1);
-		
-		searchMyFriend = (EditText)findViewById(R.id.friend_list_searchmyfriend);
-		searchMyFriendBtn = (TextView)findViewById(R.id.friend_list_searchmyfriendBtn);
-		recommendFriendBtn = (Button)findViewById(R.id.friend_list_recommendfriendBtn);
-		friendListView = (ListView)findViewById(R.id.friend_list_friendlist);
-		friendListAdapter = new AdapterForFriendList(this, friendList, 
-				R.layout.friend_list_item, 
-				new String[] {"fname","gender","email"}, 
-				new int[] {R.id.friend_list_item_fname,R.id.friend_list_item_gender,R.id.friend_list_item_email});
-		
-		friendListView.setAdapter(friendListAdapter);
+//		Intent intent = getIntent();
+//		userId = intent.getIntExtra("userId", -1);
+//		
+//		searchMyFriend = (EditText)findViewById(R.id.menu_friend_center_searchmyfriend);
+//		searchMyFriendBtn = (TextView)findViewById(R.id.menu_friend_center_searchmyfriendBtn);
+//		recommendFriendBtn = (Button)findViewById(R.id.menu_friend_center_recommendfriendBtn);
+////		friendListView = (ListView)findViewById(R.id.friend_list_friendlist);
+//		friendListAdapter = new AdapterForFriendList(this, friendList, 
+//				R.layout.friend_list_item, 
+//				new String[] {"fname","gender","email"}, 
+//				new int[] {R.id.friend_list_item_fname,R.id.friend_list_item_gender,R.id.friend_list_item_email});
+//		
+//		friendListView.setAdapter(friendListAdapter);
 //		LinearLayout.LayoutParams searchMyFriendBtnParams = (LayoutParams) searchMyFriendBtn.getLayoutParams();
 //		LinearLayout.LayoutParams searchMyFriendParams = (LayoutParams) searchMyFriend.getLayoutParams();
 //		Log.i(TAG,"origin: "+searchMyFriendParams.height+", now: "+ searchMyFriendBtnParams.height);

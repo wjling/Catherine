@@ -98,8 +98,7 @@
 			<RelativeLayout
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
-			    android:background="@drawable/tittle_friend_list"
-			    android:paddingRight="5dp" >
+			    android:background="@drawable/tittle_friend_list" >
 
 			    <Button
 			        android:id="@+id/ui_content_menuBtn"

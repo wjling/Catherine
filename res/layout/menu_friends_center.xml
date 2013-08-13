@@ -19,7 +19,7 @@
             android:background="@drawable/side" />
 
         <EditText
-            android:id="@+id/friend_list_searchmyfriend"
+            android:id="@+id/menu_friend_center_searchmyfriend"
             style="@null"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -30,7 +30,7 @@
         </EditText>
 
         <TextView
-            android:id="@+id/friend_list_searchmyfriendBtn"
+            android:id="@+id/menu_friend_center_searchmyfriendBtn"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -38,7 +38,7 @@
             android:background="@drawable/search" />
 
         <Button
-            android:id="@+id/friend_list_recommendfriendBtn"
+            android:id="@+id/menu_friend_center_recommendfriendBtn"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/friend_list_friendlist"
+        android:id="@+id/menu_friend_center_friendlist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>
