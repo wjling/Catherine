@@ -12,7 +12,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+		android:launchMode="singleTask" >
         <activity
             android:name="com.app.catherine.Start"
             android:label="@string/app_name" >
@@ -20,7 +21,8 @@
         </activity>
         <activity
             android:name="com.app.ui.loginAndreg"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,32 +31,32 @@
         </activity>
         <activity
             android:name="com.app.ui.UserInterface"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
         <activity 
             android:name="com.app.addFriendPack.searchFriend" 
             android:theme="@style/AppTheme" 
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
         <activity 
             android:name="com.app.addFriendPack.addFriend" 
             android:theme="@style/AppTheme" 
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
         <activity 
             android:name="com.app.ui.menu.FriendCenter.FriendNotification" 
             android:theme="@style/AppTheme" 
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
          <activity 
             android:name="com.app.addActivityPack.AddActivity" 
             android:theme="@style/AppTheme" 
-            android:label="@string/app_name">
-        </activity>
-        <activity 
-            android:name="com.app.ui.menu.MyEvents.MyEventsNotification" 
-            android:theme="@style/AppTheme" 
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
         <service 
              android:name="com.app.HeartBeating.HeartbeatService"

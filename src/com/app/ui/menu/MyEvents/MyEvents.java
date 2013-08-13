@@ -1,19 +1,33 @@
 package com.app.ui.menu.MyEvents;
 
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.app.catherine.R;
 import com.app.customwidget.PullUpDownView;
 import com.app.customwidget.PullUpDownView.onPullListener;
+import com.app.utils.HttpSender;
+import com.app.utils.OperationCode;
+import com.app.utils.RegUtils;
+import com.app.utils.ReturnCode;
 import com.app.utils.cardAdapter;
 
+import android.R.integer;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -39,6 +53,12 @@ public class MyEvents {
 	private Handler uiHandler;
 	private int screenWidth;
 	private int userId;
+
+	private HttpSender sender;
+	private MsgHandler handler;
+//	private int []EventIDList;
+	private String datePattern = "yyyy-MM-dd HH:mm:ss";
+	private JSONArray seqJsonArray = null;
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
@@ -71,6 +91,9 @@ public class MyEvents {
 		this.uiHandler = uiHandler;
 		this.screenWidth = screenWidth;
 		this.userId = userId;
+		
+		sender = new HttpSender();
+		handler = new MsgHandler( Looper.myLooper() );
 	}
 	
 
@@ -149,38 +172,52 @@ public class MyEvents {
 		);
 		
 		myEventsListView.setAdapter(myEventsAdapter);
-		getActivities();
+//		getActivities();
 	}
 	
 	//add by luo
-	private void getActivities()
+	private void getActivityFrom( String str)
 	{
-		myEventsList.clear();
-		Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
-		msg1.sendToTarget();
-		Calendar calendar = Calendar.getInstance();
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH);
-		int day = calendar.get(Calendar.MONDAY);
-		int second = calendar.get(Calendar.SECOND);
-		int minute = calendar.get(Calendar.MINUTE);
-		int hour = calendar.get(Calendar.HOUR);
+		JSONObject eventInforJson;
+		String subject="主题", time="", location="未定", launcher="谁发起的?", remark="没有备注哦oo";
+		int member_count = 0;
+		String year="0000", month="00", day="00", hour="00", minute="00", second="00";
 		
-		for(int i=0; i<10; i++)
-		{
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("title", "Activity: " + i);
-			map.put("day", day+"");
-			map.put("monthAndYear", month + "月" +year);
-			map.put("time", hour+":"+minute+":"+second);
-			map.put("location", "GOGO新天地三楼");
-			map.put("launcher", "by " + "luo");
-			map.put("remark", "今晚去唱k，有没人有兴趣捏？ 有没兴趣顺便一起吃个饭甘样捏？有没兴趣顺便看埋场《速6》呢？如果有兴趣，不妨渣车嚟信科院大楼接我，哈哈，哥你想多了.");
-			map.put("participantsNum", 100+"");
-			myEventsList.add(map);
+		try{
+			eventInforJson = new JSONObject(str);
+			subject = eventInforJson.optString("subject");
+			time = eventInforJson.optString("time");      //活动开始时间
+			location = eventInforJson.optString("location");
+			launcher = eventInforJson.optString("launcher");
+			remark = eventInforJson.optString("remark");
+			member_count  = eventInforJson.optInt("member_count");
 		}
-		
-//			myEventsAdapter.notifyDataSetChanged();
+		catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+		//为空的时候，后台返回字符串None
+		if( !"None".equals(time) && time.length()>0 )
+		{
+			year = time.substring(0, 4);
+			month = time.substring(5, 7);
+			day = time.substring(8, 10);
+			hour = time.substring(11, 13);
+			minute = time.substring(14, 16);
+			second = time.substring(17,19);
+		}
+				
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("title", subject);
+		map.put("day", day+"");
+		map.put("monthAndYear", month + "月" +year);
+		map.put("time", hour+":"+minute+":"+second);
+		map.put("location", location);
+		map.put("launcher", "by " + launcher);
+		map.put("remark", remark);
+		map.put("participantsNum", member_count+"");
+		myEventsList.add(map);		
 	}
 	
 	public void loadData(){
@@ -192,21 +229,118 @@ public class MyEvents {
 				Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
 				msg1.sendToTarget();
 				
-				//get data from server
-				try {
-					getActivities();  
-					
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				
-				Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
-				msg2.sendToTarget();
+				//get data from server, send a request~
+				sendRequest(OperationCode.GET_MY_EVENTS);
 			}
 		}).start();
 	}
 	
+	private void sendRequest(int opCode)
+	{
+		JSONObject params = new JSONObject();
+		try{
+			switch (opCode) {
+			case OperationCode.GET_MY_EVENTS:
+				params.put("id", userId);
+				sender.Httppost(OperationCode.GET_MY_EVENTS, params, handler);
+				break;
+			case OperationCode.GET_EVENTS:
+				params.put("sequence", seqJsonArray);
+				Log.e("test", params.toString());
+				sender.Httppost(OperationCode.GET_EVENTS, params, handler);
+			default:
+				break;
+			}
+			
+		}
+		catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+	}
 	
-	
+	class MsgHandler extends Handler
+	{
+		public MsgHandler(Looper looper)
+		{
+			super(looper);
+		}
+		
+		public void handleMessage(Message msg)
+		{
+			String returnStr = msg.obj.toString();
+			JSONObject returnJson = null;
+			
+			JSONArray eventJsonArray = null;
+			int returnCMD;
+			
+			if( returnStr!="DEFAULT")
+			{
+				
+				try{
+					returnJson = new JSONObject( returnStr );
+					returnCMD = returnJson.optInt("cmd");
+					
+						switch ( msg.what ) {
+							case OperationCode.GET_MY_EVENTS:																			
+								
+								if( returnCMD==ReturnCode.NORMAL_REPLY )
+								{						
+									seqJsonArray = returnJson.optJSONArray("sequence");
+									int length = seqJsonArray.length();
+									if( length>0 )
+									{
+										Log.i("my events", "seq length: " + length);
+//										EventIDList = new int[length];
+//										for( int i=0; i<length; i++)									
+//											EventIDList[i] = seqJsonArray.getInt(i);
+										
+										//使用events sequence请求活动内容
+										sendRequest(OperationCode.GET_EVENTS);
+									}
+									else										
+										Toast.makeText(context, "当前没有活动", Toast.LENGTH_SHORT).show();									
+								}
+								else								
+									Toast.makeText(context, "get my events返回其他值了"+returnCMD, Toast.LENGTH_SHORT).show();																	
+							break;
+								
+							case OperationCode.GET_EVENTS:
+								if( returnCMD==ReturnCode.NORMAL_REPLY )
+								{
+									eventJsonArray = returnJson.optJSONArray("event_list");
+									int length = eventJsonArray.length();
+									
+									//先清空event list
+									myEventsList.clear();
+									
+									
+										for( int k=0; k<length; k++)
+											getActivityFrom( eventJsonArray.getString(k) );
+										
+									
+									//load data done; inform user interface
+									Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
+									msg2.sendToTarget();
+								}
+								else
+									Toast.makeText(context, "get events返回其他值了"+returnCMD, Toast.LENGTH_SHORT).show();	
+								break;
+			
+							default:
+								break;
+							}
+						}
+						catch (JSONException e) {
+				            // TODO Auto-generated catch block
+				            e.printStackTrace();
+				        }
+				
+			}
+			else
+			{
+				Toast.makeText(context, "服务器请求超时", Toast.LENGTH_SHORT).show();
+			}	
+		}
+	}
 }
