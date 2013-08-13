@@ -19,6 +19,7 @@ public class FriendNotification extends Activity{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		contentView = LayoutInflater.from(this).inflate(R.layout.friend_center_notification, null);
+		contentView.setId(R.layout.friend_center_notification);
 		setContentView(contentView);
 		init();
 	}
