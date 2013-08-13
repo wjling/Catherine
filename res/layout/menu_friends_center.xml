@@ -48,20 +48,14 @@
             android:text="好友推荐" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/menu_friend_center_notificationBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="通知" />
+
     <ListView
         android:id="@+id/menu_friend_center_friendlist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
-
-    <ListView
-        android:id="@+id/menu_friends_center_friendrequests"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
-
-    <ListView
-        android:id="@+id/menu_friends_center_requestresults"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>

@@ -12,6 +12,7 @@ import com.app.localDataBase.FriendStruct;
 import com.app.localDataBase.NotificationTableAdapter;
 import com.app.localDataBase.TableFriends;
 import com.app.localDataBase.notificationObject;
+import com.app.ui.menu.FriendCenter.FriendCenter;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 
@@ -32,7 +33,7 @@ public class NotificationCenter {
 	
 	private final String TAG = "NotificationCenter";
 	private Context context;
-	private Menu UI_Menu;
+	private FriendCenter UI_friendCenter;
 //	private View notificationCenterView;
 	
 	private int userId;
@@ -44,10 +45,10 @@ public class NotificationCenter {
 	private ArrayList<HashMap<String, Object>> friendRequests = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<HashMap<String, Object>> friendRequestResults = new ArrayList<HashMap<String,Object>>();
 	
-	public NotificationCenter(Context context, Menu UI_Menu, Handler uiHandler, int userId) {
+	public NotificationCenter(Context context, FriendCenter UI_friendCenter, Handler uiHandler, int userId) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
-		this.UI_Menu = UI_Menu;
+		this.UI_friendCenter = UI_friendCenter;
 		this.uiHandler = uiHandler;
 		this.userId = userId;
 	}
@@ -256,7 +257,7 @@ public class NotificationCenter {
 			}	
 			
 		}
-		ListView lv1 = (ListView)UI_Menu.getFriendsCenterView().findViewById(R.id.menu_friends_center_friendrequests);
+		ListView lv1 = (ListView)UI_friendCenter.getFriendNotificationView().findViewById(R.id.friend_center_notification_friendrequests);
 		friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
 				R.layout.friend_request, 
 				new String[]{"fname","gender","email","confirm_msg"}, 
@@ -373,7 +374,7 @@ public class NotificationCenter {
 	public void showRequestResult()
 	{
 		//valifications.addAll(valificationsData());
-		ListView lv = (ListView)UI_Menu.getFriendsCenterView().findViewById(R.id.menu_friends_center_requestresults);
+		ListView lv = (ListView)UI_friendCenter.getFriendNotificationView().findViewById(R.id.friend_center_notification_requestresults);
 		int size = verifications.size();
 		HashMap<String, Object> map;
 		friendRequestResults.clear();

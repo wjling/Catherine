@@ -61,7 +61,7 @@ GestureDetector.OnGestureListener
 	private Menu UI_Menu;
 	private NotificationCenter notificationCenter;
 	private MyEvents UI_myEvents;
-	private FriendCenter UI_friendsCenter;
+	private FriendCenter UI_friendCenter;
 	private Settings UI_settings;
 	
 	private int userId = -1;
@@ -130,7 +130,7 @@ GestureDetector.OnGestureListener
 		initMyEvents();
 		initFriendsCenter();
 		initSettings();
-		notificationCenter = new NotificationCenter(this, this.UI_Menu,uiHandler, userId);
+		notificationCenter = new NotificationCenter(this, this.UI_friendCenter,uiHandler, userId);
 		notificationCenter.getNotifications();
 	}
 	private OnClickListener ui_ButtonClickListener = new OnClickListener() {
@@ -175,8 +175,8 @@ GestureDetector.OnGestureListener
 	
 	private void initFriendsCenter()
 	{
-		UI_friendsCenter = new FriendCenter(this, UI_Menu.getFriendsCenterView(), uiHandler, userId);
-		UI_friendsCenter.init();
+		UI_friendCenter = new FriendCenter(this, UI_Menu.getFriendsCenterView(), uiHandler, userId);
+		UI_friendCenter.init();
 	}
 	
 	private void initSettings()
@@ -502,7 +502,7 @@ GestureDetector.OnGestureListener
 				case R.id.ui_menu_friendscenter:
 					addActivityBtn.setVisibility(View.GONE);
 					addFriendBtn.setVisibility(View.VISIBLE);
-					
+					UI_friendCenter.showFriendList();
 //					notificationCenter.init();
 					break;
 				case R.id.ui_menu_update:
