@@ -230,8 +230,8 @@ public class NotificationCenter {
 					map.put("id", jo.getString("item_id")); //数据项id
 					map.put("fid", jo.getString("id"));//好友id
 					map.put("confirm_msg", jo.getString("confirm_msg"));
-					map.put("friendObject", "加好友请求： "+jo);
-					Log.v("json", i+jo.toString());
+					map.put("friendObject", jo);
+					Log.v("json", "加好友请求： "+jo.toString());
 					friendRequests.add(map);
 				}
 				else if(tag == "ADD_ACTIVITY_INVITATION")
@@ -320,7 +320,7 @@ public class NotificationCenter {
 //			Log.v("json", "hehe "+selectedItem.toString());
 			id = (String) selectedItem.get("id");
 			friendObject = (JSONObject)selectedItem.get("friendObject");
-			Toast.makeText(context, "id:"+ id, Toast.LENGTH_SHORT).show();
+//			Toast.makeText(context, "id:"+ id, Toast.LENGTH_SHORT).show();
 			AlertDialog.Builder builder = new Builder(context);
 			
 			builder.setTitle("好友验证").setIcon(R.drawable.ic_launcher).setMessage("是否添加为好友？").create();
