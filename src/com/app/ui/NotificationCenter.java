@@ -49,6 +49,7 @@ public class NotificationCenter {
 	private ArrayList<HashMap<String, Object>> friendRequests = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<HashMap<String, Object>> friendRequestResults = new ArrayList<HashMap<String,Object>>();
 	private ArrayList<HashMap<String, Object>> eventInvitations = new ArrayList<HashMap<String,Object>>();
+	private ArrayList<HashMap<String, Object>> eventInvitationResults = new ArrayList<HashMap<String,Object>>();
 	
 	private SimpleAdapter friendRequestAdapter;
 	private SimpleAdapter eventInvitationAdapter;
@@ -144,6 +145,7 @@ public class NotificationCenter {
 					outputJson.put("item_id", id);
 					outputJson.put("content", "添加"+userName+"失败@_@");				
 				}
+				outputJson.put("tag", "ADD_FRIEND_VERIFY"); //为添加好友的结果加上标识
 				verifications.add(outputJson);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -169,6 +171,7 @@ public class NotificationCenter {
 					outputJson.put("item_id", itemID);
 					outputJson.put("content", inviteeName + "居然拒绝了参加活动:" + eventID);
 				}
+				outputJson.put("tag", "ADD_ACTIVITY_FEEDBACK"); //为参加活动的结果加上标识
 				verifications.add(outputJson);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -192,6 +195,7 @@ public class NotificationCenter {
 				else 
 					outputJson.put("content", launcherID + "居然拒绝了让你参加活动:" + subject);
 				
+				outputJson.put("tag", "RESPONSE_INTO_ACTIVITY"); //为中途邀请参加活动的结果加上标识
 				verifications.add(outputJson);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -226,7 +230,7 @@ public class NotificationCenter {
 					map.put("id", jo.getString("item_id")); //数据项id
 					map.put("fid", jo.getString("id"));//好友id
 					map.put("confirm_msg", jo.getString("confirm_msg"));
-					map.put("friendObject", jo);
+					map.put("friendObject", "加好友请求： "+jo);
 					Log.v("json", i+jo.toString());
 					friendRequests.add(map);
 				}
@@ -239,9 +243,9 @@ public class NotificationCenter {
 					map.put("launcher", jo.getString("launcher"));//发起者id
 					map.put("item_id", jo.getString("item_id")); //数据项id
 					map.put("event_id",jo.getInt("event_id"));
-					map.put("activityObject", jo);
+					map.put("activityObject","加活动请求: "+ jo);
 					Log.v("json", i+jo.toString());
-//					activityInvitations.add(map);
+					eventInvitations.add(map);
 				}
 				else if (tag == "REQUEST_INTO_ACTIVITY") 
 				{
@@ -265,10 +269,10 @@ public class NotificationCenter {
 			}	
 			
 		}
-		Log.i("NotificationCenter","notificationView的id为： "+ notificationView.getId());
+//		Log.i("NotificationCenter","notificationView的id为： "+ notificationView.getId());
 		if(notificationView.getId() == R.layout.friend_center_notification)
 		{
-			Log.i("NotificationCenter","显示朋友通知： "+friendRequests.toString());
+			Log.i(TAG,"显示朋友通知： "+friendRequests.toString());
 			ListView lv1 = (ListView)notificationView.findViewById(R.id.friend_center_notification_friendrequests);
 			friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
 					R.layout.friend_request, 
@@ -279,7 +283,7 @@ public class NotificationCenter {
 		}
 		else if(notificationView.getId() == R.layout.my_events_notification)
 		{
-			Log.i("NotificationCenter","显示活动通知： "+eventInvitations.toString());
+			Log.i(TAG,"显示活动通知： "+eventInvitations.toString());
 			ListView lv2 = (ListView)notificationView.findViewById(R.id.my_events_notification_eventsRequests);
 			eventInvitationAdapter = new SimpleAdapter(context, eventInvitations, 
 					R.layout.activity_request_item, 
@@ -367,7 +371,6 @@ public class NotificationCenter {
 		private void sendMessage(int uid,int fid, int result)
 		{
 			JSONObject params = new JSONObject();
-			
 			try {
 				params.put("id", uid);
 				params.put("friend_id", fid);
@@ -451,40 +454,54 @@ public class NotificationCenter {
 		int size = verifications.size();
 		HashMap<String, Object> map;
 		friendRequestResults.clear();
+		eventInvitationResults.clear();
 		
 		for(int i=0;i<size;i++)
 		{
 			JSONObject jo = verifications.get(i);
 			try {
+				String tag = jo.getString("tag");
 				map = new HashMap<String, Object>();
 //				String itemId = jo.getString("item_id");
 				int itemId = jo.getInt("item_id");
 				String content = jo.getString("content");
 				map.put("item_id", itemId);
 				map.put("content", content);
-				friendRequestResults.add(map);
+				if(tag == "ADD_FRIEND_VERIFY")
+				{
+					friendRequestResults.add(map);
+				}
+				else if( tag == "ADD_ACTIVITY_FEEDBACK")
+				{
+					eventInvitationResults.add(map);
+				}
 				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		ListView lv = new ListView(context);
+		
 		if(notificationView.getId() == R.layout.friend_center_notification)
 		{
-			lv = (ListView)notificationView.findViewById(R.id.friend_center_notification_requestresults);
-			
+			ListView lv = (ListView)notificationView.findViewById(R.id.friend_center_notification_requestresults);
+			AdapterForRequest adapter = new AdapterForRequest(context, friendRequestResults, 
+					R.layout.request_result_item, 
+					new String[]{"content"}, 
+					new int[]{R.id.request_result_msg});
+			lv.setAdapter(adapter);
 		}
 		else if(notificationView.getId() == R.layout.my_events_notification)
 		{
-			lv = (ListView)notificationView.findViewById(R.id.my_events_notification_eventsRequestResults);
+			ListView lv = (ListView)notificationView.findViewById(R.id.my_events_notification_eventsRequestResults);
+			AdapterForRequest adapter = new AdapterForRequest(context, eventInvitationResults, 
+					R.layout.request_result_item, 
+					new String[]{"content"}, 
+					new int[]{R.id.request_result_msg});
+			lv.setAdapter(adapter);
 		}
 		
-		AdapterForRequest adapter = new AdapterForRequest(context, friendRequestResults, 
-				R.layout.request_result_item, 
-				new String[]{"content"}, 
-				new int[]{R.id.request_result_msg});
-		lv.setAdapter(adapter);
+		
 		
 	}
 	
