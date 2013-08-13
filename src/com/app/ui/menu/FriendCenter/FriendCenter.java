@@ -82,6 +82,9 @@ public class FriendCenter {
 		friendNotificationView = LayoutInflater.from(context).inflate(R.layout.friend_center_notification, null);
 		recommendedFriendsBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_recommendfriendBtn);
 		notificationBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_notificationBtn);
+		
+		recommendedFriendsBtn.setOnClickListener(buttonsOnClickListener);
+		notificationBtn.setOnClickListener(buttonsOnClickListener);
 		friendListView = (ListView)friendCenterView.findViewById(R.id.menu_friend_center_friendlist);
 		friendListAdapter = new AdapterForFriendList(context, friendList, 
 				R.layout.friend_list_item, 
@@ -100,12 +103,16 @@ public class FriendCenter {
 			switch(v.getId())
 			{
 			case R.id.menu_friend_center_recommendfriendBtn:
-				Intent intent1 = new Intent();
-				intent1.setClass(context, searchFriend.class);
-				intent1.putExtra("userId", userId);
-				context.startActivity(intent1);
+//				Intent intent1 = new Intent();
+//				intent1.setClass(context, searchFriend.class);
+//				intent1.putExtra("userId", userId);
+//				context.startActivity(intent1);
 				break;
 			case R.id.menu_friend_center_notificationBtn:
+				Intent intent2 = new Intent();
+				intent2.setClass(context, FriendNotification.class);
+				intent2.putExtra("userId", userId);
+				context.startActivity(intent2);
 				break;
 				default: break;
 			}
