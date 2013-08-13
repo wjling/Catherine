@@ -1,11 +1,14 @@
 package com.app.ui;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 import com.app.catherine.R;
 import com.app.customwidget.PullUpDownView;
 import com.app.customwidget.PullUpDownView.onPullListener;
+import com.app.utils.cardAdapter;
 
 import android.content.Context;
 import android.os.Handler;
@@ -26,10 +29,11 @@ public class MyEvents {
 	private onPullListener myEventsPullUpDownViewListener;
 	private OnItemClickListener myEventsListViewListener;
 	
-	public ArrayAdapter<String> myEventsAdapter;
-	public List<String> myEventsList = new ArrayList<String>();
+	public cardAdapter myEventsAdapter;
+	public ArrayList<HashMap<String, Object>> myEventsList = new ArrayList<HashMap<String,Object>>();
 	
 	private Handler uiHandler;
+	private int screenWidth;
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
@@ -37,11 +41,12 @@ public class MyEvents {
 	private static final int MSG_WHAT_REFRESH_DONE = -5;
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
-	public MyEvents(Context context, View myEventsView, Handler uiHandler) {
+	public MyEvents(Context context, View myEventsView, Handler uiHandler, int screenWidth) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.myEventsView = myEventsView;
 		this.uiHandler = uiHandler;
+		this.screenWidth = screenWidth;
 	}
 
 	public void init() {
@@ -103,9 +108,51 @@ public class MyEvents {
 		myEventsPullUpDownView.setOnPullListener(myEventsPullUpDownViewListener);
 		myEventsListView.setOnItemClickListener(myEventsListViewListener);
 		
-		myEventsAdapter = new ArrayAdapter<String>(context, R.layout.pulldown_item, myEventsList);
-		myEventsListView.setAdapter(myEventsAdapter);
+//		myEventsAdapter = new ArrayAdapter<String>(context, R.layout.pulldown_item, myEventsList);
+//		myEventsListView.setAdapter(myEventsAdapter);
 		
+		//edit by luo
+		myEventsAdapter = new cardAdapter(context, 
+				myEventsList,
+				R.layout.activity_item, 
+				new String[]{"title", "day", "monthAndYear","time", "location", "launcher", "remark", "participantsNum"}, 
+				new int[]{R.id.activityTitle, R.id.day, R.id.monthAndYear, R.id.time, R.id.location, R.id.launcher, R.id.remark, R.id.participantsNum},
+				screenWidth 
+		);
+		
+		myEventsListView.setAdapter(myEventsAdapter);
+		getActivities();
+	}
+	
+	//add by luo
+	private void getActivities()
+	{
+		myEventsList.clear();
+		Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
+		msg1.sendToTarget();
+		Calendar calendar = Calendar.getInstance();
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		int day = calendar.get(Calendar.MONDAY);
+		int second = calendar.get(Calendar.SECOND);
+		int minute = calendar.get(Calendar.MINUTE);
+		int hour = calendar.get(Calendar.HOUR);
+		
+		for(int i=0; i<10; i++)
+		{
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("title", "Activity: " + i);
+			map.put("day", day+"");
+			map.put("monthAndYear", month + "月" +year);
+			map.put("time", hour+":"+minute+":"+second);
+			map.put("location", "GOGO新天地三楼");
+			map.put("launcher", "by " + "luo");
+			map.put("remark", "今晚去唱k，有没人有兴趣捏？ 有没兴趣顺便一起吃个饭甘样捏？有没兴趣顺便看埋场《速6》呢？如果有兴趣，不妨渣车嚟信科院大楼接我，哈哈，哥你想多了.");
+			map.put("participantsNum", 100+"");
+			myEventsList.add(map);
+		}
+		
+//			myEventsAdapter.notifyDataSetChanged();
 	}
 	
 	public void loadData(){
@@ -116,17 +163,17 @@ public class MyEvents {
 				myEventsList.clear();
 				Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
 				msg1.sendToTarget();
+				
+				//get data from server
 				try {
+					getActivities();  
+					
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				List<String> strings = new ArrayList<String>();
-				for (String body : mStringArray) {
-					strings.add(body);
-				}
+				
 				Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
-				msg2.obj = strings;
 				msg2.sendToTarget();
 			}
 		}).start();

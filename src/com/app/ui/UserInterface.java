@@ -166,7 +166,8 @@ GestureDetector.OnGestureListener
 	
 	private void initMyEvents()
 	{
-		UI_myEvents = new MyEvents(this, UI_Menu.getMyEventsView(), uiHandler);
+		int width = getWindowManager().getDefaultDisplay().getWidth();
+		UI_myEvents = new MyEvents(this, UI_Menu.getMyEventsView(), uiHandler, width);
 		UI_myEvents.init();
 		UI_myEvents.myEventsListView.setOnTouchListener(this);	//非常重要的一步~聪明人秒懂
 		UI_myEvents.loadData();
@@ -522,26 +523,19 @@ GestureDetector.OnGestureListener
 				UI_myEvents.myEventsPullUpDownView.notifyOnLoadData();
 				break;
 			case MSG_WHAT_LOAD_DATA_DONE:
-				if(msg.obj != null)
-				{
-					List<String> strings = (List<String>) msg.obj;
-					if(!strings.isEmpty())
-					{
-						UI_myEvents.myEventsList.addAll(strings);
-						UI_myEvents.myEventsAdapter.notifyDataSetChanged();
-					}
+					UI_myEvents.myEventsAdapter.notifyDataSetChanged();
+					
 					UI_myEvents.myEventsPullUpDownView.notifyLoadDataDone();
-				}
 				break;
 			case MSG_WHAT_REFRESH_DONE:
-				String string1 = (String) msg.obj;
-				UI_myEvents.myEventsList.add(0,string1);
+//				String string1 = (String) msg.obj;
+//				UI_myEvents.myEventsList.add(0,string1);
 				UI_myEvents.myEventsAdapter.notifyDataSetChanged();
 				UI_myEvents.myEventsPullUpDownView.notifyRefreshDone();
 				break;
 			case MSG_WHAT_GET_MORE_DONE:
-				String string2 = (String) msg.obj;
-				UI_myEvents.myEventsList.add(string2);
+//				String string2 = (String) msg.obj;
+//				UI_myEvents.myEventsList.add(string2);
 				UI_myEvents.myEventsAdapter.notifyDataSetChanged();
 				UI_myEvents.myEventsPullUpDownView.notifyGetMoreDone();
 				break;

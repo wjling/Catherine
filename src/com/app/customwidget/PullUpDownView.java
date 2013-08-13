@@ -11,6 +11,7 @@ import com.app.customwidget.MyScrollListView.onScrollListViewListener;
 
 import android.R.color;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -222,6 +223,11 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		myListView.setOnScrollListViewListener(this);
 		myListView.setCacheColorHint(color.white);
 		addView(myListView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		
+		PullUpDownView.LayoutParams params = (PullUpDownView.LayoutParams) myListView.getLayoutParams();
+		params.setMargins(8, 0, 8, 0);
+		myListView.setLayoutParams(params);
+		this.setBackgroundColor( 0xffe0f0f0 );
 		
 		myOnPullListener = new onPullListener() {
 			

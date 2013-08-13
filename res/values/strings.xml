@@ -19,6 +19,18 @@
     <string name="addActivityLocation">添加活动地点</string>
     <string name="addActivityParticipant">添加参与活动的好友</string>
     <string name="submitActivityBtn">提交活动</string>
+    <string name="modify">修改</string>
+    <string name="ack">确定</string>
+    <string name="individual_info">个人信息</string>
+    <string name="account_info">账户信息</string>
+    <string name="gender">性别:</string>
+    <string name="location">地点:</string>
+    <string name="description">个人描述:</string>
+    <string name="email">邮箱地址:</string>
+    <string name="bind_account">社交账号绑定:</string>
+    <string name="camera">拍照</string>
+    <string name="album">相册</string>
     <string name="activitytime">&#160;&#160;时&#160;&#160;&#160;&#160;间&#160;&#160; </string>
     <string name="activityLoc">&#160;&#160;地&#160;&#160;&#160;&#160;点&#160;&#160; </string>
+
 </resources>

@@ -1,9 +1,16 @@
 package com.app.customwidget;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.LinearLayout.LayoutParams;
 
 public class MyScrollListView extends ListView{
 
@@ -26,6 +33,10 @@ public class MyScrollListView extends ListView{
 		// TODO Auto-generated method stub
 		listTopPosition = 0;
 		listBottomPosition = 1;
+		setVerticalScrollBarEnabled(false);
+		
+		setDivider( new ColorDrawable( 0xffe0f0f0 ) );
+		setDividerHeight(10);
 	}
 	
 	/* (non-Javadoc)

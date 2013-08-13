@@ -121,6 +121,9 @@ public class HttpSender {
         case OperationCode.LOGOUT:
             httpUrl += "logout";
             break;
+        case OperationCode.GET_USER_INFO:
+            httpUrl += "get_user_info";
+            break;
         default:
             httpUrl += "json";
             break;
