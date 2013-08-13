@@ -20,11 +20,12 @@
 
         <EditText
             android:id="@+id/menu_friend_center_searchmyfriend"
-            style="@null"
+            android:background="@null"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="7000"
-            android:background="#ffffff" >
+            android:focusable="false"
+            android:focusableInTouchMode="false">
 
             <requestFocus />
         </EditText>

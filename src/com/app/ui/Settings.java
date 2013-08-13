@@ -411,7 +411,7 @@ public class Settings{
                     }
                     else 
                     {
-                        Bitmap bitmap = getBitmapFromResources(R.drawable.ic_launcher);
+                        Bitmap bitmap = getBitmapFromResources(R.drawable.defaultavatar);
                         Bitmap new_bitmap = scaleBitmap(bitmap, 100, 100);
                         avatar.setImageBitmap(new_bitmap);
                     }

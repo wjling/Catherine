@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ public class FriendCenter {
 	private View friendNotificationView;
 	private Button recommendedFriendsBtn;
 	private Button notificationBtn;
+	private EditText searchEditText;
 	private ListView friendListView;
 	private LetterSidebar sidebar;
 	
@@ -90,9 +92,12 @@ public class FriendCenter {
 		friendNotificationView = LayoutInflater.from(context).inflate(R.layout.friend_center_notification, null);
 		recommendedFriendsBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_recommendfriendBtn);
 		notificationBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_notificationBtn);
+		searchEditText = (EditText)friendCenterView.findViewById(R.id.menu_friend_center_searchmyfriend);
 		
 		recommendedFriendsBtn.setOnClickListener(buttonsOnClickListener);
 		notificationBtn.setOnClickListener(buttonsOnClickListener);
+		searchEditText.setOnClickListener(editTextOnClickListener);
+		searchEditText.setLongClickable(false);
 		friendListView = (ListView)friendCenterView.findViewById(R.id.menu_friend_center_friendlist);
 		friendListAdapter = new AdapterForFriendList(context, friendList, 
 				R.layout.friend_list_item, 
@@ -116,6 +121,16 @@ public class FriendCenter {
             
         }
 	};
+	
+OnClickListener editTextOnClickListener = new OnClickListener() {
+        
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            searchEditText.setFocusable(true);
+            searchEditText.setFocusableInTouchMode(true);
+        }
+};
 	
 	OnClickListener buttonsOnClickListener = new OnClickListener() {
 		
