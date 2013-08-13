@@ -321,5 +321,8 @@ public final class R {
         /** 模糊
          */
         public static final int avatar_dialog=0x7f070002;
+        /** 模糊
+         */
+        public static final int sidebar=0x7f070003;
     }
 }
