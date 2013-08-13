@@ -221,11 +221,12 @@ public class MyEvents {
 	}
 	
 	public void loadData(){
+	    myEventsList.clear();
 		new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
-				myEventsList.clear();
+				//myEventsList.clear();
 				Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
 				msg1.sendToTarget();
 				
