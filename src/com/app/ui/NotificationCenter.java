@@ -34,6 +34,7 @@ public class NotificationCenter {
 	private final String TAG = "NotificationCenter";
 	private Context context;
 	private FriendCenter UI_friendCenter;
+	private View notificationView;
 //	private View notificationCenterView;
 	
 	private int userId;
@@ -257,7 +258,7 @@ public class NotificationCenter {
 			}	
 			
 		}
-		ListView lv1 = (ListView)UI_friendCenter.getFriendNotificationView().findViewById(R.id.friend_center_notification_friendrequests);
+		ListView lv1 = (ListView)notificationView.findViewById(R.id.friend_center_notification_friendrequests);
 		friendRequestAdapter = new SimpleAdapter(context, friendRequests, 
 				R.layout.friend_request, 
 				new String[]{"fname","gender","email","confirm_msg"}, 
@@ -374,7 +375,7 @@ public class NotificationCenter {
 	public void showRequestResult()
 	{
 		//valifications.addAll(valificationsData());
-		ListView lv = (ListView)UI_friendCenter.getFriendNotificationView().findViewById(R.id.friend_center_notification_requestresults);
+		ListView lv = (ListView)notificationView.findViewById(R.id.friend_center_notification_requestresults);
 		int size = verifications.size();
 		HashMap<String, Object> map;
 		friendRequestResults.clear();
@@ -403,5 +404,16 @@ public class NotificationCenter {
 		lv.setAdapter(adapter);
 		
 		
+	}
+	
+	
+	public void setNotificationView(View v)
+	{
+		this.notificationView = v;
+	}
+	
+	public void setContext(Context context)
+	{
+		this.context = context;
 	}
 }

@@ -59,7 +59,7 @@ GestureDetector.OnGestureListener
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
 	private Menu UI_Menu;
-	private NotificationCenter notificationCenter;
+	public static NotificationCenter notificationCenter;
 	private MyEvents UI_myEvents;
 	private FriendCenter UI_friendCenter;
 	private Settings UI_settings;
@@ -131,7 +131,7 @@ GestureDetector.OnGestureListener
 		initFriendsCenter();
 		initSettings();
 		notificationCenter = new NotificationCenter(this, this.UI_friendCenter,uiHandler, userId);
-		notificationCenter.getNotifications();
+//		notificationCenter.getNotifications();
 	}
 	private OnClickListener ui_ButtonClickListener = new OnClickListener() {
 		
