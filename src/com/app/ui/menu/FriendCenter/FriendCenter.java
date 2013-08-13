@@ -40,6 +40,7 @@ import com.app.widget.LetterSidebar.OnTouchingLetterChangedListener;
 
 public class FriendCenter {
 
+	private final String TAG = "FriendCenter";
 	private Context context;
 	private View friendCenterView;
 	private View friendNotificationView;
@@ -209,7 +210,7 @@ public class FriendCenter {
 			ArrayList<FriendStruct> friends = new ArrayList<FriendStruct>();
 			JSONObject jsResponse = new JSONObject(msg.obj.toString());
 			int cmd = jsResponse.getInt("cmd");
-			Log.i("FriendCenter", "同步好友收到的json: "+jsResponse);
+			Log.i(TAG, "同步好友收到的json: "+jsResponse);
 			if(cmd == ReturnCode.NORMAL_REPLY)
 			{
 				JSONArray jsArray = jsResponse.getJSONArray("friend_list");
@@ -224,10 +225,11 @@ public class FriendCenter {
 					for(int i=0;i<length;i++)
 					{
 						JSONObject jo = jsArray.getJSONObject(i);
-						Log.i("FriendCenter", "a jsonObject: "+jo.toString());
+						jo.put("uid", userId);
+						Log.i(TAG, "一个好友的信息: "+jo.toString());
 						FriendStruct fs = new FriendStruct();
 						fs = FriendStruct.getFromJSON(jo);
-						fs.uid = userId;
+//						fs.uid = userId;
 						friends.add(fs);
 					}
 					tbFriends.add(friends);	//add to the friends table of the local database

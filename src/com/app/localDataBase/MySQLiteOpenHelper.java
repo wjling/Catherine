@@ -11,11 +11,12 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
 	
 	private String TABLE_NAME1 = "friends";
 	private String SQL_createTable1 = "CREATE TABLE "+TABLE_NAME1+
-			" (uid INTEGER PRIMARY KEY,"+
+			" (uid INTEGER,"+
 			"fid INTEGER, " +
 			"fname varchar(20), " +
 			"gender varchar(20), " +
-			"email varchar(30))";
+			"email varchar(30), " +
+			"PRIMARY KEY(uid, fid))";
 	
 	//edit by luo
 	private String TABLE_NAME2 = "notifications";
