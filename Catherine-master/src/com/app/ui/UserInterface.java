@@ -490,7 +490,7 @@ GestureDetector.OnGestureListener
 				case R.id.ui_menu_myevents:
 					addActivityBtn.setVisibility(View.VISIBLE);
 					addFriendBtn.setVisibility(View.GONE);
-					UI_myEvents.loadData();
+//					UI_myEvents.loadData();
 					break;
 				case R.id.ui_menu_privateevents:
 					addActivityBtn.setVisibility(View.GONE);

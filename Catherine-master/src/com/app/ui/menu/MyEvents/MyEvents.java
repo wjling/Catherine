@@ -1,5 +1,7 @@
 package com.app.ui.menu.MyEvents;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -30,6 +32,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -45,7 +49,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class MyEvents {
-	//cv
+
 	private Context context;
 	public View myEventsView;
 	public PullUpDownView myEventsPullUpDownView;
@@ -64,9 +68,7 @@ public class MyEvents {
 	private MsgHandler handler;
 	
 	private Set<Integer> photoIdSet = new HashSet<Integer>();
-	public Map<Integer, Bitmap> idAndImageStr = new HashMap<Integer, Bitmap>();
 	private int curRequestAvatarId;
-	private String datePattern = "yyyy-MM-dd HH:mm:ss";
 	private JSONArray seqJsonArray = null;
 	
 	//My Events 
@@ -160,15 +162,12 @@ public class MyEvents {
 			}
 		};
 		
-		
 		notificationBtn = (Button)myEventsView.findViewById(R.id.menu_my_events_notificationBtn);
 		notificationBtn.setOnClickListener(buttonsOnClickListener);
 		myEventsPullUpDownView = (PullUpDownView)myEventsView.findViewById(R.id.my_events_pull_up_down_view);
 		myEventsListView = myEventsPullUpDownView.getListView();
 		myEventsPullUpDownView.setOnPullListener(myEventsPullUpDownViewListener);
 		myEventsListView.setOnItemClickListener(myEventsListViewListener);
-		
-
 		
 		//edit by luo
 		myEventsAdapter = new cardAdapter(context, 
@@ -177,12 +176,10 @@ public class MyEvents {
 				new String[]{"title", "day", "monthAndYear","time", "location", "launcher", "remark", "participantsNum"}, 
 				new int[]{R.id.activityTitle, R.id.day, R.id.monthAndYear, R.id.time, R.id.location, R.id.launcher, R.id.remark, R.id.participantsNum},
 				screenWidth,
-				new int[]{R.id.user1, R.id.user2, R.id.user3, R.id.user4},
-				idAndImageStr
+				new int[]{R.id.user1, R.id.user2, R.id.user3, R.id.user4}
 		);
 		
 		myEventsListView.setAdapter(myEventsAdapter);
-//		getActivities();
 	}
 	
 	//add by luo
@@ -234,6 +231,7 @@ public class MyEvents {
 		myEventsList.add(map);		
 	}
 	
+	//所有活动卡片要显示的头像的并集photoIdSet
 	private void getPhotoId(JSONArray photolistJsonArray)
 	{
 		try {
@@ -249,16 +247,16 @@ public class MyEvents {
 	}
 	
 	public void loadData(){
+		
 	    myEventsList.clear();
 		new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
-				//myEventsList.clear();
 				Message msg1 = uiHandler.obtainMessage(MSG_WHAT_ON_LOAD_DATA);
 				msg1.sendToTarget();
 				
-				//get data from server, send a request~
+				//get data from server, send a request~   by luo
 				sendRequest(OperationCode.GET_MY_EVENTS);
 			}
 		}).start();
@@ -298,8 +296,9 @@ public class MyEvents {
 	private void getAllavatars()
 	{
 		for (int id : photoIdSet) {
-			//当map中不存有头像的时候，才去拉取头像，否则不拉取
-			if( !idAndImageStr.containsKey(id) )
+			//当local不存有头像的时候，才去拉取头像，否则不拉取
+			//或者：第一次取活动要拉取头像，后面就不再拉取头像了=============
+			if( !imageUtil.fileExist(id) )
 			{
 				curRequestAvatarId = id;
 				sendRequest( OperationCode.GET_AVATAR );
@@ -361,12 +360,9 @@ public class MyEvents {
 									
 									//先清空event list
 									myEventsList.clear();
-									
-									
-										for( int k=0; k<length; k++)
-											getActivityFrom( eventJsonArray.getString(k) );
+									for( int k=0; k<length; k++)
+										getActivityFrom( eventJsonArray.getString(k) );
 										
-									
 									//load data done; inform user interface
 									Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
 									msg2.sendToTarget();
@@ -394,7 +390,8 @@ public class MyEvents {
 								            if(temp!=null)
 								            {
 								                Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);		
-								                idAndImageStr.put( avatarForUserId, bitmap );
+								                //记得要在子线程中写文件
+								                imageUtil.savePhoto(avatarForUserId, bitmap);
 								            }
 								        } catch (Exception e) {
 								            // TODO Auto-generated catch block

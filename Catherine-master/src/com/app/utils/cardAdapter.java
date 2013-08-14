@@ -39,7 +39,6 @@ public class cardAdapter extends BaseAdapter
 	private int to[];	
 	private int screenW;
 	private int toAvatar[];
-	private Map<Integer, Bitmap> idAndImageStr;
 	
 	public cardAdapter() {
 		// TODO Auto-generated constructor stub
@@ -47,7 +46,7 @@ public class cardAdapter extends BaseAdapter
 	}
 	
 	public cardAdapter(Context context, ArrayList<HashMap<String, Object>> list, int resource,
-			String []from, int []to, int screenW, int []toAvatar, Map<Integer, Bitmap> idAndImageStr) {
+			String []from, int []to, int screenW, int []toAvatar) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.mInflater = LayoutInflater.from(context);
@@ -58,7 +57,6 @@ public class cardAdapter extends BaseAdapter
 		this.screenW = screenW;
 		
 		this.toAvatar = toAvatar;
-		this.idAndImageStr = idAndImageStr;
 	}
 	
 	private void SetContentWidth(View main, View v)
@@ -104,9 +102,8 @@ public class cardAdapter extends BaseAdapter
 			view = mInflater.inflate(resource, null);
 		}
 		
-		init(view, position);
-		
 		//set text or set something else about the view
+		init(view, position);
 		for (int i = 0; i < from.length; i++) 
 		{
 			TextView Title = (TextView)view.findViewById( to[i] );
@@ -130,14 +127,13 @@ public class cardAdapter extends BaseAdapter
 			for ( ; i < length; i++) 
 			{
 				int id = avatarJsonArray.getInt(i);
-				if( idAndImageStr.containsKey(id) )  //有头像，设头像
+				if( imageUtil.fileExist(id) )       //本地有头像就用本地头像
 				{
 					CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
-					Bitmap bitmap = idAndImageStr.get(id);
-
-				   photo.setImageBitmap(bitmap);				         
+					Bitmap bitmap = imageUtil.getLocalBitmapBy(id);
+					photo.setImageBitmap(bitmap);
 				}
-				else  //没头像，用默认头像
+				else  									//没头像，用默认头像
 				{
 					CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
 					photo.setImageResource(R.drawable.defaultavatar);
@@ -153,15 +149,6 @@ public class cardAdapter extends BaseAdapter
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//		CircularImage photo1 = (CircularImage)view.findViewById(R.id.user1);
-//		photo1.setImageResource(R.drawable.defaultavatar);
-//		CircularImage photo2 = (CircularImage)view.findViewById(R.id.user2);
-//		photo2.setImageResource(R.drawable.defaultavatar);
-//		CircularImage photo3 = (CircularImage)view.findViewById(R.id.user3);
-//		photo3.setImageResource(R.drawable.defaultavatar);
-//		CircularImage photo4 = (CircularImage)view.findViewById(R.id.user4);
-//		photo4.setImageResource(R.drawable.defaultavatar);
-		
 		
 		View activityInfoAllView = view.findViewById(R.id.activityInfoAll);
 		SetContentWidth(view, activityInfoAllView);
