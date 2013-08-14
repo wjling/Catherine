@@ -306,7 +306,8 @@ public class Settings{
         try {
             if(temp!=null){
                 Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);
-                Bitmap new_bitmap = scaleBitmap(bitmap, 100, 100);
+                int scale = UserInterface.dip2px(activity, 70);
+                Bitmap new_bitmap = scaleBitmap(bitmap, scale, scale);
                 avatar.setImageBitmap(new_bitmap);
             }
         } catch (Exception e) {
@@ -412,7 +413,8 @@ public class Settings{
                     else 
                     {
                         Bitmap bitmap = getBitmapFromResources(R.drawable.defaultavatar);
-                        Bitmap new_bitmap = scaleBitmap(bitmap, 100, 100);
+                        int scale = UserInterface.dip2px(activity, 70);
+                        Bitmap new_bitmap = scaleBitmap(bitmap, scale, scale);
                         avatar.setImageBitmap(new_bitmap);
                     }
                 }catch (JSONException e) {
