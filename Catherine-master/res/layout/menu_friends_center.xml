@@ -2,14 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:background="@color/gray">
 
     <LinearLayout
         android:id="@+id/LinearLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="visible" >
+        android:visibility="visible" 
+        android:gravity="center">
 
         <TextView
             android:id="@+id/TextView1"
@@ -38,31 +40,26 @@
             android:layout_weight="1"
             android:background="@drawable/search" />
 
-        <Button
-            android:id="@+id/menu_friend_center_recommendfriendBtn"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="5dp"
-            android:layout_weight="0"
-            android:text="好友推荐" />
+        
     </LinearLayout>
 
-    <Button
-        android:id="@+id/menu_friend_center_notificationBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="好友通知" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp" >
 
+     	<ListView 
+        	android:id="@+id/menu_friend_center_functions"
+       		android:layout_width="match_parent"
+       		android:layout_height="wrap_content">
+   		</ListView>
+   		
         <ListView
             android:id="@+id/menu_friend_center_friendlist"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content" 
+            android:layout_below="@id/menu_friend_center_functions">
         </ListView>
         
         <com.app.widget.LetterSidebar

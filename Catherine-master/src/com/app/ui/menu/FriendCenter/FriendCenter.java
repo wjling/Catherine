@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -51,9 +56,10 @@ public class FriendCenter {
 	private Context context;
 	private View friendCenterView;
 	private View friendNotificationView;
-	private Button recommendedFriendsBtn;
-	private Button notificationBtn;
+//	private Button recommendedFriendsBtn;
+//	private Button notificationBtn;
 	private EditText searchEditText;
+	private ListView functionsListView;
 	private ListView friendListView;
 	private LetterSidebar sidebar;
 	
@@ -62,8 +68,10 @@ public class FriendCenter {
 	private myHandler fcHandler = new myHandler();
 	
 	ArrayList<FriendStruct> friends;
+	ArrayList<HashMap<String, Object>> functionsList = new ArrayList<HashMap<String,Object>>();
 	ArrayList<HashMap<String, Object>> friendList = new ArrayList<HashMap<String,Object>>();
-	AdapterForFriendList friendListAdapter;
+	AdapterForFriendList friendListAdapter, functionsAdapter;
+	HashMap<String, Integer> alphaIndex = new HashMap<String, Integer>();
 	Comparator<Object> chinese_Comparator = Collator.getInstance(Locale.CHINA);
 //	Comparator<HashMap> myComparator = new Comparator<HashMap>() {
 //		
@@ -97,25 +105,84 @@ public class FriendCenter {
 	public void setLayout()
 	{
 		friendNotificationView = LayoutInflater.from(context).inflate(R.layout.friend_center_notification, null);
-		recommendedFriendsBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_recommendfriendBtn);
-		notificationBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_notificationBtn);
+//		recommendedFriendsBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_recommendfriendBtn);
+//		notificationBtn = (Button)friendCenterView.findViewById(R.id.menu_friend_center_notificationBtn);
 		searchEditText = (EditText)friendCenterView.findViewById(R.id.menu_friend_center_searchmyfriend);
 		
-		recommendedFriendsBtn.setOnClickListener(buttonsOnClickListener);
-		notificationBtn.setOnClickListener(buttonsOnClickListener);
 		searchEditText.setOnClickListener(editTextOnClickListener);
 		searchEditText.setLongClickable(false);
+		functionsListView = (ListView)friendCenterView.findViewById(R.id.menu_friend_center_functions);
+		functionsListView.setDivider(null);
+		functionsAdapter = new AdapterForFriendList(context, functionsList, 
+	            R.layout.friend_list_item, 
+	            new String[] {"avatar", "fname"}, 
+	            new int[] {R.id.friend_list_item_avatar, R.id.friend_list_item_fname});
+		functionsListView.setOnItemClickListener(functionsListListener);
 		friendListView = (ListView)friendCenterView.findViewById(R.id.menu_friend_center_friendlist);
+		friendListView.setDivider(null);
 		friendListAdapter = new AdapterForFriendList(context, friendList, 
 				R.layout.friend_list_item, 
-				new String[] {"fname","gender","email"}, 
-				new int[] {R.id.friend_list_item_fname,R.id.friend_list_item_gender,R.id.friend_list_item_email});
-		
+				new String[] {"avatar", "fname"}, 
+				new int[] {R.id.friend_list_item_avatar, R.id.friend_list_item_fname});
+		functionsListView.setAdapter(functionsAdapter);
 		friendListView.setAdapter(friendListAdapter);
+		friendListView.setOnScrollListener(friendListScrollListener);
 		sidebar=(LetterSidebar)friendCenterView.findViewById(R.id.lettersidebar);
         sidebar.setOnTouchingLetterChangedListener(letterChangedListener);
         
+        initFunctionsList();
 	}
+	
+	OnScrollListener friendListScrollListener = new OnScrollListener() {
+        
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem,
+                int visibleItemCount, int totalItemCount) {
+            // TODO Auto-generated method stub
+            if ( visibleItemCount > 0 )
+            {
+                HashMap<String, Object> map = (HashMap<String, Object>)friendListAdapter.getItem(firstVisibleItem);
+                if (map != null)
+                {
+                    int letter = PinYinComparator.getPinYin((String)(map.get("fname"))).toUpperCase().charAt(0) - 'A';
+                    sidebar.OnScrollChangedLetter(letter);
+                }
+            }
+        }
+    };
+	
+	OnItemClickListener functionsListListener = new OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                long arg3) {
+            // TODO Auto-generated method stub
+            if (arg2 == 0)
+            {
+//              Intent intent1 = new Intent();
+//              intent1.setClass(context, searchFriend.class);
+//              intent1.putExtra("userId", userId);
+//              context.startActivity(intent1);
+            }
+            else if (arg2 == 1) 
+            {
+                Intent intent2 = new Intent();
+                intent2.setClass(context, FriendNotification.class);
+                intent2.putExtra("userId", userId);
+                context.startActivity(intent2);
+            }
+            else {
+                Log.i("Friend Center", "error position in functions list");
+            }
+        }
+	    
+	};
 
 	OnTouchingLetterChangedListener letterChangedListener = new OnTouchingLetterChangedListener() {
 	   
@@ -123,9 +190,13 @@ public class FriendCenter {
         public void onTouchingLetterChanged(String s) {
             // TODO Auto-generated method stub
             Log.i("Letter Sidebar letter is : ", s);
-            int position = s.charAt(0) - 'A';
-            Log.i("Letter Sidebar position is : ", position + "");
-            
+            //int position = s.charAt(0) - 'A';
+            //Log.i("Letter Sidebar position is : ", position + "");
+            Integer position = alphaIndex.get(s);
+            if (position != null)
+            {
+                friendListView.setSelection(position);
+            }
         }
 	};
 	
@@ -139,31 +210,18 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
         }
 };
 	
-	OnClickListener buttonsOnClickListener = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			switch(v.getId())
-			{
-			case R.id.menu_friend_center_recommendfriendBtn:
-//				Intent intent1 = new Intent();
-//				intent1.setClass(context, searchFriend.class);
-//				intent1.putExtra("userId", userId);
-//				context.startActivity(intent1);
-				break;
-			case R.id.menu_friend_center_notificationBtn:
-				Intent intent2 = new Intent();
-				intent2.setClass(context, FriendNotification.class);
-				intent2.putExtra("userId", userId);
-				context.startActivity(intent2);
-				break;
-				default: break;
-			}
-		}
-	};
 	
-	
+	public void initFunctionsList()
+	{
+	    String[] functionTitle = { "好友推荐", "消息中心" };
+	    for (String title : functionTitle)
+	    {
+	        HashMap<String, Object> map = new HashMap<String, Object>();
+	        map.put("fname", title);
+	        map.put("fid", 0);
+	        functionsList.add(map);
+	    }
+	}
 	
 	public void askServerForFriendList()
 	{
@@ -215,7 +273,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 			}
 		}
 		Collections.sort(friendList, myPinYinComparator);
-		
+		insertLetterTag();
 		friendListAdapter.notifyDataSetChanged();
 		
 //		friendListAdapter = new AdapterForFriendList(this, friendList, 
@@ -224,6 +282,37 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 //				new int[] {R.id.friend_list_item_fname,R.id.friend_list_item_gender,R.id.friend_list_item_email});
 //		
 //		friendListView.setAdapter(friendListAdapter);
+	}
+	
+	public void insertLetterTag()
+	{
+	    if (friendList == null)
+	    {
+	        Log.i("insertLetterTag: ","friendList is null");
+	        return;
+	    }
+	    alphaIndex.clear();
+	    ArrayList<HashMap<String, Object>> tempList = new ArrayList<HashMap<String,Object>>();
+	    String currentTag = "";
+	    String tempTag;
+	    for (HashMap<String, Object> hMap : friendList)
+	    {
+	        tempTag = PinYinComparator.getPinYin((String)hMap.get("fname")).charAt(0) + "";
+	        tempTag = tempTag.toUpperCase();
+	        if (tempTag != currentTag)
+	        {
+	            currentTag = tempTag;
+	            HashMap<String, Object> tempMap = new HashMap<String, Object>();
+	            tempMap.put("fid", -1);
+	            tempMap.put("fname", currentTag);
+	            int pos = tempList.size();
+	            alphaIndex.put(currentTag, pos);
+	            tempList.add(tempMap);
+	        }
+	        tempList.add(hMap);
+	    }
+	    friendList.clear();
+	    friendList.addAll(tempList);
 	}
 	
 	public void sychronizeFriendsList(Message msg)
@@ -274,7 +363,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 		}
 	}
 	
-	public class PinYinComparator implements Comparator<HashMap<String,Object>>
+	public static class PinYinComparator implements Comparator<HashMap<String,Object>>
 	{
 
 		@Override
@@ -286,7 +375,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 		}
 		
 		
-		private String getPinYin(String inputString) {
+		public static String getPinYin(String inputString) {
             HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
             format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
             format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);

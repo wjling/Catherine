@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsListView.OnScrollListener;
 
 public class LetterSidebar extends View{
 
@@ -127,6 +128,21 @@ public class LetterSidebar extends View{
             break;
         }
         return true;
+    }
+    
+    
+    public void OnScrollChangedLetter(int c)
+    {
+        int oldChoose = choose;
+        if (oldChoose != c && this.onTouchingLetterChangedListener != null)
+        {   
+            if (c >= 0 && c < letterTable.length)
+            {
+                //this.onTouchingLetterChangedListener.onTouchingLetterChanged(letterTable[c]);
+                choose = c;
+                invalidate();
+            }
+        }
     }
     
     @Override
