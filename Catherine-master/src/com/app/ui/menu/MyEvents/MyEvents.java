@@ -45,6 +45,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class MyEvents {
+	//cv
 	private Context context;
 	public View myEventsView;
 	public PullUpDownView myEventsPullUpDownView;
