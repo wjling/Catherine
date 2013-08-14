@@ -40,6 +40,7 @@ import android.widget.Toast;
 
 public class loginAndreg extends Activity
 {
+	//hehehhehe
 	private HorizontalScrollView scrollView;
 	private ViewGroup parent;
 	private int w, h;
