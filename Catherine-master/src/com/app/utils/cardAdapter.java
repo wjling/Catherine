@@ -5,12 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import com.app.addActivityPack.CircularImage;
 import com.app.catherine.R;
 
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +38,8 @@ public class cardAdapter extends BaseAdapter
 	private String from[];
 	private int to[];	
 	private int screenW;
+	private int toAvatar[];
+	private Map<Integer, Bitmap> idAndImageStr;
 	
 	public cardAdapter() {
 		// TODO Auto-generated constructor stub
@@ -41,7 +47,7 @@ public class cardAdapter extends BaseAdapter
 	}
 	
 	public cardAdapter(Context context, ArrayList<HashMap<String, Object>> list, int resource,
-			String []from, int []to, int screenW) {
+			String []from, int []to, int screenW, int []toAvatar, Map<Integer, Bitmap> idAndImageStr) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.mInflater = LayoutInflater.from(context);
@@ -51,7 +57,8 @@ public class cardAdapter extends BaseAdapter
 		this.to = to;
 		this.screenW = screenW;
 		
-//		init();
+		this.toAvatar = toAvatar;
+		this.idAndImageStr = idAndImageStr;
 	}
 	
 	private void SetContentWidth(View main, View v)
@@ -97,7 +104,7 @@ public class cardAdapter extends BaseAdapter
 			view = mInflater.inflate(resource, null);
 		}
 		
-		init(view);
+		init(view, position);
 		
 		//set text or set something else about the view
 		for (int i = 0; i < from.length; i++) 
@@ -109,18 +116,52 @@ public class cardAdapter extends BaseAdapter
 		return view;
 	}
 	
-	private void init(View view)
+	private void init(View view, int pos)
 	{
 		CircularImage join = (CircularImage)view.findViewById(R.id.joinBtn);
 		join.setImageResource(R.drawable.join);
-		CircularImage photo = (CircularImage)view.findViewById(R.id.user1);
-		photo.setImageResource(R.drawable.defaultavatar);
-		CircularImage photo2 = (CircularImage)view.findViewById(R.id.user2);
-		photo2.setImageResource(R.drawable.defaultavatar);
-		CircularImage photo3 = (CircularImage)view.findViewById(R.id.user3);
-		photo3.setImageResource(R.drawable.defaultavatar);
-		CircularImage photo4 = (CircularImage)view.findViewById(R.id.user4);
-		photo4.setImageResource(R.drawable.defaultavatar);
+
+		HashMap<String, Object> item = list.get(pos);
+		JSONArray avatarJsonArray = (JSONArray) item.get("avatarNum");
+		
+		int length = avatarJsonArray.length();
+		try {
+			int i=0;
+			for ( ; i < length; i++) 
+			{
+				int id = avatarJsonArray.getInt(i);
+				if( idAndImageStr.containsKey(id) )  //有头像，设头像
+				{
+					CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
+					Bitmap bitmap = idAndImageStr.get(id);
+
+				   photo.setImageBitmap(bitmap);				         
+				}
+				else  //没头像，用默认头像
+				{
+					CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
+					photo.setImageResource(R.drawable.defaultavatar);
+				}
+			}
+			//其他没头像的成员也设为默认头像
+			for( ; i<4; i++)
+			{
+				CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
+				photo.setImageResource(R.drawable.defaultavatar);
+			}
+		} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//		CircularImage photo1 = (CircularImage)view.findViewById(R.id.user1);
+//		photo1.setImageResource(R.drawable.defaultavatar);
+//		CircularImage photo2 = (CircularImage)view.findViewById(R.id.user2);
+//		photo2.setImageResource(R.drawable.defaultavatar);
+//		CircularImage photo3 = (CircularImage)view.findViewById(R.id.user3);
+//		photo3.setImageResource(R.drawable.defaultavatar);
+//		CircularImage photo4 = (CircularImage)view.findViewById(R.id.user4);
+//		photo4.setImageResource(R.drawable.defaultavatar);
+		
 		
 		View activityInfoAllView = view.findViewById(R.id.activityInfoAll);
 		SetContentWidth(view, activityInfoAllView);

@@ -6,7 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,10 +23,13 @@ import com.app.utils.OperationCode;
 import com.app.utils.RegUtils;
 import com.app.utils.ReturnCode;
 import com.app.utils.cardAdapter;
+import com.app.utils.imageUtil;
 
 import android.R.integer;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -53,10 +59,12 @@ public class MyEvents {
 	private Handler uiHandler;
 	private int screenWidth;
 	private int userId;
-
 	private HttpSender sender;
 	private MsgHandler handler;
-//	private int []EventIDList;
+	
+	private Set<Integer> photoIdSet = new HashSet<Integer>();
+	public Map<Integer, Bitmap> idAndImageStr = new HashMap<Integer, Bitmap>();
+	private int curRequestAvatarId;
 	private String datePattern = "yyyy-MM-dd HH:mm:ss";
 	private JSONArray seqJsonArray = null;
 	
@@ -168,7 +176,9 @@ public class MyEvents {
 				R.layout.activity_item, 
 				new String[]{"title", "day", "monthAndYear","time", "location", "launcher", "remark", "participantsNum"}, 
 				new int[]{R.id.activityTitle, R.id.day, R.id.monthAndYear, R.id.time, R.id.location, R.id.launcher, R.id.remark, R.id.participantsNum},
-				screenWidth 
+				screenWidth,
+				new int[]{R.id.user1, R.id.user2, R.id.user3, R.id.user4},
+				idAndImageStr
 		);
 		
 		myEventsListView.setAdapter(myEventsAdapter);
@@ -182,6 +192,7 @@ public class MyEvents {
 		String subject="主题", time="", location="未定", launcher="谁发起的?", remark="没有备注哦oo";
 		int member_count = 0;
 		String year="0000", month="00", day="00", hour="00", minute="00", second="00";
+		JSONArray photolistJsonArray = null;
 		
 		try{
 			eventInforJson = new JSONObject(str);
@@ -191,6 +202,8 @@ public class MyEvents {
 			launcher = eventInforJson.optString("launcher");
 			remark = eventInforJson.optString("remark");
 			member_count  = eventInforJson.optInt("member_count");
+			photolistJsonArray = eventInforJson.optJSONArray("member");
+			getPhotoId(photolistJsonArray);
 		}
 		catch (JSONException e) {
             // TODO Auto-generated catch block
@@ -217,7 +230,22 @@ public class MyEvents {
 		map.put("launcher", "by " + launcher);
 		map.put("remark", remark);
 		map.put("participantsNum", member_count+"");
+		map.put("avatarNum", photolistJsonArray);
 		myEventsList.add(map);		
+	}
+	
+	private void getPhotoId(JSONArray photolistJsonArray)
+	{
+		try {
+			for (int i = 0; i < photolistJsonArray.length(); i++) 
+			{
+				Integer id = (Integer) photolistJsonArray.get(i);
+				photoIdSet.add( id );
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void loadData(){
@@ -249,6 +277,12 @@ public class MyEvents {
 				params.put("sequence", seqJsonArray);
 				Log.e("test", params.toString());
 				sender.Httppost(OperationCode.GET_EVENTS, params, handler);
+				break;
+			case OperationCode.GET_AVATAR:
+				params.put("id", curRequestAvatarId);
+				params.put("operation", 0);
+				sender.Httppost(OperationCode.GET_AVATAR, params, handler);
+				break;
 			default:
 				break;
 			}
@@ -258,6 +292,19 @@ public class MyEvents {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+	}
+	
+	//向服务器发送请求头像
+	private void getAllavatars()
+	{
+		for (int id : photoIdSet) {
+			//当map中不存有头像的时候，才去拉取头像，否则不拉取
+			if( !idAndImageStr.containsKey(id) )
+			{
+				curRequestAvatarId = id;
+				sendRequest( OperationCode.GET_AVATAR );
+			}
+		}
 	}
 	
 	class MsgHandler extends Handler
@@ -323,11 +370,45 @@ public class MyEvents {
 									//load data done; inform user interface
 									Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
 									msg2.sendToTarget();
+									
+									new Thread()
+									{
+											public void run() {
+												getAllavatars();
+											}
+									}.start();
 								}
 								else
 									Toast.makeText(context, "get events返回其他值了"+returnCMD, Toast.LENGTH_SHORT).show();	
 								break;
-			
+								
+							case OperationCode.GET_AVATAR:
+								if( returnCMD==ReturnCode.NORMAL_REPLY )
+								{
+									int avatarForUserId = returnJson.optInt("id");
+									String imageStr = returnJson.optString("avatar");
+
+									//存放到map里面，告知有内容更新，在初始化卡片的时候使用
+									byte[] temp = imageUtil.String2Bytes(imageStr);
+									 try {
+								            if(temp!=null)
+								            {
+								                Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);		
+								                idAndImageStr.put( avatarForUserId, bitmap );
+								            }
+								        } catch (Exception e) {
+								            // TODO Auto-generated catch block
+								            e.printStackTrace();
+								        } 
+									
+									myEventsAdapter.notifyDataSetChanged();
+								}
+								else if ( returnCMD==ReturnCode.REQUEST_FAIL ) 
+								{
+									Log.e("myevent", "请求头像失败");
+								}
+								break;
+								
 							default:
 								break;
 							}
