@@ -167,8 +167,7 @@ public class MyEvents {
 		myEventsPullUpDownView.setOnPullListener(myEventsPullUpDownViewListener);
 		myEventsListView.setOnItemClickListener(myEventsListViewListener);
 		
-//		myEventsAdapter = new ArrayAdapter<String>(context, R.layout.pulldown_item, myEventsList);
-//		myEventsListView.setAdapter(myEventsAdapter);
+
 		
 		//edit by luo
 		myEventsAdapter = new cardAdapter(context, 
