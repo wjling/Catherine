@@ -64,7 +64,7 @@ public class FriendCenter {
 	ArrayList<FriendStruct> friends;
 	ArrayList<HashMap<String, Object>> friendList = new ArrayList<HashMap<String,Object>>();
 	AdapterForFriendList friendListAdapter;
-	Comparator<Object> chinese_Comparator = Collator.getInstance(Locale.CHINA);
+//	Comparator<Object> chinese_Comparator = Collator.getInstance(Locale.CHINA);
 //	Comparator<HashMap> myComparator = new Comparator<HashMap>() {
 //		
 //		@Override

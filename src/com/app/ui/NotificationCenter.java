@@ -91,6 +91,7 @@ public class NotificationCenter {
 			try {
 				JSONObject msgJson = new JSONObject(msg);
 					msgJson.put("item_id", id);
+					msgJson.put("uid", userId);
 					msgJson.put("tag", "ADD_FRIEND_REQUEST");
 				requests.add(msgJson);
 				Log.i(TAG, "数据表中存放的好友请求是："+msgJson.toString());
