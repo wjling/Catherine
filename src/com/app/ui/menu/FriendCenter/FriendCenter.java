@@ -7,6 +7,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,17 +65,18 @@ public class FriendCenter {
 	ArrayList<HashMap<String, Object>> friendList = new ArrayList<HashMap<String,Object>>();
 	AdapterForFriendList friendListAdapter;
 	Comparator<Object> chinese_Comparator = Collator.getInstance(Locale.CHINA);
-	Comparator<HashMap> myComparator = new Comparator<HashMap>() {
-		
-		@Override
-		public int compare(HashMap arg0, HashMap arg1) {
-			// TODO Auto-generated method stub
-			String name0 = arg0.get("fname").toString();
-			String name1 = arg1.get("fname").toString();
-			return chinese_Comparator.compare(name0, name1);
-		}
-	};
-//	private NotificationCenter notificationCenter;
+//	Comparator<HashMap> myComparator = new Comparator<HashMap>() {
+//		
+//		@Override
+//		public int compare(HashMap arg0, HashMap arg1) {
+//			// TODO Auto-generated method stub
+//			String name0 = arg0.get("fname").toString();
+//			String name1 = arg1.get("fname").toString();
+//			return chinese_Comparator.compare(name0, name1);
+//		}
+//	};
+	
+	private PinYinComparator myPinYinComparator = new PinYinComparator();
 	
 	public FriendCenter(Context context, View friendsCenterView, Handler uiHandler, int userId) {
 		// TODO Auto-generated constructor stub
@@ -207,7 +214,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 //				}
 			}
 		}
-		Collections.sort(friendList, myComparator);
+		Collections.sort(friendList, myPinYinComparator);
 		
 		friendListAdapter.notifyDataSetChanged();
 		
@@ -265,6 +272,53 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public class PinYinComparator implements Comparator<HashMap<String,Object>>
+	{
+
+		@Override
+		public int compare(HashMap<String,Object> arg0, HashMap<String,Object> arg1) {
+			// TODO Auto-generated method stub
+			String pinYinName0 = getPinYin(arg0.get("fname").toString());
+			String pinYinName1 = getPinYin(arg1.get("fname").toString());
+			return pinYinName0.compareTo(pinYinName1);
+		}
+		
+		
+		private String getPinYin(String inputString) {
+            HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
+            format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+            format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+            format.setVCharType(HanyuPinyinVCharType.WITH_V);
+ 
+            char[] input = inputString.trim().toCharArray();// 把字符串转化成字符数组
+            String output = "";
+ 
+            try {
+                for (int i = 0; i < input.length; i++) {
+                    // \\u4E00是unicode编码，判断是不是中文
+                    if (java.lang.Character.toString(input[i]).matches(
+                            "[\\u4E00-\\u9FA5]+")) {
+                        // 将汉语拼音的全拼存到temp数组
+                        String[] temp = PinyinHelper.toHanyuPinyinStringArray(
+                                input[i], format);
+                        // 取拼音的第一个读音
+                        output += temp[0];
+                    }
+                    // 大写字母转化成小写字母
+                    else if (input[i] > 'A' && input[i] < 'Z') {
+                        output += java.lang.Character.toString(input[i]);
+                        output = output.toLowerCase();
+                    }
+                    output += java.lang.Character.toString(input[i]);
+                }
+            } catch (Exception e) {
+                Log.e("Exception", e.toString());
+            }
+            return output;
+        }
+		
 	}
 	
 	public class myHandler extends Handler
