@@ -65,9 +65,23 @@ public class cardAdapter extends BaseAdapter
 		View dateView = main.findViewById(R.id.activityDate);
 		RelativeLayout.LayoutParams paramsdate = (RelativeLayout.LayoutParams)dateView.getLayoutParams();
 		int dateW = paramsdate.width;
-		Log.e("test", "datew: " + dateW);
-		int delPix = 95 * dateW / 50;
 
+		int delPix = 100 * dateW / 55;
+    	int screenWidth = screenW;
+    	
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)v.getLayoutParams();
+		params.width = screenWidth - delPix;
+		v.setLayoutParams(params);
+	}
+	
+	private void SetUserInfoWidth(View main, View v)
+    {
+		//reference
+		View dateView = main.findViewById(R.id.activityDate);
+		RelativeLayout.LayoutParams paramsdate = (RelativeLayout.LayoutParams)dateView.getLayoutParams();
+		int dateW = paramsdate.width;
+
+		int delPix = 40 * dateW / 55;
     	int screenWidth = screenW;
     	
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)v.getLayoutParams();
@@ -152,6 +166,8 @@ public class cardAdapter extends BaseAdapter
 		
 		View activityInfoAllView = view.findViewById(R.id.activityInfoAll);
 		SetContentWidth(view, activityInfoAllView);
+		View userInfoView = view.findViewById(R.id.userInfo);
+		SetUserInfoWidth(view, userInfoView);
 		
 		join.setOnClickListener(BtnListener);
 		view.findViewById(R.id.comment_btn).setOnClickListener(BtnListener);
