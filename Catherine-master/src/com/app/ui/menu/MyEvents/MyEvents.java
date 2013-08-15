@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,12 +21,14 @@ import org.json.JSONObject;
 import com.app.catherine.R;
 import com.app.customwidget.PullUpDownView;
 import com.app.customwidget.PullUpDownView.onPullListener;
+import com.app.ui.UserInterface;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 import com.app.utils.RegUtils;
 import com.app.utils.ReturnCode;
 import com.app.utils.cardAdapter;
 import com.app.utils.imageUtil;
+
 
 import android.R.integer;
 import android.content.Context;
@@ -70,7 +73,10 @@ public class MyEvents {
 	private Set<Integer> photoIdSet = new HashSet<Integer>();
 	private int curRequestAvatarId;
 	private JSONArray seqJsonArray = null;
-	private boolean firstLoad = true;
+	private boolean firstLoad = true, refreshing=false;
+	private Vector<Integer> allEventIDList = new Vector<Integer>();
+	private Vector<Integer> requestEventIDList = new Vector<Integer>();
+	private int requestIndex = 0;
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
@@ -131,6 +137,11 @@ public class MyEvents {
 					@Override
 					public void run() {
 						//重新请求活动
+						allEventIDList.clear();
+						myEventsList.clear();
+						myEventsAdapter.notifyDataSetChanged();
+						requestIndex = 0;
+						refreshing = true;
 						sendRequest(OperationCode.GET_MY_EVENTS);									
 					}
 				}).start();
@@ -144,14 +155,17 @@ public class MyEvents {
 					
 					@Override
 					public void run() {
-						try {
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}				
-						Message msg = uiHandler.obtainMessage(MSG_WHAT_GET_MORE_DONE);
-						msg.obj = "After more " + System.currentTimeMillis();
-						msg.sendToTarget();
+						
+						if( hasMoreEvent() )
+							sendRequest(OperationCode.GET_MY_EVENTS);	
+						else
+						{
+							Message msgLoadMore = uiHandler.obtainMessage(MSG_WHAT_GET_MORE_DONE);
+							msgLoadMore.obj = "After more " + System.currentTimeMillis();
+							msgLoadMore.sendToTarget();
+							Log.e("myevents", "*************no more events*********");
+						}
+
 					}
 				}).start();
 			}
@@ -267,7 +281,7 @@ public class MyEvents {
 				sender.Httppost(OperationCode.GET_MY_EVENTS, params, handler);
 				break;
 			case OperationCode.GET_EVENTS:
-				params.put("sequence", seqJsonArray);
+				params.put("sequence", new JSONArray( requestEventIDList ) );
 				Log.e("test", params.toString());
 				sender.Httppost(OperationCode.GET_EVENTS, params, handler);
 				break;
@@ -301,6 +315,22 @@ public class MyEvents {
 		}
 	}
 	
+	private void initRequestEventList()
+	{
+		//每次申请10条
+		int i=0, length = allEventIDList.size();
+		requestEventIDList.clear();
+		for (; i < 10 &&  requestIndex<length; i++, requestIndex++) 
+		{
+			requestEventIDList.add( allEventIDList.get(requestIndex) );
+		}
+	}
+	
+	private boolean hasMoreEvent()
+	{
+		return requestIndex < allEventIDList.size();
+	}
+	
 	class MsgHandler extends Handler
 	{
 		public MsgHandler(Looper looper)
@@ -329,19 +359,32 @@ public class MyEvents {
 								if( returnCMD==ReturnCode.NORMAL_REPLY )
 								{						
 									seqJsonArray = returnJson.optJSONArray("sequence");
+									if( seqJsonArray==null) break;
+									
 									int length = seqJsonArray.length();
 									if( length>0 )
 									{
 										Log.i("my events", "seq length: " + length);
-//										EventIDList = new int[length];
-//										for( int i=0; i<length; i++)									
-//											EventIDList[i] = seqJsonArray.getInt(i);
-										
+										allEventIDList.clear();
+										for( int i=0; i<length; i++)									
+											allEventIDList.add( seqJsonArray.getInt(i) );
+
+										initRequestEventList();
 										//使用events sequence请求活动内容
 										sendRequest(OperationCode.GET_EVENTS);
 									}
 									else										
-										Toast.makeText(context, "当前没有活动", Toast.LENGTH_SHORT).show();									
+									{
+										Toast.makeText(context, "当前没有活动", Toast.LENGTH_SHORT).show();	
+										//load data done; inform user interface
+										Message msgLoad = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
+										msgLoad.sendToTarget();
+										
+										Message msgLoadMore = uiHandler.obtainMessage(MSG_WHAT_GET_MORE_DONE);
+										msgLoadMore.obj = "After more " + System.currentTimeMillis();
+										msgLoadMore.sendToTarget();
+										firstLoad = false;
+									}
 								}
 								else								
 									Toast.makeText(context, "get my events返回其他值了"+returnCMD, Toast.LENGTH_SHORT).show();																	
@@ -354,7 +397,7 @@ public class MyEvents {
 									int length = eventJsonArray.length();
 									
 									//先清空event list
-									myEventsList.clear();
+//									myEventsList.clear();
 									for( int k=0; k<length; k++)
 										getActivityFrom( eventJsonArray.getString(k) );
 										
@@ -366,14 +409,22 @@ public class MyEvents {
 										firstLoad = false;
 										Log.i("myevent", "load done");
 									}
-									else
+									else if( refreshing==true )
 									{
 										//refresh data done
 										Message msgRefresh = uiHandler.obtainMessage(MSG_WHAT_REFRESH_DONE);
 										msgRefresh.obj = "After refresh " + System.currentTimeMillis();
 										msgRefresh.sendToTarget();
+										refreshing=false;
 										Log.i("myevent", "refresh done");
 									}
+									else   //load more
+									{
+										Message msgLoadMore = uiHandler.obtainMessage(MSG_WHAT_GET_MORE_DONE);
+										msgLoadMore.obj = "After more " + System.currentTimeMillis();
+										msgLoadMore.sendToTarget();
+									}
+
 									
 									new Thread()
 									{
