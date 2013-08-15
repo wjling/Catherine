@@ -12,6 +12,7 @@ import android.util.Log;
 
 public class imageUtil 
 {
+    private final static String APP_PATH = Environment.getExternalStorageDirectory() + "/Catherine/";
 	private final static String IMAGE_PATH = Environment.getExternalStorageDirectory() + "/Catherine/Avatar/";
 	
 	 public static byte[] String2Bytes(String imgStr) 
@@ -51,7 +52,15 @@ public class imageUtil
 	public static void savePhoto(int uid, Bitmap bmp)
 	{
 		//when you need to save the image inside your own folder in the sd card
-		File imageFileFolder = new File( IMAGE_PATH );
+	    File imageFileFolder = new File( APP_PATH );
+
+        if( !imageFileFolder.exists() )
+        {
+            imageFileFolder.mkdir();
+            Log.i("myevent", "************创建一个目录" + APP_PATH);
+        }
+        
+        imageFileFolder = new File(IMAGE_PATH);
 
 		if( !imageFileFolder.exists() )
 		{

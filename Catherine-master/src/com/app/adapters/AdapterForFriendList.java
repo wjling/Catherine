@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.app.catherine.R;
 import com.app.localDataBase.TableFriends;
 import com.app.ui.UserInterface;
+import com.app.utils.imageUtil;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -116,7 +117,14 @@ public class AdapterForFriendList extends BaseAdapter{
 			case R.id.friend_list_item_avatar:
 			    if (fid > 0)
 			    {
-			        viewHolder.avatar.setImageDrawable(context.getResources().getDrawable(R.drawable.defaultavatar));
+			        if (imageUtil.fileExist(fid))
+                    {
+                        viewHolder.avatar.setImageBitmap(imageUtil.getLocalBitmapBy(fid));
+                    }
+                    else 
+                    {
+                        viewHolder.avatar.setImageDrawable(context.getResources().getDrawable(R.drawable.defaultavatar));    
+                    }
 			    }
 			    else
 			    {

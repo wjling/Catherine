@@ -21,6 +21,8 @@ import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -46,6 +48,7 @@ import com.app.ui.NotificationCenter;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 import com.app.utils.ReturnCode;
+import com.app.utils.imageUtil;
 import com.app.widget.LetterSidebar;
 import com.app.widget.LetterSidebar.OnTouchingLetterChangedListener;
 
@@ -66,6 +69,7 @@ public class FriendCenter {
 	private int userId = -1;
 	private Handler uiHandler;
 	private myHandler fcHandler = new myHandler();
+	private static final int MSG_WHAT_ON_UPDATE_LIST = -1;
 	
 	ArrayList<FriendStruct> friends;
 	ArrayList<HashMap<String, Object>> functionsList = new ArrayList<HashMap<String,Object>>();
@@ -97,9 +101,15 @@ public class FriendCenter {
 	
 	public void init() {
 		// TODO Auto-generated method stub
-//		notificationCenter = new NotificationCenter(context, friendCenterView, uiHandler, userId);
-		setLayout();
-		askServerForFriendList();
+	    new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                setLayout();
+                askServerForFriendList();
+            }        
+        }).start();
 	}
 	
 	public void setLayout()
@@ -240,40 +250,63 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 	
 	public void showFriendList()
 	{
-		friendList.clear();
-		TableFriends tf = new TableFriends(context);
-		friends = tf.getAllFriends(userId+"");
-		if(friends.size() == 0)
-		{
-			Toast.makeText(context, "你暂时还没有好友哦", Toast.LENGTH_SHORT).show();
-		}
-		else
-		{
-			for (FriendStruct fs : friends) {
-//				if(fs.uid == userId)
-//				{
-					HashMap<String, Object> map = new HashMap<String, Object>();
-//					Log.i("FriendCenter","fs.gender: "+fs.gender);
-					map.put("uid", userId);
-					map.put("fname", fs.fname);
-					int gender = Integer.parseInt(fs.gender);
-					if(gender == 1)
-					{
-						map.put("gender", "男");
-					}
-					else
-					{
-						map.put("gender", "女");
-					}
-	//				map.put("gender", fs.gender);
-					map.put("email", fs.email);
-					map.put("fid",fs.fid);
-					friendList.add(map);
-//				}
-			}
-		}
-		Collections.sort(friendList, myPinYinComparator);
-		insertLetterTag();
+	    friendList.clear();
+        int[] alpha_counter = new int[26];
+        TableFriends tf = new TableFriends(context);
+        friends = tf.getAllFriends(userId+"");
+        if(friends.size() == 0)
+        {
+            Toast.makeText(context, "你暂时还没有好友哦", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            for (final FriendStruct fs : friends)
+            {
+                    HashMap<String, Object> map = new HashMap<String, Object>();
+//                    map.put("uid", userId);
+                    map.put("fname", fs.fname);
+//                    int gender = Integer.parseInt(fs.gender);
+//                    if(gender == 1)
+//                    {
+//                        map.put("gender", "男");
+//                    }
+//                    else
+//                    {
+//                        map.put("gender", "女");
+//                    }
+//                    map.put("gender", fs.gender);
+//                    map.put("email", fs.email);
+                    map.put("fid",fs.fid);
+                    friendList.add(map);
+                     
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            // TODO Auto-generated method stub
+                             if (!imageUtil.fileExist(fs.fid))
+                             {
+                                 retrieve_avatar(fs.fid);
+                             }
+                        }
+                       
+                    }).start();
+            }
+        }
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                Collections.sort(friendList, myPinYinComparator);
+                insertLetterTag();
+                Message msg = fcHandler.obtainMessage(MSG_WHAT_ON_UPDATE_LIST);
+                msg.sendToTarget();
+            }
+           
+        }).start();
+			
 		friendListAdapter.notifyDataSetChanged();
 		
 //		friendListAdapter = new AdapterForFriendList(this, friendList, 
@@ -363,6 +396,45 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 		}
 	}
 	
+    public void retrieve_avatar(int uid)
+    {
+        JSONObject params = new JSONObject();
+        try
+        {
+            params.put("id", uid);
+            params.put("operation", 0);
+            new HttpSender().Httppost(OperationCode.GET_AVATAR, params, fcHandler);
+        } catch (JSONException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
+    public void writeAvatar(String str)
+    {
+        JSONObject returnJson;
+        try {
+            returnJson = new JSONObject(str );
+            if (returnJson.getInt("cmd") == ReturnCode.NORMAL_REPLY)
+            {
+                String returnStr = returnJson.getString("avatar");  
+                byte[] temp = imageUtil.String2Bytes(returnStr);
+                if(temp!=null)
+                {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);
+                    imageUtil.savePhoto(returnJson.getInt("id"), bitmap);
+                }
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Message msg = fcHandler.obtainMessage(MSG_WHAT_ON_UPDATE_LIST);
+        msg.sendToTarget();
+
+    }
+	
 	public static class PinYinComparator implements Comparator<HashMap<String,Object>>
 	{
 
@@ -425,6 +497,18 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 				sychronizeFriendsList(msg);
 //				showFriendList();
 				break;
+			case OperationCode.GET_AVATAR:
+                final String final_mes = msg.obj.toString();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                    writeAvatar(final_mes);
+                }
+                }).start();
+                break;
+            case MSG_WHAT_ON_UPDATE_LIST:
+                friendListAdapter.notifyDataSetChanged();
+                break;
 				default: break;
 			}
 			super.handleMessage(msg);
