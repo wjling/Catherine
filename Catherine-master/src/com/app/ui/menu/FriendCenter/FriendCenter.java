@@ -263,7 +263,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
             for (final FriendStruct fs : friends)
             {
                     HashMap<String, Object> map = new HashMap<String, Object>();
-//                    map.put("uid", userId);
+                    map.put("uid", userId);
                     map.put("fname", fs.fname);
 //                    int gender = Integer.parseInt(fs.gender);
 //                    if(gender == 1)
