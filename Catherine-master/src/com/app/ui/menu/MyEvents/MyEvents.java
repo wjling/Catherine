@@ -70,6 +70,7 @@ public class MyEvents {
 	private Set<Integer> photoIdSet = new HashSet<Integer>();
 	private int curRequestAvatarId;
 	private JSONArray seqJsonArray = null;
+	private boolean firstLoad = true;
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
@@ -129,14 +130,8 @@ public class MyEvents {
 					
 					@Override
 					public void run() {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}				
-						Message msg = uiHandler.obtainMessage(MSG_WHAT_REFRESH_DONE);
-						msg.obj = "After refresh " + System.currentTimeMillis();
-						msg.sendToTarget();
+						//重新请求活动
+						sendRequest(OperationCode.GET_MY_EVENTS);									
 					}
 				}).start();
 				
@@ -298,11 +293,11 @@ public class MyEvents {
 		for (int id : photoIdSet) {
 			//当local不存有头像的时候，才去拉取头像，否则不拉取
 			//或者：第一次取活动要拉取头像，后面就不再拉取头像了=============
-			if( !imageUtil.fileExist(id) )
-			{
+//			if( !imageUtil.fileExist(id) )
+//			{
 				curRequestAvatarId = id;
 				sendRequest( OperationCode.GET_AVATAR );
-			}
+//			}
 		}
 	}
 	
@@ -363,9 +358,22 @@ public class MyEvents {
 									for( int k=0; k<length; k++)
 										getActivityFrom( eventJsonArray.getString(k) );
 										
-									//load data done; inform user interface
-									Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
-									msg2.sendToTarget();
+									if( firstLoad==true )
+									{
+										//load data done; inform user interface
+										Message msg2 = uiHandler.obtainMessage(MSG_WHAT_LOAD_DATA_DONE);
+										msg2.sendToTarget();
+										firstLoad = false;
+										Log.i("myevent", "load done");
+									}
+									else
+									{
+										//refresh data done
+										Message msgRefresh = uiHandler.obtainMessage(MSG_WHAT_REFRESH_DONE);
+										msgRefresh.obj = "After refresh " + System.currentTimeMillis();
+										msgRefresh.sendToTarget();
+										Log.i("myevent", "refresh done");
+									}
 									
 									new Thread()
 									{
