@@ -549,15 +549,34 @@ GestureDetector.OnGestureListener
 	}
 	
 	 @Override
-	 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	 protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
 	      // TODO Auto-generated method stub
 	      if (requestCode == UI_settings.CASE_PHOTO && resultCode == RESULT_OK && null != data)
 	      {
-	          UI_settings.onAvatarsetFromPhoto(data);
+	          new Thread(new Runnable()
+	          {
+
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                    UI_settings.onAvatarsetFromPhoto(data);
+                }
+	              
+	          }).start();
+	          
 	      }
 	      else if (requestCode == UI_settings.CASE_CAMERA && resultCode == RESULT_OK && null != data)
 	      {
-	          UI_settings.onAvatarsetFromCamera(data);
+	          new Thread(new Runnable()
+              {
+
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                    UI_settings.onAvatarsetFromCamera(data);
+                }
+                  
+              }).start();
 	      }
 	      else {
 	          Toast.makeText(this, "请重新选择头像", Toast.LENGTH_SHORT);

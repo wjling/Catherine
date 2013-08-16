@@ -16,6 +16,7 @@ import com.app.catherine.R;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 import com.app.utils.ReturnCode;
+import com.app.utils.imageUtil;
 import com.app.widget.AvatarDialog;
 
 import android.app.Activity;
@@ -76,6 +77,7 @@ public class Settings{
         individualInfoState = false;
         accountInfoState = false;
         isFirstVisit = true;
+        handler = new MessageHandler(Looper.myLooper());
         init();
     }
     
@@ -101,12 +103,19 @@ public class Settings{
         description.setLongClickable(false);
         myName = (TextView)settingsView.findViewById(R.id.settings_name);
         myEmail = (TextView)settingsView.findViewById(R.id.settings_email);
-        handler = new MessageHandler(Looper.myLooper());
+
     }
 
     private void init() {
         // TODO Auto-generated method stub
-        setLayout();
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                setLayout();
+            }        
+        }).start();
     }
     
     public void initData() {
@@ -128,7 +137,14 @@ public class Settings{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        new HttpSender().Httppost(OperationCode.GET_AVATAR, params, handler);
+        if (imageUtil.fileExist(userId))
+        {
+            avatar.setImageBitmap(imageUtil.getLocalBitmapBy(userId));
+        }
+        else
+        {
+            new HttpSender().Httppost(OperationCode.GET_AVATAR, params, handler);
+        }
         isFirstVisit = false;
     }
     
@@ -260,7 +276,7 @@ public class Settings{
                 .setPositiveButton(R.string.ack, null).show();
                 ImageView big_avatar = (ImageView)layout.findViewById(R.id.big_avatar);
                 avatar.setDrawingCacheEnabled(true);
-                Bitmap bigAvatar = scaleBitmap(Bitmap.createBitmap(avatar.getDrawingCache()), 300, 300);
+                Bitmap bigAvatar = imageUtil.scaleBitmap(Bitmap.createBitmap(avatar.getDrawingCache()), 300, 300);
                 big_avatar.setImageBitmap(bigAvatar);
                 //big_avatar.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_launcher));
                 avatar.setDrawingCacheEnabled(false);
@@ -280,34 +296,17 @@ public class Settings{
         }
     };
     
-    public Bitmap scaleBitmap(Bitmap bm,int newWidth,int newHeight)
-    {
-        // 原始图像的宽和高
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        
-        // 计算缩放率
-        float scaleWidth = ((float)newWidth) / width;
-        float scaleHeight = ((float)newHeight) / height;
-        
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-        
-        return resizedBitmap;
-    }
-
-    
+  
     //string -> byte[] -> bitmap -> setImageBitmap to show
     public void setImage(String str)
     {
-        byte[] temp = String2Bytes(str);
+        byte[] temp = imageUtil.String2Bytes(str);
         try {
             if(temp!=null){
                 Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);
+                imageUtil.savePhoto(userId, bitmap);
                 int scale = UserInterface.dip2px(activity, 70);
-                Bitmap new_bitmap = scaleBitmap(bitmap, scale, scale);
+                Bitmap new_bitmap = imageUtil.scaleBitmap(bitmap, scale, scale);
                 avatar.setImageBitmap(new_bitmap);
             }
         } catch (Exception e) {
@@ -331,25 +330,20 @@ public class Settings{
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }       
+        }  
+//        new Thread(new Runnable()
+//        {
+//
+//            @Override
+//            public void run() {
+//                // TODO Auto-generated method stub
+//                setImage(imageStr);
+//            }
+//            
+//        }).start();
+        
     }
     
-    private void get_avatar() 
-    {
-        JSONObject params = new JSONObject();
-        
-        try
-        {
-            params.put("id", userId);
-            params.put("operation", 0);
-            new HttpSender().Httppost(OperationCode.GET_AVATAR, params, handler);
-            Log.i(TAG, "upload param: " + params.toString());
-        } catch (JSONException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }       
-    }
     
     //image to string
     public String getImageStr(String imfFilePath) 
@@ -367,28 +361,13 @@ public class Settings{
         return Base64.encodeToString(data, Base64.DEFAULT);
     }
     
-    //string to bytes array
-    public byte[] String2Bytes(String imgStr) 
-    {
-        byte[] bytes = null;
-        try {
-            bytes = Base64.decode(imgStr, Base64.DEFAULT);
-            for (int i = 0; i < bytes.length; i++) {
-                if (bytes[i]<0) {
-                    bytes[i] += 256;
-                }
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return bytes;
-    }
     
  // 从资源中获取Bitmap
     public Bitmap getBitmapFromResources(int resId) {
         Resources res = activity.getResources();
         return BitmapFactory.decodeResource(res, resId);
     }
+    
 
     
     class MessageHandler extends Handler
@@ -414,7 +393,7 @@ public class Settings{
                     {
                         Bitmap bitmap = getBitmapFromResources(R.drawable.defaultavatar);
                         int scale = UserInterface.dip2px(activity, 70);
-                        Bitmap new_bitmap = scaleBitmap(bitmap, scale, scale);
+                        Bitmap new_bitmap = imageUtil.scaleBitmap(bitmap, scale, scale);
                         avatar.setImageBitmap(new_bitmap);
                     }
                 }catch (JSONException e) {
@@ -427,11 +406,11 @@ public class Settings{
                     JSONObject returnJson;
                     returnJson = new JSONObject( msg.obj.toString() );
                     Log.i("upload_avatar", returnJson.toString());
-                    get_avatar();
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                setImage(imageStr);
                 break;
             case OperationCode.GET_USER_INFO:
                 JSONObject returnJson;
