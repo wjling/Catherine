@@ -199,6 +199,7 @@ public class MyEvents {
 		int member_count = 0;
 		String year="0000", month="00", day="00", hour="00", minute="00", second="00";
 		JSONArray photolistJsonArray = null;
+		int event_id = 0;
 		
 		try{
 			eventInforJson = new JSONObject(str);
@@ -209,6 +210,7 @@ public class MyEvents {
 			remark = eventInforJson.optString("remark");
 			member_count  = eventInforJson.optInt("member_count");
 			photolistJsonArray = eventInforJson.optJSONArray("member");
+			event_id = eventInforJson.optInt("event_id");
 			getPhotoId(photolistJsonArray);
 		}
 		catch (JSONException e) {
@@ -226,17 +228,23 @@ public class MyEvents {
 			minute = time.substring(14, 16);
 			second = time.substring(17,19);
 		}
+		
+		if( "None".equals(time) ) 
+			time = "0000-00-00 00:00:00";
 				
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("title", subject);
 		map.put("day", day+"");
 		map.put("monthAndYear", month + "ÔÂ" +year);
+		map.put("date", time);  //date detail
 		map.put("time", hour+":"+minute+":"+second);
 		map.put("location", location);
 		map.put("launcher", "by " + launcher);
 		map.put("remark", remark);
 		map.put("participantsNum", member_count+"");
-		map.put("avatarNum", photolistJsonArray);
+		map.put("photolistJsonArray", photolistJsonArray);
+		map.put("id", userId);
+		map.put("event_id", event_id);
 		myEventsList.add(map);		
 	}
 	

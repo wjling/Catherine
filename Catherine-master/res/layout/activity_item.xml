@@ -125,6 +125,7 @@
 			    	        android:id="@+id/remark"
 			    	        android:layout_width="match_parent"
 			    	        android:layout_height="55dip"
+			    	        android:maxLines="3"
 			    	        android:textSize="11sp" 
 						    android:textColor="#999999"						    
 						    android:paddingLeft="8dip"
