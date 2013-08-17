@@ -132,16 +132,16 @@ public class MyEvents {
 			@Override
 			public void Refresh() {
 				// TODO Auto-generated method stub
-				new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						//重新请求活动
 						allEventIDList.clear();
 						myEventsList.clear();
 						myEventsAdapter.notifyDataSetChanged();
 						requestIndex = 0;
-						refreshing = true;
+						refreshing = true;		
+						
+				new Thread(new Runnable() {				
+					@Override
+					public void run() {
+						//重新请求活动
 						sendRequest(OperationCode.GET_MY_EVENTS);									
 					}
 				}).start();
@@ -307,11 +307,11 @@ public class MyEvents {
 		for (int id : photoIdSet) {
 			//当local不存有头像的时候，才去拉取头像，否则不拉取
 			//或者：第一次取活动要拉取头像，后面就不再拉取头像了=============
-//			if( !imageUtil.fileExist(id) )
-//			{
+			if( !imageUtil.fileExist(id) )
+			{
 				curRequestAvatarId = id;
 				sendRequest( OperationCode.GET_AVATAR );
-//			}
+			}
 		}
 	}
 	
