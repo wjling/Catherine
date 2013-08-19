@@ -444,11 +444,11 @@ public class WheelView extends View {
     public String getCurrentTextItem() {
         int index = getCurrentItem();
         if (adapter == null || adapter.getItemsCount() == 0) {
-            return null;
+            return "";
         }
         int count = adapter.getItemsCount();
         if ((index < 0 || index >= count) && !isCyclic) {
-            return null;
+            return "";
         } else {
             while (index < 0) {
                 index = count + index;
