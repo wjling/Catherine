@@ -130,28 +130,30 @@ public class cardAdapter extends BaseAdapter
 		
 		final int pos = position;
 		
-		view.setOnClickListener( new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				HashMap<String, Object> EventItem = list.get(pos);			
-				
-				Intent intent = new Intent();
-				intent.setClass(context, EventMainPage.class);
-					intent.putExtra("theme", (String)EventItem.get("title"));
-					intent.putExtra("location", (String)EventItem.get("location"));
-					intent.putExtra("participantsNum", (String)EventItem.get("participantsNum"));
-					intent.putExtra("launcher", (String)EventItem.get("launcher"));
-					intent.putExtra("remark", (String)EventItem.get("remark"));
-					intent.putExtra("date", (String)EventItem.get("date"));			
-					intent.putExtra("photolistJsonArray", EventItem.get("photolistJsonArray").toString());
-					
-					intent.putExtra("id", (Integer)EventItem.get("id"));
-					intent.putExtra("event_id", (Integer)EventItem.get("event_id"));
-				context.startActivity(intent);
-			}
-		} );
+		
+		//move to MyEvents.java
+//		view.setOnClickListener( new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				HashMap<String, Object> EventItem = list.get(pos);			
+//				
+//				Intent intent = new Intent();
+//				intent.setClass(context, EventMainPage.class);
+//					intent.putExtra("theme", (String)EventItem.get("title"));
+//					intent.putExtra("location", (String)EventItem.get("location"));
+//					intent.putExtra("participantsNum", (String)EventItem.get("participantsNum"));
+//					intent.putExtra("launcher", (String)EventItem.get("launcher"));
+//					intent.putExtra("remark", (String)EventItem.get("remark"));
+//					intent.putExtra("date", (String)EventItem.get("date"));			
+//					intent.putExtra("photolistJsonArray", EventItem.get("photolistJsonArray").toString());
+//					
+//					intent.putExtra("id", (Integer)EventItem.get("id"));
+//					intent.putExtra("event_id", (Integer)EventItem.get("event_id"));
+//				context.startActivity(intent);
+//			}
+//		} );
 		
 		return view;
 	}
