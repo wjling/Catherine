@@ -33,5 +33,6 @@
     <string name="activitytime">&#160;&#160;时&#160;&#160;&#160;&#160;间&#160;&#160; </string>
     <string name="activityLoc">&#160;&#160;地&#160;&#160;&#160;&#160;点&#160;&#160; </string>
     <string name="cancel">取消</string>
+    <string name="backupHint">活动内容描述...</string>
 
 </resources>

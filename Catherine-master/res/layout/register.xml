@@ -12,13 +12,13 @@
         <LinearLayout 
 	        android:id="@+id/topBlock"
 	        android:layout_width="match_parent"
-	        android:layout_height="200dip"
+	        android:layout_height="150dip"
 	        android:orientation="vertical"
 	        >
 	        <RelativeLayout
 	            android:id="@+id/topLoginBlock"
 	            android:layout_width="match_parent"
-	            android:layout_height="180dip"
+	            android:layout_height="130dip"
 	            android:background="#3ecc9d"
 	            android:orientation="horizontal">		            
                	
@@ -41,9 +41,7 @@
 	                android:textColor="#ffffff" 
 	                android:text="Register" 
 	                android:layout_alignParentBottom="true"
-	                android:layout_toLeftOf="@+id/loginhint"
-	                android:layout_marginLeft="10dip"
-	                android:layout_marginRight="10dip"/>
+					android:layout_centerHorizontal="true"/>
 		                       
 	        </RelativeLayout>
 	        
@@ -117,7 +115,6 @@
 			        android:layout_height="wrap_content"
 			        android:layout_gravity="center"
 			        android:orientation="horizontal"
-			        android:layout_marginTop="5dip"
 			            >			        
 			    	<RadioButton
 			        	android:id="@+id/reg_genderMan"
@@ -136,7 +133,6 @@
 		            android:id="@+id/regBtn"
 		            android:layout_width="120dip"
 		            android:layout_height="30dip"
-		            android:layout_marginTop="10dip"
 		            android:layout_gravity="center"
 		            android:textColor="#ffffff"
 		            android:background="@drawable/login"
