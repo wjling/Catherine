@@ -445,7 +445,7 @@ public class Settings {
                 key = "name";
                 break;
             case R.id.settings_description:
-                viewId = R.id.settings_name;
+                viewId = R.id.settings_description;
                 titleId = R.string.description;
                 oldString = description.getText().toString();
                 key = "sign";
