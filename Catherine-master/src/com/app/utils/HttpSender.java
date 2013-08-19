@@ -124,6 +124,9 @@ public class HttpSender {
         case OperationCode.GET_USER_INFO:
             httpUrl += "get_user_info";
             break;
+        case OperationCode.CHANGE_SETTINGS:
+            httpUrl += "change_settings";
+            break;
         default:
             httpUrl += "json";
             break;

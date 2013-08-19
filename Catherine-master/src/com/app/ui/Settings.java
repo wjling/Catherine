@@ -1,5 +1,7 @@
 package com.app.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,14 +36,17 @@ import com.app.widget.WheelView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CancellationSignal.OnCancelListener;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -50,20 +55,26 @@ import android.provider.MediaStore;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.util.Base64;
 import android.util.Log;
+import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Settings{
+public class Settings {
     private Activity activity;
     private View settingsView;
     private final String TAG = "imageupload";
@@ -71,26 +82,24 @@ public class Settings{
     private Uri uri;
     private String imageStr;
     private ImageView avatar;
-    private Button individualInfoBtn, accountInfoBtn;
-    private boolean individualInfoState, accountInfoState;
-    private EditText gender, location, description;
-    private TextView myName, myEmail;
+    private EditText location, description, myName;
+    private TextView gender, myEmail;
     private AvatarDialog avatarDialog;
-    int userId;
+    private int userId;
     private MessageHandler handler;
-    private boolean isFirstVisit;
+    private boolean isFirstVisit, areaListPrepare;
     private ArrayList<State> stateList;
     public final int CASE_PHOTO = 0;
     public final int CASE_CAMERA = 1;
+    public final int MSG_WHAT_ON_AREA_LIST_PREPARED = -2;
     
     public Settings(Activity activity, View settingsView, int userId) {
         // TODO Auto-generated constructor stub
         this.activity = activity;
         this.settingsView = settingsView;
         this.userId = userId;
-        individualInfoState = false;
-        accountInfoState = false;
         isFirstVisit = true;
+        areaListPrepare = false;
         handler = new MessageHandler(Looper.myLooper());
         this.stateList = null;
         init();
@@ -100,24 +109,28 @@ public class Settings{
     {
         avatar = (ImageView)settingsView.findViewById(R.id.avatar);
         avatar.setOnClickListener(avatarListener);
-        individualInfoBtn = (Button)settingsView.findViewById(R.id.individual_info_bt);
-        accountInfoBtn = (Button)settingsView.findViewById(R.id.account_info_bt);
-        individualInfoBtn.setOnClickListener(modifyBtnListener);
-        accountInfoBtn.setOnClickListener(modifyBtnListener);
-        gender = (EditText)settingsView.findViewById(R.id.settings_gender);
-        gender.setFocusable(false);
-        gender.setFocusableInTouchMode(false);
-        gender.setLongClickable(false);
+        gender = (TextView)settingsView.findViewById(R.id.settings_gender);
         location = (EditText)settingsView.findViewById(R.id.settings_location);
         location.setFocusable(false);
         location.setFocusableInTouchMode(false);
         location.setLongClickable(false);
         location.setOnClickListener(locationOnClickListener);
+        location.setHint(R.string.location_hint);
+        location.setHintTextColor(Color.parseColor("#ffaaaaaa"));
         description = (EditText)settingsView.findViewById(R.id.settings_description);
         description.setFocusable(false);
         description.setFocusableInTouchMode(false);
         description.setLongClickable(false);
-        myName = (TextView)settingsView.findViewById(R.id.settings_name);
+        description.setHint(R.string.description_hint);
+        description.setHintTextColor(Color.parseColor("#ffaaaaaa"));
+        description.setOnClickListener(editTextOnClickListener);
+        myName = (EditText)settingsView.findViewById(R.id.settings_name);
+        myName.setFocusable(false);
+        myName.setFocusableInTouchMode(false);
+        myName.setLongClickable(false);
+        myName.setHint(R.string.myName_hint);
+        myName.setHintTextColor(Color.parseColor("#ffaaaaaa"));
+        myName.setOnClickListener(editTextOnClickListener);
         myEmail = (TextView)settingsView.findViewById(R.id.settings_email);
 
     }
@@ -152,6 +165,8 @@ public class Settings{
                         e.printStackTrace();
                         Log.i("In Settings", "IOException");
                     }
+                    Message msg = handler.obtainMessage(MSG_WHAT_ON_AREA_LIST_PREPARED);
+                    msg.sendToTarget();
                 }
             }        
         }).start();
@@ -170,12 +185,6 @@ public class Settings{
             e.printStackTrace();
         }
         new HttpSender().Httppost(OperationCode.GET_USER_INFO, params, handler);
-        try {
-            params.put("operation", 0);
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         if (imageUtil.fileExist(userId))
         {
             Bitmap bitmap = imageUtil.getLocalBitmapBy(userId);
@@ -185,6 +194,12 @@ public class Settings{
         }
         else
         {
+            try {
+                params.put("operation", 0);
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             new HttpSender().Httppost(OperationCode.GET_AVATAR, params, handler);
         }
         isFirstVisit = false;
@@ -196,7 +211,7 @@ public class Settings{
         uri = data.getData();          
         Log.i(TAG, "uri: " + uri.toString());            
         getPath(uri);
-        getImageStr(path);       
+        imageStr = getImageStr(path);       
         uploadImage();
     }
     
@@ -214,13 +229,13 @@ public class Settings{
           
             saveFilePath = filePath + "/" + filename() + ".png";
             FileOutputStream baos= new FileOutputStream(saveFilePath);
-            camera_bitmap.compress(Bitmap.CompressFormat.PNG, 0, baos);
+            camera_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             baos.flush();
             baos.close();
         } catch (Exception e) {
           e.printStackTrace();
         }
-        getImageStr(saveFilePath);
+        imageStr = getImageStr(saveFilePath);
         uploadImage();
     }
     
@@ -241,42 +256,6 @@ public class Settings{
             path = cursor.getString(column_index);                  Log.i(TAG, "path: " + path);
     }
     
-    OnClickListener modifyBtnListener = new OnClickListener() {
-        
-        @Override
-        public void onClick(View v) {
-            // TODO Auto-generated method stub
-           switch (v.getId()) {
-        case R.id.individual_info_bt:
-            individualInfoState = !individualInfoState;
-            if (individualInfoState)
-            {
-                individualInfoBtn.setText(R.string.ack);
-            }
-            else {
-                individualInfoBtn.setText(R.string.modify);
-            }
-            gender.setFocusable(individualInfoState);
-            gender.setFocusableInTouchMode(individualInfoState);
-            location.setFocusable(individualInfoState);
-            location.setFocusableInTouchMode(individualInfoState);
-            description.setFocusable(individualInfoState);
-            description.setFocusableInTouchMode(individualInfoState);
-            break;
-        case R.id.account_info_bt:
-            accountInfoState = !accountInfoState;   
-            if (accountInfoState)
-            {
-                accountInfoBtn.setText(R.string.ack);
-            }
-            else {
-                accountInfoBtn.setText(R.string.modify);
-            }
-        default:
-            break;
-        }     
-        }
-    };
     
     OnClickListener uploadByPhotosListener = new OnClickListener() {
         
@@ -309,49 +288,58 @@ public class Settings{
         @Override
         public void onClick(View v) {
             // TODO Auto-generated method stub
-            if (!individualInfoState) 
-            {
-                LayoutInflater inflater = activity.getLayoutInflater();
-                View layout = inflater.inflate(R.layout.show_avatar,
-                        (ViewGroup)activity. findViewById(R.id.show_avatar));
-                new AlertDialog.Builder(activity).setTitle("Avatar").setView(layout)
-                .setPositiveButton(R.string.ack, null).show();
-                ImageView big_avatar = (ImageView)layout.findViewById(R.id.big_avatar);
-                avatar.setDrawingCacheEnabled(true);
-                Bitmap bigAvatar = imageUtil.scaleBitmap(Bitmap.createBitmap(avatar.getDrawingCache()), 300, 300);
-                big_avatar.setImageBitmap(bigAvatar);
-                //big_avatar.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_launcher));
-                avatar.setDrawingCacheEnabled(false);
-            }
-            else {
-                avatarDialog = new AvatarDialog(activity, R.style.avatar_dialog);//创建Dialog并设置样式主题
-               // Window win = avatarDialog.getWindow();
-                //LayoutParams params = new LayoutParams();
-                //params.x = 0;//设置x坐标
-                //params.y = 0;//设置y坐标
-                //win.setAttributes(params);
-                avatarDialog.setCanceledOnTouchOutside(true);//设置点击Dialog外部任意区域关闭Dialog         
-                avatarDialog.show();
-                avatarDialog.setAlbumButtonListener(uploadByPhotosListener);
-                avatarDialog.setCameraButtonListener(uploadByCameraListener);              
-            }
+//            LayoutInflater inflater = activity.getLayoutInflater();
+//            View layout = inflater.inflate(R.layout.show_avatar,
+//                    (ViewGroup)activity. findViewById(R.id.show_avatar));
+//            new AlertDialog.Builder(activity).setTitle("Avatar").setView(layout)
+//            .setPositiveButton(R.string.ack, null).show();
+//            ImageView big_avatar = (ImageView)layout.findViewById(R.id.big_avatar);
+//            avatar.setDrawingCacheEnabled(true);
+//            Bitmap bigAvatar = imageUtil.scaleBitmap(Bitmap.createBitmap(avatar.getDrawingCache()), 300, 300);
+//            big_avatar.setImageBitmap(bigAvatar);
+//            //big_avatar.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_launcher));
+//            avatar.setDrawingCacheEnabled(false);
+            
+            //_______________________________________________________
+            avatarDialog = new AvatarDialog(activity, R.style.avatar_dialog);//创建Dialog并设置样式主题
+            // Window win = avatarDialog.getWindow();
+             //LayoutParams params = new LayoutParams();
+             //params.x = 0;//设置x坐标
+             //params.y = 0;//设置y坐标
+             //win.setAttributes(params);
+             avatarDialog.setCanceledOnTouchOutside(true);//设置点击Dialog外部任意区域关闭Dialog         
+             avatarDialog.show();
+             avatarDialog.setAlbumButtonListener(uploadByPhotosListener);
+             avatarDialog.setCameraButtonListener(uploadByCameraListener); 
         }
     };
     
+    
     OnClickListener locationOnClickListener = new OnClickListener() {
+        String oldString;
+        WheelView stateItem;
+        WheelView cityItem;
+        WheelView areaItem;
         
         @Override
         public void onClick(View arg0) {
             // TODO Auto-generated method stub
             Log.i("In settings: ", "In settings on button click");
+            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(arg0.getWindowToken(), 0);
+            if (!areaListPrepare)
+            {
+                return ;
+            }
+            oldString = location.getText().toString();
             LayoutInflater inflater = activity.getLayoutInflater();
             View layout = inflater.inflate(R.layout.area_layout,
                     (ViewGroup)activity. findViewById(R.id.area_layout));
             new AlertDialog.Builder(activity).setView(layout)
-            .setPositiveButton(R.string.ack, null).setNegativeButton(R.string.cancel, null).show();
-            final WheelView stateItem = (WheelView)layout.findViewById(R.id.state);
-            final WheelView cityItem = (WheelView)layout.findViewById(R.id.city);
-            final WheelView areaItem = (WheelView)layout.findViewById(R.id.area);
+            .setPositiveButton(R.string.ack, ackOnClickListener).setNegativeButton(R.string.cancel, null).show();
+            stateItem = (WheelView)layout.findViewById(R.id.state);
+            cityItem = (WheelView)layout.findViewById(R.id.city);
+            areaItem = (WheelView)layout.findViewById(R.id.area);
 //            if (stateList == null)
 //            {
 //                try {
@@ -382,13 +370,13 @@ public class Settings{
                     ArrayList<City> tmpList = stateList.get(newValue).getAreaList();
                     if (tmpList.size() > 0) {
                         cityItem.setAdapter(new ListWheelAdapter<City>(tmpList));
-                        cityItem.setCurrentItem(0);
+                        cityItem.setCurrentItem(0, true);
     
     
                         ArrayList<Area> tmpAreas  = tmpList.get(0).getAreaList();
                         if (tmpAreas.size() > 0){
                             areaItem.setAdapter(new ListWheelAdapter<Area>(tmpAreas));
-                            areaItem.setCurrentItem(0);
+                            areaItem.setCurrentItem(0, true);
                         }else {
                             areaItem.setAdapter(null);
                         }
@@ -407,7 +395,7 @@ public class Settings{
                     ArrayList<Area> tmpAreas  = tmpCities.get(newValue).getAreaList();
                     if (tmpAreas.size() > 0){
                         areaItem.setAdapter(new ListWheelAdapter<Area>(tmpAreas));
-                        areaItem.setCurrentItem(0);
+                        areaItem.setCurrentItem(0, true);
                     }else {
                         areaItem.setAdapter(null);
                     }
@@ -415,8 +403,102 @@ public class Settings{
                 }
             });
         }
+        
+        android.content.DialogInterface.OnClickListener ackOnClickListener = new android.content.DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // TODO Auto-generated method stub
+                String newString = stateItem.getCurrentTextItem() + " " + cityItem.getCurrentTextItem() + " " + areaItem.getCurrentTextItem();
+                if  (!newString.equals(oldString))
+                {
+                    JSONObject params = new JSONObject();
+                    try {
+                        params.put("id", userId);
+                        params.put("location", newString);
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    new HttpSender().Httppost(OperationCode.CHANGE_SETTINGS, params, handler);
+                    location.setText(newString);
+                    
+                }
+            }
+        };
     };
-    
+
+    OnClickListener editTextOnClickListener = new OnClickListener() {
+        TextView tmpTextView;
+        int titleId, viewId;
+        String oldString;
+        String key;
+        
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            switch (v.getId()) {
+            case R.id.settings_name:
+                viewId = R.id.settings_name;
+                titleId = R.string.nick_name;
+                oldString = myName.getText().toString();
+                key = "name";
+                break;
+            case R.id.settings_description:
+                viewId = R.id.settings_name;
+                titleId = R.string.description;
+                oldString = description.getText().toString();
+                key = "sign";
+                break;
+            default:
+                viewId = -1;
+                titleId = R.string.defaultString;
+                oldString = "";
+                key = "";
+                break;
+            }
+            LayoutInflater inflater = activity.getLayoutInflater();
+            View layout = inflater.inflate(R.layout.edit_window,
+                    (ViewGroup)activity. findViewById(R.id.edit_layout));
+            new AlertDialog.Builder(activity).setTitle(titleId).setView(layout)
+            .setPositiveButton(R.string.ack, ackOnClickListener).setNegativeButton(R.string.cancel, null).show();
+            tmpTextView = (TextView)layout.findViewById(R.id.edit_window);
+            tmpTextView.setText(oldString);
+        }
+        
+        android.content.DialogInterface.OnClickListener ackOnClickListener = new android.content.DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // TODO Auto-generated method stub
+                String newString = tmpTextView.getText().toString();
+                if (!newString.equals(oldString))
+                {
+                    JSONObject params = new JSONObject();
+                    try {
+                        params.put("id", userId);
+                        params.put(key, newString);
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }      
+                    new HttpSender().Httppost(OperationCode.CHANGE_SETTINGS, params, handler);
+                    switch (viewId) {
+                    case R.id.settings_name:
+                        myName.setText(newString);
+                        break;
+                    case R.id.settings_description:
+                        description.setText(newString);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+
+        };
+       
+    };
   
     //string -> byte[] -> bitmap -> setImageBitmap to show
     public void setImage(String str)
@@ -478,7 +560,17 @@ public class Settings{
         } catch (IOException e) {
             // TODO: handle exception
         }
-        imageStr = Base64.encodeToString(data, Base64.DEFAULT);
+         
+        while ( data.length / 1024 > 50) {  
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+            bitmap.compress(Bitmap.CompressFormat.PNG, 50, baos);
+            data = baos.toByteArray();
+        }
+//        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());//把压缩后的数据baos存放到ByteArrayInputStream中   
+//        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, null);//把ByteArrayInputStream数据生成图片     
+
+        //imageStr = Base64.encodeToString(data, Base64.DEFAULT);
         return Base64.encodeToString(data, Base64.DEFAULT);
     }
     
@@ -489,7 +581,30 @@ public class Settings{
         return BitmapFactory.decodeResource(res, resId);
     }
     
-
+    public void setInfo(JSONObject jo)
+    {
+        try {
+            myName.setText(jo.getString("name"));
+            myEmail.setText(jo.getString("email"));
+            if (jo.getInt("gender") == 1)
+            {
+                gender.setText("男");
+            }
+            else {
+                gender.setText("女");
+            } 
+            String tmpStr;
+            tmpStr = jo.getString("location");
+            location.setText(tmpStr.equals("null")? "": tmpStr);
+            tmpStr = jo.getString("sign");
+            description.setText(tmpStr.equals("null")? "": tmpStr);
+        } catch (JSONException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        
+    }
+       
     
     class MessageHandler extends Handler
     {       
@@ -540,21 +655,18 @@ public class Settings{
                     Log.i("get_user_info", returnJson.toString());
                     if (returnJson.getInt("cmd") == ReturnCode.NORMAL_REPLY)
                     {
-                        myName.setText(returnJson.getString("name"));
-                        myEmail.setText(returnJson.getString("email"));
-                        if (returnJson.getInt("gender") == 1)
-                        {
-                            gender.setText("男");
-                        }
-                        else {
-                            gender.setText("女");
-                        }   
+                       setInfo(returnJson);
                     }
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                
+                break;
+            case OperationCode.CHANGE_SETTINGS:
+                break;
+            case MSG_WHAT_ON_AREA_LIST_PREPARED:
+                areaListPrepare = true;
+                break;
             default:
                 break;
             }

@@ -435,6 +435,30 @@ public class WheelView extends View {
 		return adapter.getItem(index);
 	}
 	
+	
+	/**
+     * Returns current item
+     * 
+     * @return the item or null
+     */
+    public String getCurrentTextItem() {
+        int index = getCurrentItem();
+        if (adapter == null || adapter.getItemsCount() == 0) {
+            return null;
+        }
+        int count = adapter.getItemsCount();
+        if ((index < 0 || index >= count) && !isCyclic) {
+            return null;
+        } else {
+            while (index < 0) {
+                index = count + index;
+            }
+        }
+        
+        index %= count;
+        return adapter.getItem(index);
+    }
+	
 	/**
 	 * Builds text depending on current value
 	 * 

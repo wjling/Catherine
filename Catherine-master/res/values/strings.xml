@@ -33,5 +33,11 @@
     <string name="activitytime">&#160;&#160;时&#160;&#160;&#160;&#160;间&#160;&#160; </string>
     <string name="activityLoc">&#160;&#160;地&#160;&#160;&#160;&#160;点&#160;&#160; </string>
     <string name="cancel">取消</string>
+    <string name="modify_pw">修改密码&gt;&gt;</string>
+    <string name="nick_name">昵称:</string>
+    <string name="myName_hint">请填写昵称</string>
+    <string name="location_hint">请设置地点</string>
+    <string name="description_hint">请填写个人描述</string>
+    <string name="defaultString"></string>
 
 </resources>
