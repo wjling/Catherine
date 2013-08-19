@@ -6,18 +6,30 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.jar.Attributes.Name;
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParserException;
 
+import com.app.adapters.ListWheelAdapter;
 import com.app.catherine.R;
+import com.app.dataStructure.Area;
+import com.app.dataStructure.City;
+import com.app.dataStructure.State;
+import com.app.utils.AreaXMLParser;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 import com.app.utils.ReturnCode;
 import com.app.utils.imageUtil;
 import com.app.widget.AvatarDialog;
+import com.app.widget.OnWheelChangedListener;
+import com.app.widget.WheelView;
+
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -44,6 +56,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -66,6 +79,7 @@ public class Settings{
     int userId;
     private MessageHandler handler;
     private boolean isFirstVisit;
+    private ArrayList<State> stateList;
     public final int CASE_PHOTO = 0;
     public final int CASE_CAMERA = 1;
     
@@ -78,6 +92,7 @@ public class Settings{
         accountInfoState = false;
         isFirstVisit = true;
         handler = new MessageHandler(Looper.myLooper());
+        this.stateList = null;
         init();
     }
     
@@ -97,6 +112,7 @@ public class Settings{
         location.setFocusable(false);
         location.setFocusableInTouchMode(false);
         location.setLongClickable(false);
+        location.setOnClickListener(locationOnClickListener);
         description = (EditText)settingsView.findViewById(R.id.settings_description);
         description.setFocusable(false);
         description.setFocusableInTouchMode(false);
@@ -114,6 +130,29 @@ public class Settings{
             public void run() {
                 // TODO Auto-generated method stub
                 setLayout();
+                
+            }        
+        }).start();
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                if (stateList == null)
+                {
+                    try {
+                        stateList = AreaXMLParser.doParse(activity);
+                    } catch (XmlPullParserException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        Log.i("In Settings", "XmlPullParserException");
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        Log.i("In Settings", "IOException");
+                    }
+                }
             }        
         }).start();
     }
@@ -139,7 +178,10 @@ public class Settings{
         }
         if (imageUtil.fileExist(userId))
         {
-            avatar.setImageBitmap(imageUtil.getLocalBitmapBy(userId));
+            Bitmap bitmap = imageUtil.getLocalBitmapBy(userId);
+            int scale = UserInterface.dip2px(activity, 70);
+            Bitmap new_bitmap = imageUtil.scaleBitmap(bitmap, scale, scale);
+            avatar.setImageBitmap(new_bitmap);
         }
         else
         {
@@ -242,11 +284,11 @@ public class Settings{
         public void onClick(View v) {
             // TODO Auto-generated method stub
             Log.i("In settings: ", "In settings on button click");
+            avatarDialog.dismiss();
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
             activity.startActivityForResult(intent, CASE_PHOTO); 
-            avatarDialog.dismiss();
         }
     };
     
@@ -256,9 +298,9 @@ public class Settings{
         public void onClick(View arg0) {
             // TODO Auto-generated method stub
             Log.i("In settings: ", "In settings on button click");
+            avatarDialog.dismiss();
             Intent intentCam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             activity.startActivityForResult(intentCam, CASE_CAMERA);
-            avatarDialog.dismiss();
         }
     };
     
@@ -293,6 +335,85 @@ public class Settings{
                 avatarDialog.setAlbumButtonListener(uploadByPhotosListener);
                 avatarDialog.setCameraButtonListener(uploadByCameraListener);              
             }
+        }
+    };
+    
+    OnClickListener locationOnClickListener = new OnClickListener() {
+        
+        @Override
+        public void onClick(View arg0) {
+            // TODO Auto-generated method stub
+            Log.i("In settings: ", "In settings on button click");
+            LayoutInflater inflater = activity.getLayoutInflater();
+            View layout = inflater.inflate(R.layout.area_layout,
+                    (ViewGroup)activity. findViewById(R.id.area_layout));
+            new AlertDialog.Builder(activity).setView(layout)
+            .setPositiveButton(R.string.ack, null).setNegativeButton(R.string.cancel, null).show();
+            final WheelView stateItem = (WheelView)layout.findViewById(R.id.state);
+            final WheelView cityItem = (WheelView)layout.findViewById(R.id.city);
+            final WheelView areaItem = (WheelView)layout.findViewById(R.id.area);
+//            if (stateList == null)
+//            {
+//                try {
+//                    stateList = AreaXMLParser.doParse(activity);
+//                } catch (XmlPullParserException e) {
+//                    // TODO Auto-generated catch block
+//                    e.printStackTrace();
+//                    Log.i("In Settings", "XmlPullParserException");
+//                } catch (IOException e) {
+//                    // TODO Auto-generated catch block
+//                    e.printStackTrace();
+//                    Log.i("In Settings", "IOException");
+//                }
+//            }
+            stateItem.setVisibleItems(5);
+            stateItem.setCyclic(true);
+            stateItem.setInterpolator(new AnticipateOvershootInterpolator());
+            stateItem.setAdapter(new ListWheelAdapter<State>(stateList));
+            cityItem.setVisibleItems(5);
+            cityItem.setCyclic(true);
+            cityItem.setInterpolator(new AnticipateOvershootInterpolator());
+            areaItem.setVisibleItems(5);
+            areaItem.setCyclic(true);
+            areaItem.setInterpolator(new AnticipateOvershootInterpolator());
+            stateItem.addChangingListener(new OnWheelChangedListener() {
+                @Override
+                public void onChanged(WheelView wheel, int oldValue, int newValue) {
+                    ArrayList<City> tmpList = stateList.get(newValue).getAreaList();
+                    if (tmpList.size() > 0) {
+                        cityItem.setAdapter(new ListWheelAdapter<City>(tmpList));
+                        cityItem.setCurrentItem(0);
+    
+    
+                        ArrayList<Area> tmpAreas  = tmpList.get(0).getAreaList();
+                        if (tmpAreas.size() > 0){
+                            areaItem.setAdapter(new ListWheelAdapter<Area>(tmpAreas));
+                            areaItem.setCurrentItem(0);
+                        }else {
+                            areaItem.setAdapter(null);
+                        }
+                    }
+                    else {
+                        cityItem.setAdapter(null);
+                    }
+                }
+            });
+            cityItem.addChangingListener(new OnWheelChangedListener() {
+                @Override
+                public void onChanged(WheelView wheel, int oldValue, int newValue) {
+                    int stateIndex = stateItem.getCurrentItem();
+                    ArrayList<City> tmpCities = stateList.get(stateIndex).getAreaList();
+
+                    ArrayList<Area> tmpAreas  = tmpCities.get(newValue).getAreaList();
+                    if (tmpAreas.size() > 0){
+                        areaItem.setAdapter(new ListWheelAdapter<Area>(tmpAreas));
+                        areaItem.setCurrentItem(0);
+                    }else {
+                        areaItem.setAdapter(null);
+                    }
+
+                }
+            });
         }
     };
     
