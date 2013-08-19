@@ -117,13 +117,33 @@ public class MyEvents {
 
 	public void init() {
 		// TODO Auto-generated method stub
+		/**
+		 * parent	: the adapterview where the click happened
+		 * view 	 	: the view within the adapterview that was clicked
+		 * position	: the position of the view in the adapter
+		 * id 			: the row id of the item that was clicked
+		 */
 		myEventsListViewListener = new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
+			public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
 				// TODO Auto-generated method stub
-				Toast.makeText(context, "点击的是第"+arg2+"个.", Toast.LENGTH_SHORT).show();
+				HashMap<String, Object> EventItem = myEventsList.get(pos);
+				
+				Intent intent = new Intent();
+				intent.setClass(context, EventMainPage.class);
+					intent.putExtra("theme", (String)EventItem.get("title"));
+					intent.putExtra("location", (String)EventItem.get("location"));
+					intent.putExtra("participantsNum", (String)EventItem.get("participantsNum"));
+					intent.putExtra("launcher", (String)EventItem.get("launcher"));
+					intent.putExtra("remark", (String)EventItem.get("remark"));
+					intent.putExtra("date", (String)EventItem.get("date"));			
+					intent.putExtra("photolistJsonArray", EventItem.get("photolistJsonArray").toString());
+					
+					intent.putExtra("id", (Integer)EventItem.get("id"));
+					intent.putExtra("event_id", (Integer)EventItem.get("event_id"));
+					intent.putExtra("launcher_id", (Integer)EventItem.get("launcher_id"));
+				context.startActivity(intent);
 			}
 		};
 		
@@ -176,6 +196,8 @@ public class MyEvents {
 		myEventsPullUpDownView = (PullUpDownView)myEventsView.findViewById(R.id.my_events_pull_up_down_view);
 		myEventsListView = myEventsPullUpDownView.getListView();
 		myEventsPullUpDownView.setOnPullListener(myEventsPullUpDownViewListener);
+		
+		myEventsListView.setItemsCanFocus(false);
 		myEventsListView.setOnItemClickListener(myEventsListViewListener);
 		
 		//edit by luo
@@ -189,6 +211,7 @@ public class MyEvents {
 		);
 		
 		myEventsListView.setAdapter(myEventsAdapter);
+
 	}
 	
 	//add by luo
@@ -199,7 +222,7 @@ public class MyEvents {
 		int member_count = 0;
 		String year="0000", month="00", day="00", hour="00", minute="00", second="00";
 		JSONArray photolistJsonArray = null;
-		int event_id = 0;
+		int event_id = 0, launcher_id = 0;
 		
 		try{
 			eventInforJson = new JSONObject(str);
@@ -211,6 +234,7 @@ public class MyEvents {
 			member_count  = eventInforJson.optInt("member_count");
 			photolistJsonArray = eventInforJson.optJSONArray("member");
 			event_id = eventInforJson.optInt("event_id");
+			launcher_id = eventInforJson.optInt("launcher_id");
 			getPhotoId(photolistJsonArray);
 		}
 		catch (JSONException e) {
@@ -245,6 +269,7 @@ public class MyEvents {
 		map.put("photolistJsonArray", photolistJsonArray);
 		map.put("id", userId);
 		map.put("event_id", event_id);
+		map.put("launcher_id", launcher_id);
 		myEventsList.add(map);		
 	}
 	

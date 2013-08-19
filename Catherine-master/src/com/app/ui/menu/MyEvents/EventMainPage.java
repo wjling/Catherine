@@ -40,7 +40,7 @@ public class EventMainPage extends Activity {
 	private String launcherName = "L J";
 	private String remark = "要出第一版噢噢噢噢！！";
 	private JSONArray photolistJsonArray = null;
-	private int id, event_id;
+	private int id, event_id, launcher_id;
 	private HttpSender sender;
 	private MsgHandler handler;
 	private boolean flag = true;
@@ -65,6 +65,7 @@ public class EventMainPage extends Activity {
 			}
 			id = intent.getIntExtra("id", 0);
 			event_id = intent.getIntExtra("event_id", 0);
+			launcher_id = intent.getIntExtra("launcher_id", 0);
 			
 		initLayout();
 		initThemeBlock();
@@ -179,7 +180,13 @@ public class EventMainPage extends Activity {
 	private void initRemarBlock()
 	{
 		CircularImage launcher = (CircularImage)this.findViewById(R.id.launcher);
-		launcher.setImageResource(R.drawable.defaultavatar);
+		if( imageUtil.fileExist(launcher_id) )
+		{
+			Bitmap bitmap = imageUtil.getLocalBitmapBy(launcher_id);
+			launcher.setImageBitmap(bitmap);
+		}
+		else
+			launcher.setImageResource(R.drawable.defaultavatar);
 		
 		TextView launcherNameTV = (TextView)this.findViewById(R.id.launcherName);
 		launcherNameTV.setText( launcherName );

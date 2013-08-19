@@ -110,9 +110,12 @@ public class loginAndreg extends Activity
 			loginBtn.setOnClickListener(clickListener);
 			
 		loginEmailAC = (AutoCompleteTextView)login.findViewById(R.id.loginEmail);
+			initLayoutH(loginEmailAC, 0.1);
 		loginPwdET = (EditText)login.findViewById(R.id.loginPwd);
+			initLayoutH(loginPwdET, 0.1);
 		savePwdCheckBox = (CheckBox)login.findViewById(R.id.loginRemember);	
-		
+			initLayoutH(savePwdCheckBox, 0.1);
+			
 		sp = this.getSharedPreferences("loginInfo", MODE_PRIVATE);
 		savePwdCheckBox.setChecked(true);
 		loginEmailAC.setThreshold(1);
@@ -135,15 +138,16 @@ public class loginAndreg extends Activity
 			loginBtn.setOnClickListener(clickListener);
 			
 		regEmailET = (EditText)reg.findViewById(R.id.regEmail);
-		
+			initLayoutH(regEmailET, 0.1);
 		regUNameET = (EditText)reg.findViewById(R.id.regUName);
-			initMarginTop(regUNameET, 0.01);
+			initLayoutH(regUNameET, 0.1);	
 		regPwdET = (EditText)reg.findViewById(R.id.regPwd);
-			initMarginTop(regPwdET, 0.01);
+			initLayoutH(regPwdET, 0.1);	
 		regPwdAgainET = (EditText)reg.findViewById(R.id.regPwdAgain);
-			initMarginTop(regPwdAgainET, 0.01);
+			initLayoutH(regPwdAgainET, 0.1);
 			
 		RadioGroup regGender = (RadioGroup)reg.findViewById(R.id.reg_genderGroup);		
+			initLayoutH(regGender, 0.1);
 	}
 	
 	private void initLayoutH(View v, double rate)

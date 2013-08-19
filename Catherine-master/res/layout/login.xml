@@ -30,7 +30,7 @@
 		            android:textColor="#ffffff" 
 		            android:text="@string/signuphint" 
 		            android:layout_alignParentBottom="true"
-		            android:layout_alignParentRight="false"
+					android:layout_alignParentLeft="true"
 		            android:padding="5dip"/>		
            
                	<TextView
@@ -41,9 +41,7 @@
 	                android:textColor="#ffffff" 
 	                android:text="Login" 
 	                android:layout_alignParentBottom="true"
-	                android:layout_toRightOf="@+id/signuphint"
-	                android:layout_marginLeft="10dip"
-	                android:layout_marginRight="10dip"/>
+					android:layout_centerHorizontal="true"/>
                	       		                       
 	        </RelativeLayout>
 	        
@@ -64,7 +62,7 @@
 	    <RelativeLayout 
 	        android:id="@+id/InfoBlock"
 	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content">
+	        android:layout_height="fill_parent">
 	        
 	        <LinearLayout 
 		        android:id="@+id/loginInfoBlock"
@@ -89,14 +87,12 @@
 		            android:layout_gravity="center"
 		            android:singleLine="true"
 		            android:textSize="15sp"
-		            android:layout_marginTop="10dip"
 		            android:inputType="textPassword" 
 		            android:hint="密码"/>
 		        <LinearLayout 
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:layout_gravity="center"
-		            android:layout_marginTop="10dip"
 		            android:orientation="horizontal">
 			            <CheckBox 
 			                android:id="@+id/loginRemember"
