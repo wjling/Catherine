@@ -323,7 +323,9 @@ public class MyEvents {
 			case OperationCode.GET_AVATAR:
 				params.put("id", curRequestAvatarId);
 				params.put("operation", 0);
-				sender.Httppost(OperationCode.GET_AVATAR, params, handler);
+//				sender.Httppost(OperationCode.GET_AVATAR, params, handler);
+				new HttpSender().Httppost(OperationCode.GET_AVATAR, params, handler);
+				Log.e("myevent", "request£º " + params);
 				break;
 			default:
 				break;
@@ -346,7 +348,6 @@ public class MyEvents {
 			{
 				curRequestAvatarId = id;
 				sendRequest( OperationCode.GET_AVATAR );
-				Log.e("myevent", "request " + id);
 			}
 		}
 	}
@@ -381,6 +382,8 @@ public class MyEvents {
 			
 			JSONArray eventJsonArray = null;
 			int returnCMD;
+			
+			
 			
 			if( returnStr!="DEFAULT")
 			{
@@ -474,6 +477,7 @@ public class MyEvents {
 								break;
 								
 							case OperationCode.GET_AVATAR:
+								
 								if( returnCMD==ReturnCode.NORMAL_REPLY )
 								{
 									final int avatarForUserId = returnJson.optInt("id");
@@ -494,6 +498,7 @@ public class MyEvents {
 //										                forImageUtil.putBitmapInMap(avatarForUserId, bitmap);
 										                forImageUtil.addBitmapToMemoryCache(avatarForUserId, bitmap);
 //										                myEventsAdapter.notifyDataSetChanged();
+										                Log.e("myevents", "image arrive : " + avatarForUserId);
 										            }
 										        } catch (Exception e) {
 										            // TODO Auto-generated catch block

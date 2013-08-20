@@ -185,6 +185,7 @@ public class imageUtil
 	//image in cache or not
 	public boolean imageExistInCache( int uid )
 	{
+		Log.e("imageUtil", "want to get image: " + uid);
 		if( mMemoryCache.get(uid)==null ) 
 		{
 			if( fileExist(uid)  )
