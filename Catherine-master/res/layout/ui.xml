@@ -102,21 +102,32 @@
 			    android:background="@drawable/tittle_friend_list"
 			    android:paddingRight="5dp" >
 
-			    <Button
-			        android:id="@+id/ui_content_menuBtn"
+			    <LinearLayout 
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
-			        android:text="MENU"
-			        android:textColor="#000000" />
+			        android:padding="7dip">
+			        <Button
+				        android:id="@+id/ui_content_menuBtn"
+				        android:layout_width="40dip"
+				        android:layout_height="30dip"			  
+				        android:background="@drawable/tomenu"
+				        android:textColor="#000000" />
+			    </LinearLayout>
+			    
 
-			    <Button
-			        android:id="@+id/ui_addActivityBtn"
+			    <LinearLayout 
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
 			        android:layout_alignParentRight="true"
-			        android:gravity="center_vertical"
-			        android:text="添加活动"
-			        android:textColor="#00ffff" />
+			        android:padding="5dip">
+				    <Button
+				        android:id="@+id/ui_addActivityBtn"
+				        android:layout_width="40dip"
+				        android:layout_height="40dip"
+				        android:gravity="center_vertical"
+				        android:background="@drawable/newactivitybtn"
+				        android:textColor="#00ffff" />
+				    </LinearLayout>
 
 			    <Button
 			        android:id="@+id/ui_content_addFriendBtn"
@@ -126,6 +137,7 @@
 			        android:layout_alignParentRight="true"
 			        android:background="@layout/buttons"
 			        android:gravity="center_vertical"
+			        android:visibility="gone"
 			        android:minWidth="48dp" />
 
 			</RelativeLayout>

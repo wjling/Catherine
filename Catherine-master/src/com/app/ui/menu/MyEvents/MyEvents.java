@@ -77,6 +77,7 @@ public class MyEvents {
 	private Vector<Integer> allEventIDList = new Vector<Integer>();
 	private Vector<Integer> requestEventIDList = new Vector<Integer>();
 	private int requestIndex = 0;
+	private imageUtil forImageUtil = new imageUtil();
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
@@ -207,7 +208,8 @@ public class MyEvents {
 				new String[]{"title", "day", "monthAndYear","time", "location", "launcher", "remark", "participantsNum"}, 
 				new int[]{R.id.activityTitle, R.id.day, R.id.monthAndYear, R.id.time, R.id.location, R.id.launcher, R.id.remark, R.id.participantsNum},
 				screenWidth,
-				new int[]{R.id.user1, R.id.user2, R.id.user3, R.id.user4}
+				new int[]{R.id.user1, R.id.user2, R.id.user3, R.id.user4},
+				forImageUtil
 		);
 		
 		myEventsListView.setAdapter(myEventsAdapter);
@@ -344,6 +346,7 @@ public class MyEvents {
 			{
 				curRequestAvatarId = id;
 				sendRequest( OperationCode.GET_AVATAR );
+				Log.e("myevent", "request " + id);
 			}
 		}
 	}
@@ -473,23 +476,32 @@ public class MyEvents {
 							case OperationCode.GET_AVATAR:
 								if( returnCMD==ReturnCode.NORMAL_REPLY )
 								{
-									int avatarForUserId = returnJson.optInt("id");
-									String imageStr = returnJson.optString("avatar");
+									final int avatarForUserId = returnJson.optInt("id");
+									final String imageStr = returnJson.optString("avatar");
 
-									//存放到map里面，告知有内容更新，在初始化卡片的时候使用
-									byte[] temp = imageUtil.String2Bytes(imageStr);
-									 try {
-								            if(temp!=null)
-								            {
-								                Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);		
-								                //记得要在子线程中写文件
-								                imageUtil.savePhoto(avatarForUserId, bitmap);
-								            }
-								        } catch (Exception e) {
-								            // TODO Auto-generated catch block
-								            e.printStackTrace();
-								        } 
-									
+									new Thread()
+									{
+										public void run(){
+											
+											//存放到map里面，告知有内容更新，在初始化卡片的时候使用
+											byte[] temp = imageUtil.String2Bytes(imageStr);
+											 try {
+										            if(temp!=null)
+										            {
+										                Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);		
+										                //记得要在子线程中写文件
+										                imageUtil.savePhoto(avatarForUserId, bitmap);
+//										                forImageUtil.putBitmapInMap(avatarForUserId, bitmap);
+										                forImageUtil.addBitmapToMemoryCache(avatarForUserId, bitmap);
+//										                myEventsAdapter.notifyDataSetChanged();
+										            }
+										        } catch (Exception e) {
+										            // TODO Auto-generated catch block
+										            e.printStackTrace();
+										        } 
+										}
+									}.start();
+																		
 									myEventsAdapter.notifyDataSetChanged();
 								}
 								else if ( returnCMD==ReturnCode.REQUEST_FAIL ) 

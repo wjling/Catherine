@@ -43,6 +43,7 @@ public class cardAdapter extends BaseAdapter
 	private int to[];	
 	private int screenW;
 	private int toAvatar[];
+	private imageUtil forImageUtil;
 	
 	public cardAdapter() {
 		// TODO Auto-generated constructor stub
@@ -50,7 +51,7 @@ public class cardAdapter extends BaseAdapter
 	}
 	
 	public cardAdapter(Context context, ArrayList<HashMap<String, Object>> list, int resource,
-			String []from, int []to, int screenW, int []toAvatar) {
+			String []from, int []to, int screenW, int []toAvatar, imageUtil forImageUtil) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.mInflater = LayoutInflater.from(context);
@@ -61,6 +62,7 @@ public class cardAdapter extends BaseAdapter
 		this.screenW = screenW;
 		
 		this.toAvatar = toAvatar;
+		this.forImageUtil = forImageUtil;
 	}
 	
 	private void SetContentWidth(View main, View v)
@@ -128,33 +130,6 @@ public class cardAdapter extends BaseAdapter
 			Title.setText( (String)list.get(position).get( from[i] ) );
 		}
 		
-		final int pos = position;
-		
-		
-		//move to MyEvents.java
-//		view.setOnClickListener( new OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				// TODO Auto-generated method stub
-//				HashMap<String, Object> EventItem = list.get(pos);			
-//				
-//				Intent intent = new Intent();
-//				intent.setClass(context, EventMainPage.class);
-//					intent.putExtra("theme", (String)EventItem.get("title"));
-//					intent.putExtra("location", (String)EventItem.get("location"));
-//					intent.putExtra("participantsNum", (String)EventItem.get("participantsNum"));
-//					intent.putExtra("launcher", (String)EventItem.get("launcher"));
-//					intent.putExtra("remark", (String)EventItem.get("remark"));
-//					intent.putExtra("date", (String)EventItem.get("date"));			
-//					intent.putExtra("photolistJsonArray", EventItem.get("photolistJsonArray").toString());
-//					
-//					intent.putExtra("id", (Integer)EventItem.get("id"));
-//					intent.putExtra("event_id", (Integer)EventItem.get("event_id"));
-//				context.startActivity(intent);
-//			}
-//		} );
-		
 		return view;
 	}
 	
@@ -174,10 +149,22 @@ public class cardAdapter extends BaseAdapter
 			for ( ; i < length; i++) 
 			{
 				int id = avatarJsonArray.getInt(i);
-				if( imageUtil.fileExist(id) )       //本地有头像就用本地头像
+//				if( imageUtil.fileExist(id) )       //本地有头像就用本地头像
+//				{
+//					CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
+//					Bitmap bitmap = imageUtil.getLocalBitmapBy(id);
+//					photo.setImageBitmap(bitmap);
+//				}
+//				if( forImageUtil.fileExistInMap(id))
+//				{
+//					CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
+//					Bitmap bitmap = forImageUtil.getBitmapInMap(id);
+//					photo.setImageBitmap(bitmap);
+//				}
+				if( forImageUtil.imageExistInCache(id) )
 				{
 					CircularImage photo = (CircularImage)view.findViewById( toAvatar[i] );
-					Bitmap bitmap = imageUtil.getLocalBitmapBy(id);
+					Bitmap bitmap = forImageUtil.getBitmapFromMemCache(id);
 					photo.setImageBitmap(bitmap);
 				}
 				else  									//没头像，用默认头像
