@@ -10,7 +10,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
 	private static String DB_NAME = "EvanDataBase.db";
 	
 	private String TABLE_NAME1 = "friends";
-	private String SQL_createTable1 = "CREATE TABLE "+TABLE_NAME1+
+	private String SQL_createTable1 = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME1+
 			" (uid INTEGER,"+
 			"fid INTEGER, " +
 			"fname varchar(20), " +
@@ -20,7 +20,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
 	
 	//edit by luo
 	private String TABLE_NAME2 = "notifications";
-	private String SQL_createTable2 = "CREATE TABLE "+TABLE_NAME2
+	private String SQL_createTable2 = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME2
 			+ " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ "uid INTEGER, "
 			+ "status INTEGER, " 
@@ -28,7 +28,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
 			+ "msg TEXT)";
 	
 	private String TABLE_NAME3 = "note";
-	private String SQL_createTable3 = "CREATE TABLE "+ TABLE_NAME3
+	private String SQL_createTable3 = "CREATE TABLE IF NOT EXISTS "+ TABLE_NAME3
 			+ " ( note_id INTEGER PRIMARY KEY, " 
 			+ "user_id INTEGER, "
 			+ "comment_id INTEGER, "
@@ -38,7 +38,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
 			+ "event_id INTEGER)";
 	
 	private String TABLE_NAME4 = "activity";
-	private String SQL_createTable4 = "CREATE TABLE "+ TABLE_NAME4
+	private String SQL_createTable4 = "CREATE TABLE IF NOT EXISTS "+ TABLE_NAME4
 			+ "( user_id INTEGER, " 
 			+ "event_id INTEGER PRIMARY KEY, "
 			+ "subject TEXT, "

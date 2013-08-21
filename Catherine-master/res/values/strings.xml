@@ -40,5 +40,18 @@
     <string name="description_hint">请填写个人描述</string>
     <string name="defaultString"></string>
     <string name="backupHint">活动内容描述...</string>
+    <string name="change_pw">修改密码</string>
+    <string name="current_pw">当前密码</string>
+    <string name="new_pw">新密码</string>
+    <string name="ack_pw">确认密码</string>
+    <string name="submit">提交</string>
+    <string name="male">男</string>
+    <string name="female">女</string>
+    <string name="pass">同意</string>
+    <string name="refuse">拒绝</string>
+    <string name="request_for_friend">请求加你为好友</string>
+    <string name="pass_friend_request">同意添加你为好友</string>
+    <string name="refuse_friend_request">拒绝添加你为好友</string>
+    <string name="delete">删除</string>
 
 </resources>

@@ -90,16 +90,16 @@ public class MyEvents {
 		@Override
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
-			switch(v.getId())
-			{
-			case R.id.menu_my_events_notificationBtn:
-				Intent intent = new Intent();
-				intent.putExtra("userId", userId);
-				intent.setClass(context, MyEventsNotification.class);
-				context.startActivity(intent);
-				break;
-				default: break;
-			}
+//			switch(v.getId())
+//			{
+//			case R.id.menu_my_events_notificationBtn:
+//				Intent intent = new Intent();
+//				intent.putExtra("userId", userId);
+//				intent.setClass(context, MyEventsNotification.class);
+//				context.startActivity(intent);
+//				break;
+//				default: break;
+//			}
 		}
 	};
 	
