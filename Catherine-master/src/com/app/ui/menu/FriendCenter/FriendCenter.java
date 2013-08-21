@@ -183,7 +183,7 @@ public class FriendCenter {
             else if (arg2 == 1) 
             {
                 Intent intent2 = new Intent();
-                intent2.setClass(context, FriendNotification.class);
+                intent2.setClass(context, NotificationCenter.class);
                 intent2.putExtra("userId", userId);
                 context.startActivity(intent2);
             }

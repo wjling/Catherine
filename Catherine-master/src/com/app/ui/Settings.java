@@ -72,7 +72,7 @@ public class Settings {
     private String imageStr;
     private ImageView avatar;
     private EditText location, description, myName;
-    private TextView gender, myEmail;
+    private TextView gender, myEmail, changPW;
     private AvatarDialog avatarDialog;
     private int userId;
     private MessageHandler handler;
@@ -80,6 +80,7 @@ public class Settings {
     private ArrayList<State> stateList;
     public final int CASE_PHOTO = 0;
     public final int CASE_CAMERA = 1;
+    public final int CASE_CHANGE_PW = 2;
     public final int MSG_WHAT_ON_AREA_LIST_PREPARED = -2;
     
     public Settings(Activity activity, View settingsView, int userId) {
@@ -99,6 +100,7 @@ public class Settings {
         avatar = (ImageView)settingsView.findViewById(R.id.avatar);
         avatar.setOnClickListener(avatarListener);
         gender = (TextView)settingsView.findViewById(R.id.settings_gender);
+        gender.setOnClickListener(genderChangeOnClickListener);
         location = (EditText)settingsView.findViewById(R.id.settings_location);
         location.setFocusable(false);
         location.setFocusableInTouchMode(false);
@@ -121,6 +123,8 @@ public class Settings {
         myName.setHintTextColor(Color.parseColor("#ffaaaaaa"));
         myName.setOnClickListener(editTextOnClickListener);
         myEmail = (TextView)settingsView.findViewById(R.id.settings_email);
+        changPW = (TextView)settingsView.findViewById(R.id.modift_pw);
+        changPW.setOnClickListener(pwChangeOnClickListener);
 
     }
 
@@ -410,7 +414,7 @@ public class Settings {
                         e.printStackTrace();
                     }
                     new HttpSender().Httppost(OperationCode.CHANGE_SETTINGS, params, handler);
-                    location.setText(newString);
+//                    location.setText(newString);
                     
                 }
             }
@@ -419,7 +423,8 @@ public class Settings {
 
     OnClickListener editTextOnClickListener = new OnClickListener() {
         TextView tmpTextView;
-        int titleId, viewId;
+        int titleId;
+//        int viewId;
         String oldString;
         String key;
         
@@ -428,19 +433,19 @@ public class Settings {
             // TODO Auto-generated method stub
             switch (v.getId()) {
             case R.id.settings_name:
-                viewId = R.id.settings_name;
+//                viewId = R.id.settings_name;
                 titleId = R.string.nick_name;
                 oldString = myName.getText().toString();
                 key = "name";
                 break;
             case R.id.settings_description:
-                viewId = R.id.settings_description;
+//                viewId = R.id.settings_description;
                 titleId = R.string.description;
                 oldString = description.getText().toString();
                 key = "sign";
                 break;
             default:
-                viewId = -1;
+//                viewId = -1;
                 titleId = R.string.defaultString;
                 oldString = "";
                 key = "";
@@ -472,16 +477,16 @@ public class Settings {
                         e.printStackTrace();
                     }      
                     new HttpSender().Httppost(OperationCode.CHANGE_SETTINGS, params, handler);
-                    switch (viewId) {
-                    case R.id.settings_name:
-                        myName.setText(newString);
-                        break;
-                    case R.id.settings_description:
-                        description.setText(newString);
-                        break;
-                    default:
-                        break;
-                    }
+//                    switch (viewId) {
+//                    case R.id.settings_name:
+//                        myName.setText(newString);
+//                        break;
+//                    case R.id.settings_description:
+//                        description.setText(newString);
+//                        break;
+//                    default:
+//                        break;
+//                    }
                 }
             }
 
@@ -593,6 +598,54 @@ public class Settings {
         }
         
     }
+    
+    OnClickListener genderChangeOnClickListener = new OnClickListener() {
+        int oldChoice = 0;
+        String[] genderItem = {"女", "男"};
+        
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            oldChoice = 0;
+            if (gender.getText().toString().equals(genderItem[1]))
+            {
+                oldChoice = 1;
+            }
+            new AlertDialog.Builder(activity).setTitle(R.string.gender).setIcon(
+                    android.R.drawable.ic_dialog_info).setSingleChoiceItems(
+                    new String[] { genderItem[0], genderItem[1] }, oldChoice,
+                    new DialogInterface.OnClickListener() {
+                     public void onClick(DialogInterface dialog, int which) {
+                         dialog.dismiss();
+                         if (oldChoice != which)
+                         {
+                             JSONObject params = new JSONObject();
+                             try {
+                                params.put("id", userId);
+                                params.put("gender", which);
+                                new HttpSender().Httppost(OperationCode.CHANGE_SETTINGS, params, handler);
+                            } catch (JSONException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                         }
+                     }
+                    }).setNegativeButton("取消", null).show();
+
+        }
+    };
+    
+    OnClickListener pwChangeOnClickListener = new OnClickListener() {
+        
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            Intent intent = new Intent();
+            intent.setClass(activity, ChangPW.class);
+            intent.putExtra("email", myEmail.getText().toString());
+            activity.startActivityForResult(intent, CASE_CHANGE_PW);
+        }
+    };
        
     
     class MessageHandler extends Handler
@@ -638,10 +691,9 @@ public class Settings {
                 setImage(imageStr);
                 break;
             case OperationCode.GET_USER_INFO:
-                JSONObject returnJson;
                 try {
+                    JSONObject returnJson;
                     returnJson = new JSONObject(msg.obj.toString());
-                    Log.i("get_user_info", returnJson.toString());
                     if (returnJson.getInt("cmd") == ReturnCode.NORMAL_REPLY)
                     {
                        setInfo(returnJson);
@@ -651,7 +703,22 @@ public class Settings {
                     e.printStackTrace();
                 }
                 break;
-            case OperationCode.CHANGE_SETTINGS:
+            case OperationCode.CHANGE_SETTINGS:    
+                try {
+                    JSONObject returnJson;
+                    returnJson = new JSONObject(msg.obj.toString());
+                    if (returnJson.getInt("cmd") == ReturnCode.NORMAL_REPLY)
+                    {
+                       isFirstVisit = true;
+                       initData();
+                    }
+                    else {
+                        Toast.makeText(activity, "更改不成功, 请重试", Toast.LENGTH_SHORT);
+                    }
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
             case MSG_WHAT_ON_AREA_LIST_PREPARED:
                 areaListPrepare = true;
