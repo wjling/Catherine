@@ -53,5 +53,12 @@
     <string name="pass_friend_request">同意添加你为好友</string>
     <string name="refuse_friend_request">拒绝添加你为好友</string>
     <string name="delete">删除</string>
+    <string name="pass_event_request">同意你加入活动</string>
+    <string name="refuse_event_request">拒绝你加入活动</string>
+    <string name="pass_event_invitation">同意加入你的活动</string>
+    <string name="refuse_event_invitation">拒绝加入你的活动</string>
+    <string name="request_for_event">申请加入活动</string>
+    <string name="already_friends">你们已经是好友</string>
+    <string name="already_in_event">你已经在该活动中</string>
 
 </resources>

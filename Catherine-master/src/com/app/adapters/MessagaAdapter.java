@@ -2,6 +2,7 @@ package com.app.adapters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IllegalFormatCodePointException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +27,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.adapters.AdapterForFriendList.ViewHolder;
 import com.app.catherine.R;
@@ -88,9 +90,10 @@ public class MessagaAdapter extends BaseAdapter{
         ViewHolder viewHolder;
         notificationObject item = list.get(position);
         JSONObject jo = null;
-        int noticeStringId = -1;
+        String noticeString = "";
         int type = -1;
         int fid = -1;
+        int event_id = -1;
         final int item_id = item.item_ID;
         try {
             jo = new JSONObject(item.msg);
@@ -100,20 +103,45 @@ public class MessagaAdapter extends BaseAdapter{
             switch (type) {
             case ReturnCode.ADD_FRIEND_NOTIFICATION:
                 layoutID = R.layout.friend_requests;
-                noticeStringId = R.string.request_for_friend;
+                noticeString = context.getResources().getString(R.string.request_for_friend);
                 break;
             case ReturnCode.ADD_FRIEND_RESULT:
                 layoutID = R.layout.friend_requests;
                 if (jo.getBoolean("result")) {
-                    noticeStringId = R.string.pass_friend_request;
+                    noticeString = context.getResources().getString(R.string.pass_friend_request);
                 }
                 else {
-                    noticeStringId = R.string.refuse_friend_request;
+                    noticeString = context.getResources().getString(R.string.refuse_friend_request);
+                }
+                break;
+            case ReturnCode.EVENT_INVITE_RESPONSE:
+                layoutID = R.layout.friend_requests;
+                event_id = jo.getInt("event_id");
+                if (jo.getBoolean("result")) {
+                    noticeString = context.getResources().getString(R.string.pass_event_invitation) + " [ " + jo.getString("subject") + " ] ";
+                }
+                else {
+                    noticeString = context.getResources().getString(R.string.refuse_event_invitation) + " [ " + jo.getString("subject") + " ] ";
+                }
+                break;
+            case ReturnCode.REQUEST_EVENT:
+                layoutID = R.layout.friend_requests;
+                event_id = jo.getInt("event_id");
+                noticeString = context.getResources().getString(R.string.request_for_event) + " [ " + jo.getString("subject") + " ] ";
+                break;
+            case ReturnCode.REQUEST_EVENT_RESPONSE:
+                layoutID = R.layout.friend_requests;
+                event_id = jo.getInt("event_id");
+                if (jo.getBoolean("result")) {
+                    noticeString = context.getResources().getString(R.string.pass_event_request) + " [ " + jo.getString("subject") + " ] ";
+                }
+                else {
+                    noticeString = context.getResources().getString(R.string.refuse_event_request) + " [ " + jo.getString("subject") + " ] ";
                 }
                 break;
             default:
                 layoutID = -1;
-                noticeStringId = -1;
+                noticeString = "";
                 break;
             }
         } catch (JSONException e1) {
@@ -121,7 +149,7 @@ public class MessagaAdapter extends BaseAdapter{
             e1.printStackTrace();
         }
         
-        if (layoutID == -1 || noticeStringId == -1)
+        if (layoutID == -1 || type == -1)
         {
             return null;
         }
@@ -157,15 +185,23 @@ public class MessagaAdapter extends BaseAdapter{
             viewHolder.avatar.setImageDrawable(context.getResources().getDrawable(R.drawable.defaultavatar));    
         }
         try {
-            viewHolder.confirm_msg.setText(jo.getString("confirm_msg"));
+            if (type == ReturnCode.ADD_FRIEND_NOTIFICATION || type == ReturnCode.REQUEST_EVENT)
+            {
+                viewHolder.confirm_msg.setText(jo.getString("confirm_msg"));
+                viewHolder.confirm_msg.setVisibility(View.VISIBLE);
+            }
+            else {
+                viewHolder.confirm_msg.setVisibility(View.GONE);
+            }
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        viewHolder.notice.setText(noticeStringId);
+        viewHolder.notice.setText(noticeString);
         
         final int final_type = type;
         final int final_fid = fid;
+        final int final_event_id = event_id;
         OnClickListener passOnClickListener = new OnClickListener() {
             
             @Override
@@ -173,7 +209,10 @@ public class MessagaAdapter extends BaseAdapter{
                 // TODO Auto-generated method stub
                 switch (final_type) {
                 case ReturnCode.ADD_FRIEND_NOTIFICATION:
-                    sendMessage(userId, final_fid, 998, 1, item_id);
+                    sendMessage(userId, final_fid, 998, 1, item_id, -1);
+                    break;
+                case ReturnCode.REQUEST_EVENT:
+                    sendMessage(userId, final_fid, 994, 1, item_id, final_event_id);
                     break;
                 default:
                     break;
@@ -188,8 +227,10 @@ public class MessagaAdapter extends BaseAdapter{
                 // TODO Auto-generated method stub
                 switch (final_type) {
                 case ReturnCode.ADD_FRIEND_NOTIFICATION:
-                    sendMessage(userId, final_fid, 998, 0, item_id);
+                    sendMessage(userId, final_fid, 998, 0, item_id, -1);
                     break;
+                case ReturnCode.REQUEST_EVENT:
+                    sendMessage(userId, final_fid, 994, 0, item_id, final_event_id);
                 default:
                     break;
                 }
@@ -208,6 +249,7 @@ public class MessagaAdapter extends BaseAdapter{
         
         switch (type) {
         case ReturnCode.ADD_FRIEND_NOTIFICATION:
+        case ReturnCode.REQUEST_EVENT:
             viewHolder.leftBtn.setOnClickListener(passOnClickListener);
             viewHolder.leftBtn.setVisibility(View.VISIBLE);
             viewHolder.leftBtn.setText(R.string.pass);
@@ -216,6 +258,8 @@ public class MessagaAdapter extends BaseAdapter{
             viewHolder.rightBtn.setText(R.string.refuse);
             break;
         case ReturnCode.ADD_FRIEND_RESULT:
+        case ReturnCode.EVENT_INVITE_RESPONSE:
+        case ReturnCode.REQUEST_EVENT_RESPONSE:
             viewHolder.leftBtn.setVisibility(View.GONE);
             viewHolder.rightBtn.setOnClickListener(deleteOnClickListener);
             viewHolder.rightBtn.setVisibility(View.VISIBLE);
@@ -229,14 +273,20 @@ public class MessagaAdapter extends BaseAdapter{
         return convertView;
     }
     
-    private void sendMessage(int uid,int fid, int cmd, int result, int item_id)
+    private void sendMessage(int uid,int fid, int cmd, int result, int item_id, int event_id)
     {
         JSONObject params = new JSONObject();
         try {
             params.put("id", uid);
-            params.put("friend_id", fid);
             params.put("cmd", cmd);
             params.put("item_id", item_id);
+            if (-1 != event_id) {
+                params.put("event_id", event_id);
+                params.put("requester_id", fid);
+            }
+            else {
+                params.put("friend_id", fid);
+            }
             if(result==1)
                 params.put("result", true);
             else 
@@ -248,7 +298,15 @@ public class MessagaAdapter extends BaseAdapter{
         }
         Log.i("FriendsCenter", "我同意或者拒绝时，给服务器发送的是："+params.toString());
         HttpSender http = new HttpSender();
-        http.Httppost(OperationCode.ADD_FRIEND, params, mHandler);
+        if (ReturnCode.ADD_FRIEND_RESULT == cmd) {
+            http.Httppost(OperationCode.ADD_FRIEND, params, mHandler);
+        }
+        else if (ReturnCode.REQUEST_EVENT_RESPONSE == cmd) {
+            http.Httppost(OperationCode.PARTICIPATE_EVENT, params, mHandler);
+        }
+        else {
+            Log.i("MessageAdapter", "sendMessage cmd Error");
+        }
     }
     
     static class ViewHolder
@@ -258,7 +316,6 @@ public class MessagaAdapter extends BaseAdapter{
         TextView notice;
         ImageView avatar;
         Button leftBtn, rightBtn;
-        int type;
         
         public ViewHolder()
         {
@@ -268,7 +325,6 @@ public class MessagaAdapter extends BaseAdapter{
             avatar = null;
             leftBtn = null;
             rightBtn = null;
-            type = 0;
         }
     }
     
@@ -285,20 +341,34 @@ public class MessagaAdapter extends BaseAdapter{
             switch(msg.what)
             {
             case OperationCode.ADD_FRIEND:
+            case OperationCode.PARTICIPATE_EVENT:
                 try {
                     JSONObject jo = new JSONObject(msg.obj.toString());
-                    if (ReturnCode.NORMAL_REPLY == jo.getInt("cmd"))
+                    int cmd = jo.getInt("cmd");
+                    if (ReturnCode.NORMAL_REPLY == cmd)
                     {                        
                         //更新显示信息
                         removeItem(jo.getInt("item_id"));
                         MessagaAdapter.this.notifyDataSetChanged();
                     }
+                    else if (ReturnCode.ALREADY_FRIENDS == cmd)
+                    {
+                        //更新显示信息
+                        removeItem(jo.getInt("item_id"));
+                        MessagaAdapter.this.notifyDataSetChanged();
+                        Toast.makeText(context, R.string.already_friends, Toast.LENGTH_SHORT);
+                    }
+                    else if (ReturnCode.ALREADY_IN_EVENT == cmd)
+                    {
+                        //更新显示信息
+                        removeItem(jo.getInt("item_id"));
+                        MessagaAdapter.this.notifyDataSetChanged();
+                        Toast.makeText(context, R.string.already_in_event, Toast.LENGTH_SHORT);
+                    }
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                break;
-            case OperationCode.PARTICIPATE_EVENT:
                 break;
                 default: break;
             }
