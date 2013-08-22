@@ -47,7 +47,7 @@ public class RelativeEvents
 		this.screenWidth = screenWidth;
 		this.relativeEventsView = toView;
 		
-		toView.setBackground(new ColorDrawable( 0xffe0f0f0 ) );
+		toView.setBackgroundDrawable(new ColorDrawable( 0xffe0f0f0 ) );
 	}
 	
 	public void init()
