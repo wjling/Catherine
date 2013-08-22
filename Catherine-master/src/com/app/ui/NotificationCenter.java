@@ -119,7 +119,7 @@ public class NotificationCenter extends Activity{
             super.handleMessage(msg);
             switch(msg.what)
             {
-            case FriendCenter.MSG_WHAT_ON_UPDATE_LIST:
+            case FriendCenter.MSG_WHAT_ON_UPDATE_Avatar:
                 messagaAdapter.notifyDataSetChanged();
                 break;
             default: 

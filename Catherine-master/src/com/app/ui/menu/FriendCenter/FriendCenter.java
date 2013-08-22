@@ -69,24 +69,19 @@ public class FriendCenter {
 	private int userId = -1;
 	private Handler uiHandler;
 	private myHandler fcHandler = new myHandler();
+	private boolean isFirstVisit;
 	public static final int MSG_WHAT_ON_UPDATE_LIST = -1;
+	public static final int MSG_WHAT_ON_UPDATE_Avatar = -2;
 	
 	ArrayList<FriendStruct> friends;
 	ArrayList<HashMap<String, Object>> functionsList = new ArrayList<HashMap<String,Object>>();
 	ArrayList<HashMap<String, Object>> friendList = new ArrayList<HashMap<String,Object>>();
+	ArrayList<HashMap<String, Object>> subfriendList = new ArrayList<HashMap<String,Object>>();
 	AdapterForFriendList friendListAdapter, functionsAdapter;
 	HashMap<String, Integer> alphaIndex = new HashMap<String, Integer>();
+	HashMap<String, Integer> subalphaIndex = new HashMap<String, Integer>();
 	Comparator<Object> chinese_Comparator = Collator.getInstance(Locale.CHINA);
-//	Comparator<HashMap> myComparator = new Comparator<HashMap>() {
-//		
-//		@Override
-//		public int compare(HashMap arg0, HashMap arg1) {
-//			// TODO Auto-generated method stub
-//			String name0 = arg0.get("fname").toString();
-//			String name1 = arg1.get("fname").toString();
-//			return chinese_Comparator.compare(name0, name1);
-//		}
-//	};
+	
 	
 	private PinYinComparator myPinYinComparator = new PinYinComparator();
 	
@@ -96,6 +91,7 @@ public class FriendCenter {
 		this.friendCenterView = friendsCenterView;
 		this.userId = userId;
 		this.uiHandler = uiHandler;
+		this.isFirstVisit = true;
 	}
 	
 	
@@ -250,10 +246,11 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 	
 	public void showFriendList()
 	{
+	    if (!isFirstVisit) {
+	        return ;
+	    }
 	    imageUtil.getInstance().unregisterHandler("FriendCenter");
-	    friendList.clear();
-	    friendListAdapter.notifyDataSetChanged();
-        int[] alpha_counter = new int[26];
+	    
         TableFriends tf = new TableFriends(context);
         friends = tf.getAllFriends(userId+"");
         if(friends.size() == 0)
@@ -261,65 +258,48 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
             Toast.makeText(context, "你暂时还没有好友哦", Toast.LENGTH_SHORT).show();
         }
         else
-        {
-            for (final FriendStruct fs : friends)
-            {
-                    HashMap<String, Object> map = new HashMap<String, Object>();
-                    map.put("uid", userId);
-                    map.put("fname", fs.fname);
-//                    int gender = Integer.parseInt(fs.gender);
-//                    if(gender == 1)
-//                    {
-//                        map.put("gender", "男");
-//                    }
-//                    else
-//                    {
-//                        map.put("gender", "女");
-//                    }
-//                    map.put("gender", fs.gender);
-//                    map.put("email", fs.email);
-                    map.put("fid",fs.fid);
-                    friendList.add(map);
-                     
-            }
+        { 
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub     
+                    subfriendList.clear();
+                    for (FriendStruct fs : friends)
+                    {
+                            HashMap<String, Object> map = new HashMap<String, Object>();
+                            map.put("uid", userId);
+                            map.put("fname", fs.fname);
+                            map.put("fid",fs.fid);
+                            subfriendList.add(map);
+                             
+                    }
+                    Collections.sort(subfriendList, myPinYinComparator);
+                    insertLetterTag();
+                    Message msg = fcHandler.obtainMessage(MSG_WHAT_ON_UPDATE_Avatar);
+                    msg.sendToTarget();
+                }
+               
+            }).start();
         }
         
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                Collections.sort(friendList, myPinYinComparator);
-                insertLetterTag();
-                Message msg = fcHandler.obtainMessage(MSG_WHAT_ON_UPDATE_LIST);
-                msg.sendToTarget();
-            }
-           
-        }).start();
-			
-		friendListAdapter.notifyDataSetChanged();
 		imageUtil.getInstance().registerHandler(fcHandler, "FriendCenter");
-		
-//		friendListAdapter = new AdapterForFriendList(this, friendList, 
-//				R.layout.friend_list_item, 
-//				new String[] {"fname","gender","email"}, 
-//				new int[] {R.id.friend_list_item_fname,R.id.friend_list_item_gender,R.id.friend_list_item_email});
-//		
-//		friendListView.setAdapter(friendListAdapter);
+		isFirstVisit = false;
+
 	}
 	
 	public void insertLetterTag()
 	{
-	    if (friendList == null)
+	    if (subfriendList == null)
 	    {
-	        Log.i("insertLetterTag: ","friendList is null");
+	        Log.i("insertLetterTag: ","subfriendList is null");
 	        return;
 	    }
-	    alphaIndex.clear();
+	    HashMap<String, Integer> tempIndex = new HashMap<String, Integer>();
 	    ArrayList<HashMap<String, Object>> tempList = new ArrayList<HashMap<String,Object>>();
 	    String currentTag = "";
 	    String tempTag;
-	    for (HashMap<String, Object> hMap : friendList)
+	    for (HashMap<String, Object> hMap : subfriendList)
 	    {
 	        tempTag = PinYinComparator.getPinYin((String)hMap.get("fname")).charAt(0) + "";
 	        tempTag = tempTag.toUpperCase();
@@ -330,13 +310,16 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 	            tempMap.put("fid", -1);
 	            tempMap.put("fname", currentTag);
 	            int pos = tempList.size();
-	            alphaIndex.put(currentTag, pos);
+	            tempIndex.put(currentTag, pos);
 	            tempList.add(tempMap);
 	        }
 	        tempList.add(hMap);
 	    }
-	    friendList.clear();
-	    friendList.addAll(tempList);
+
+	    subfriendList.clear();
+	    subfriendList.addAll(tempList);
+	    subalphaIndex.clear();
+	    subalphaIndex.putAll(tempIndex);
 	}
 	
 	public void sychronizeFriendsList(Message msg)
@@ -448,8 +431,15 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 			{
 			case OperationCode.SYNCHRONIZE:
 				sychronizeFriendsList(msg);
-//				showFriendList();
 				break;
+            case MSG_WHAT_ON_UPDATE_Avatar:
+                friendList.clear();
+                friendList.addAll(subfriendList);
+                alphaIndex.clear();
+                alphaIndex.putAll(subalphaIndex);
+                Log.i("ff", "ff");
+                friendListAdapter.notifyDataSetChanged();
+                break;
             case MSG_WHAT_ON_UPDATE_LIST:
                 friendListAdapter.notifyDataSetChanged();
                 break;

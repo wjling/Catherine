@@ -297,12 +297,12 @@ public class imageUtil
 	{
 	    if (null != fcHandler)
 	    {
-	        Message msg = fcHandler.obtainMessage(FriendCenter.MSG_WHAT_ON_UPDATE_LIST);
+	        Message msg = fcHandler.obtainMessage(FriendCenter.MSG_WHAT_ON_UPDATE_Avatar);
 	        msg.sendToTarget();
 	    }
 	    if (null != ncHandler)
 	    {
-	        Message msg = ncHandler.obtainMessage(FriendCenter.MSG_WHAT_ON_UPDATE_LIST);
+	        Message msg = ncHandler.obtainMessage(FriendCenter.MSG_WHAT_ON_UPDATE_Avatar);
             msg.sendToTarget();
 	    }
 	}
