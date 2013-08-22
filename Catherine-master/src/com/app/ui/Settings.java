@@ -70,11 +70,11 @@ public class Settings {
     private String path;
     private Uri uri;
     private String imageStr;
-    private ImageView avatar;
+    private ImageView avatar, gender;
     private EditText location, description, myName;
-    private TextView gender, myEmail, changPW;
+    private TextView myEmail, changPW;
     private AvatarDialog avatarDialog;
-    private int userId;
+    private int userId, genderInt;
     private MessageHandler handler;
     private boolean isFirstVisit, areaListPrepare;
     private ArrayList<State> stateList;
@@ -88,6 +88,7 @@ public class Settings {
         this.activity = activity;
         this.settingsView = settingsView;
         this.userId = userId;
+        this.genderInt = -1;
         isFirstVisit = true;
         areaListPrepare = false;
         handler = new MessageHandler(Looper.myLooper());
@@ -99,7 +100,7 @@ public class Settings {
     {
         avatar = (ImageView)settingsView.findViewById(R.id.avatar);
         avatar.setOnClickListener(avatarListener);
-        gender = (TextView)settingsView.findViewById(R.id.settings_gender);
+        gender = (ImageView)settingsView.findViewById(R.id.settings_gender);
         gender.setOnClickListener(genderChangeOnClickListener);
         location = (EditText)settingsView.findViewById(R.id.settings_location);
         location.setFocusable(false);
@@ -582,10 +583,12 @@ public class Settings {
             myEmail.setText(jo.getString("email"));
             if (jo.getInt("gender") == 1)
             {
-                gender.setText("ÄÐ");
+                genderInt = 1;
+                gender.setImageDrawable(activity.getResources().getDrawable(R.drawable.male));
             }
             else {
-                gender.setText("Å®");
+                genderInt = 0;
+                gender.setImageDrawable(activity.getResources().getDrawable(R.drawable.female));
             } 
             String tmpStr;
             tmpStr = jo.getString("location");
@@ -600,24 +603,18 @@ public class Settings {
     }
     
     OnClickListener genderChangeOnClickListener = new OnClickListener() {
-        int oldChoice = 0;
         String[] genderItem = {"Å®", "ÄÐ"};
         
         @Override
         public void onClick(View v) {
             // TODO Auto-generated method stub
-            oldChoice = 0;
-            if (gender.getText().toString().equals(genderItem[1]))
-            {
-                oldChoice = 1;
-            }
             new AlertDialog.Builder(activity).setTitle(R.string.gender).setIcon(
                     android.R.drawable.ic_dialog_info).setSingleChoiceItems(
-                    new String[] { genderItem[0], genderItem[1] }, oldChoice,
+                    new String[] { genderItem[0], genderItem[1] }, genderInt,
                     new DialogInterface.OnClickListener() {
                      public void onClick(DialogInterface dialog, int which) {
                          dialog.dismiss();
-                         if (oldChoice != which)
+                         if (genderInt != which)
                          {
                              JSONObject params = new JSONObject();
                              try {
