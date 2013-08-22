@@ -40,7 +40,8 @@ public class cardAdapter extends BaseAdapter
 	private int to[];	
 	private int screenW;
 	private int toAvatar[];
-	private imageUtil forImageUtil;
+	private imageUtil forImageUtil  = imageUtil.getInstance();
+	private boolean inActivity;
 
 	private myHandler ncHandler = new myHandler();
 	
@@ -50,7 +51,7 @@ public class cardAdapter extends BaseAdapter
 	}
 	
 	public cardAdapter(Context context, ArrayList<HashMap<String, Object>> list, int resource,
-			String []from, int []to, int screenW, int []toAvatar, imageUtil forImageUtil) {
+			String []from, int []to, int screenW, int []toAvatar, boolean inActivity) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.mInflater = LayoutInflater.from(context);
@@ -59,9 +60,8 @@ public class cardAdapter extends BaseAdapter
 		this.from = from;
 		this.to = to;
 		this.screenW = screenW;
-		
+		this.inActivity = inActivity;
 		this.toAvatar = toAvatar;
-		this.forImageUtil = forImageUtil;
 		Log.e("cardAdapter",   "in cardadapter constructor");
 	}
 	
@@ -133,13 +133,8 @@ public class cardAdapter extends BaseAdapter
 		return view;
 	}
 	
-	
-	
 	private void init(View view, final int pos)
 	{
-		CircularImage join = (CircularImage)view.findViewById(R.id.joinBtn);
-		join.setImageResource(R.drawable.join);
-
 		HashMap<String, Object> item = list.get(pos);
 		JSONArray avatarJsonArray = (JSONArray) item.get("photolistJsonArray");
 		
@@ -190,6 +185,11 @@ public class cardAdapter extends BaseAdapter
 		View userInfoView = view.findViewById(R.id.userInfo);
 		SetUserInfoWidth(view, userInfoView);
 		
+		CircularImage join = (CircularImage)view.findViewById(R.id.joinBtn);
+		
+		if( inActivity==false )
+		{
+		join.setImageResource(R.drawable.join);	
 		join.setOnClickListener(	new OnClickListener(){
 
 						@Override
@@ -212,6 +212,11 @@ public class cardAdapter extends BaseAdapter
 						
 					}
 				);
+		}
+		else
+		{
+//			join.setVisibility(View.GONE);
+		}
 		
 //		view.findViewById(R.id.comment_btn).setOnClickListener(BtnListener);
 //		view.findViewById(R.id.takephoto_btn).setOnClickListener(BtnListener);
