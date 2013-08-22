@@ -30,6 +30,7 @@ public class WebSocketUtil
 	{
 		this.uid = uid;
 		this.handler = handler;
+
 		client = new WebSocketClient(URI.create("ws://222.200.182.183:10088/"), socketListener, null);
 	}
 	

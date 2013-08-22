@@ -57,7 +57,7 @@ public class MyEvents {
 	public View myEventsView;
 	public PullUpDownView myEventsPullUpDownView;
 	public ListView myEventsListView;
-	private Button notificationBtn;
+//	private Button notificationBtn;
 	private onPullListener myEventsPullUpDownViewListener;
 	private OnItemClickListener myEventsListViewListener;
 	
@@ -77,18 +77,19 @@ public class MyEvents {
 	private Vector<Integer> allEventIDList = new Vector<Integer>();
 	private Vector<Integer> requestEventIDList = new Vector<Integer>();
 	private int requestIndex = 0;
+	private imageUtil forImageUtil;
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
 	private static final int MSG_WHAT_LOAD_DATA_DONE = -4;
 	private static final int MSG_WHAT_REFRESH_DONE = -5;
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
-	
-	private OnClickListener buttonsOnClickListener = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
+//	
+//	private OnClickListener buttonsOnClickListener = new OnClickListener() {
+//		
+//		@Override
+//		public void onClick(View v) {
+//			// TODO Auto-generated method stub
 //			switch(v.getId())
 //			{
 //			case R.id.menu_my_events_notificationBtn:
@@ -99,8 +100,8 @@ public class MyEvents {
 //				break;
 //				default: break;
 //			}
-		}
-	};
+//		}
+//	};
 	
 	public MyEvents(Context context, View myEventsView, Handler uiHandler, int screenWidth, int userId) {
 		// TODO Auto-generated constructor stub
@@ -191,8 +192,8 @@ public class MyEvents {
 			}
 		};
 		
-		notificationBtn = (Button)myEventsView.findViewById(R.id.menu_my_events_notificationBtn);
-		notificationBtn.setOnClickListener(buttonsOnClickListener);
+//		notificationBtn = (Button)myEventsView.findViewById(R.id.menu_my_events_notificationBtn);
+//		notificationBtn.setOnClickListener(buttonsOnClickListener);
 		myEventsPullUpDownView = (PullUpDownView)myEventsView.findViewById(R.id.my_events_pull_up_down_view);
 		myEventsListView = myEventsPullUpDownView.getListView();
 		myEventsPullUpDownView.setOnPullListener(myEventsPullUpDownViewListener);
@@ -271,6 +272,7 @@ public class MyEvents {
 		map.put("id", userId);
 		map.put("event_id", event_id);
 		map.put("launcher_id", launcher_id);
+		map.put("item_id", -1);
 		myEventsList.add(map);		
 	}
 	

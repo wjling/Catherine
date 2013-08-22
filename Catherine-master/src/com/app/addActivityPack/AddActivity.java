@@ -108,6 +108,19 @@ public class AddActivity extends Activity
 		sender = new HttpSender();
 	}
 	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+		
+		Intent intent = new Intent();
+			intent.setClass(AddActivity.this, UserInterface.class);
+			intent.putExtra("userId", userId);
+			intent.putExtra("email", email);
+			startActivity(intent);
+		finish();
+	}
+
 	//Ã·Ωª∞¥≈•
 	private OnClickListener submitActivityListener = new OnClickListener()
 	{

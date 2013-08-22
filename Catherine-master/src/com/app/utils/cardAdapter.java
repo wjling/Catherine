@@ -2,32 +2,29 @@ package com.app.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.app.addActivityPack.CircularImage;
 import com.app.catherine.R;
-import com.app.ui.loginAndreg;
-import com.app.ui.menu.MyEvents.EventMainPage;
+import com.app.localDataBase.NotificationTableAdapter;
 
-
-import android.R.integer;
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +41,8 @@ public class cardAdapter extends BaseAdapter
 	private int screenW;
 	private int toAvatar[];
 	private imageUtil forImageUtil;
+
+	private myHandler ncHandler = new myHandler();
 	
 	public cardAdapter() {
 		// TODO Auto-generated constructor stub
@@ -63,6 +62,7 @@ public class cardAdapter extends BaseAdapter
 		
 		this.toAvatar = toAvatar;
 		this.forImageUtil = forImageUtil;
+		Log.e("cardAdapter",   "in cardadapter constructor");
 	}
 	
 	private void SetContentWidth(View main, View v)
@@ -135,7 +135,7 @@ public class cardAdapter extends BaseAdapter
 	
 	
 	
-	private void init(View view, int pos)
+	private void init(View view, final int pos)
 	{
 		CircularImage join = (CircularImage)view.findViewById(R.id.joinBtn);
 		join.setImageResource(R.drawable.join);
@@ -144,6 +144,7 @@ public class cardAdapter extends BaseAdapter
 		JSONArray avatarJsonArray = (JSONArray) item.get("photolistJsonArray");
 		
 		int length = avatarJsonArray.length();
+		Log.e("cardAdapter", length + " = length");
 		try {
 			int i=0;
 			for ( ; i < length; i++) 
@@ -189,32 +190,119 @@ public class cardAdapter extends BaseAdapter
 		View userInfoView = view.findViewById(R.id.userInfo);
 		SetUserInfoWidth(view, userInfoView);
 		
-		join.setOnClickListener(BtnListener);
-		view.findViewById(R.id.comment_btn).setOnClickListener(BtnListener);
-		view.findViewById(R.id.takephoto_btn).setOnClickListener(BtnListener);
+		join.setOnClickListener(	new OnClickListener(){
+
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							switch ( v.getId() ) {
+							case R.id.joinBtn:
+								join(pos);
+								break;
+							case R.id.comment_btn:
+								Toast.makeText(context, "comment", Toast.LENGTH_SHORT).show();
+								break;
+							case R.id.takephoto_btn:
+								Toast.makeText(context, "take photo", Toast.LENGTH_SHORT).show();
+								break;
+							default:
+								break;
+							}
+						}
+						
+					}
+				);
+		
+//		view.findViewById(R.id.comment_btn).setOnClickListener(BtnListener);
+//		view.findViewById(R.id.takephoto_btn).setOnClickListener(BtnListener);
 	}
 	
-	private OnClickListener BtnListener = new OnClickListener()
+	private void join( final int pos)
 	{
-
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			switch ( v.getId() ) {
-			case R.id.joinBtn:
-				Toast.makeText(context, "join", Toast.LENGTH_SHORT).show();
-				break;
-			case R.id.comment_btn:
-				Toast.makeText(context, "comment", Toast.LENGTH_SHORT).show();
-				break;
-			case R.id.takephoto_btn:
-				Toast.makeText(context, "take photo", Toast.LENGTH_SHORT).show();
-				break;
-			default:
-				break;
+		final int currentUId = (Integer) list.get(pos).get("id");
+		final int eventId = (Integer) list.get(pos).get("event_id");
+		final int item_id = (Integer) list.get(pos).get("item_id");
+		
+//		Toast.makeText(context, "join: pos="+pos + " uid=" + currentUId, Toast.LENGTH_SHORT).show();
+		
+		AlertDialog.Builder builder = new Builder(context);
+		
+		builder.setTitle("活动验证").setIcon(R.drawable.ic_launcher).setMessage("加入活动吗？").create();
+		builder.setPositiveButton("同意", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface arg0, int arg1) {
+				// TODO Auto-generated method stub
+				JSONObject params = new JSONObject();
+				try {
+					params.put("cmd", 997);
+					params.put("id", currentUId);
+					params.put("event_id", eventId);
+					params.put("result", 1);
+					HttpSender httpSender = new HttpSender();
+					httpSender.Httppost(OperationCode.PARTICIPATE_EVENT, params, ncHandler);
+					Log.e("cardAdapter", "join: " + params);
+					
+					NotificationTableAdapter adapter = new NotificationTableAdapter(context);
+					adapter.deleteData( item_id );
+					
+					list.remove(pos);
+					cardAdapter.this.notifyDataSetChanged();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+		});
+		
+		builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+//				JSONObject params = new JSONObject();
+//				try {
+//					params.put("cmd", 997);
+//					params.put("id", currentUId);
+//					params.put("event_id", eventId);
+//					params.put("result", 0);
+//					HttpSender httpSender = new HttpSender();
+//					httpSender.Httppost(OperationCode.PARTICIPATE_EVENT, params, ncHandler);
+//					Log.e("cardAdapter", "refuse: " + params);
+//					
+//					NotificationTableAdapter adapter = new NotificationTableAdapter(context);
+//					adapter.deleteData( item_id );
+//					
+//					list.remove(pos);
+//					cardAdapter.this.notifyDataSetChanged();
+//				} catch (JSONException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+			}
+		});
+		
+		builder.show();
+	}
+	
+	public class myHandler extends Handler
+	{
+		public myHandler() {
+			// TODO Auto-generated constructor stub
 		}
 		
-	};
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
+			switch(msg.what)
+			{
+			case OperationCode.PARTICIPATE_EVENT:
+				
+				break;
+				default: break;
+			}
+		}
+	}
 
 }

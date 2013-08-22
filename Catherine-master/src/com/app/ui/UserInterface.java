@@ -3,7 +3,10 @@ package com.app.ui;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
@@ -29,6 +32,7 @@ import com.app.addFriendPack.searchFriend;
 import com.app.catherine.R;
 import com.app.ui.menu.FriendCenter.FriendCenter;
 import com.app.ui.menu.MyEvents.MyEvents;
+import com.app.ui.menu.RelativeEvents.RelativeEvents;
 import com.app.utils.MyBroadcastReceiver;
 
 public class UserInterface extends Activity implements OnTouchListener,
@@ -70,6 +74,7 @@ GestureDetector.OnGestureListener
 	
 	//add by luo
 	private MyBroadcastReceiver broadcastReceiver  = null;
+	public RelativeEvents relativeEventsPage;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +96,40 @@ GestureDetector.OnGestureListener
 		
 	}
 	
+	
+	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+//		super.onBackPressed();
+		
+		Builder dialog = new AlertDialog.Builder(UserInterface.this)
+								.setTitle("提示")
+								.setMessage("确定要退出程序吗？")
+								.setPositiveButton("是", 
+										new DialogInterface.OnClickListener() {
+											
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												// TODO Auto-generated method stub
+												//跳回到主页面userinterface
+												finish();
+											}
+										})
+								.setNegativeButton("否", 
+										new DialogInterface.OnClickListener() {
+											
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												// TODO Auto-generated method stub
+												//啥都不做
+											}
+										});
+			dialog.show();
+	}
+
+
+
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
@@ -130,7 +169,8 @@ GestureDetector.OnGestureListener
 		initMyEvents();
 		initFriendsCenter();
 		initSettings();
-	}
+		initRelativeActivityPage();    // add by luo	
+		}
 	private OnClickListener ui_ButtonClickListener = new OnClickListener() {
 		
 		@Override
@@ -159,6 +199,7 @@ GestureDetector.OnGestureListener
 			intent.putExtra("userId", userId);
 			intent.putExtra("email", email);
 			startActivity(intent);
+			finish();  //add 8 . 22
 		}
 	};
 	
@@ -181,6 +222,13 @@ GestureDetector.OnGestureListener
     {
         UI_settings = new Settings(this, UI_Menu.getSettingsView(), userId);
     }
+	
+	//add by luo
+	private void initRelativeActivityPage()
+	{
+		int width = getWindowManager().getDefaultDisplay().getWidth();
+		relativeEventsPage = new RelativeEvents(this, userId, width, UI_Menu.getPrivateView());
+	}
 	
 	OnClickListener menuButtonOnClickListener = new OnClickListener() {
 		
@@ -278,7 +326,7 @@ GestureDetector.OnGestureListener
 		// TODO Auto-generated method stub
 		mScrollX = 0;
 		isScrolling = false;
-		UI_myEvents.myEventsListView.onTouchEvent(arg0);
+		UI_myEvents.myEventsListView.onTouchEvent(arg0);		
 		return true;
 	}
 
@@ -360,7 +408,7 @@ GestureDetector.OnGestureListener
 
 	@Override
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
-			float arg3) {
+			float arg3) {  
 		// TODO Auto-generated method stub
 //		Log.i("myUI","onScroll: arg2:"+arg2+", arg3: "+arg3);
 		if(Math.abs(arg2) >= Math.abs(arg3))
@@ -492,6 +540,9 @@ GestureDetector.OnGestureListener
 				case R.id.ui_menu_privateevents:
 					addActivityBtn.setVisibility(View.GONE);
 					addFriendBtn.setVisibility(View.GONE);
+					//add by luo
+					relativeEventsPage.init();
+					relativeEventsPage.showNotification();
 					break;
 				case R.id.ui_menu_recommendedevents:
 					addActivityBtn.setVisibility(View.GONE);
