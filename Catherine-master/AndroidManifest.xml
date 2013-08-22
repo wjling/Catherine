@@ -47,7 +47,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity 
-            android:name="com.app.ui.menu.FriendCenter.FriendNotification" 
+            android:name="com.app.ui.NotificationCenter" 
             android:theme="@style/AppTheme" 
             android:label="@string/app_name"
             android:screenOrientation="portrait">
@@ -59,14 +59,13 @@
             android:screenOrientation="portrait">
         </activity>
         <activity 
-            android:name="com.app.ui.menu.MyEvents.MyEventsNotification" 
+            android:name="com.app.ui.menu.MyEvents.EventMainPage" 
             android:theme="@style/AppTheme" 
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>
         <activity 
-            android:name="com.app.ui.menu.MyEvents.EventMainPage" 
-            android:theme="@style/AppTheme" 
+            android:name="com.app.ui.ChangPW" 
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>

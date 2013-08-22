@@ -128,6 +128,9 @@ public class HttpSender {
         case OperationCode.CHANGE_SETTINGS:
             httpUrl += "change_settings";
             break;
+        case OperationCode.CHANGE_PW:
+            httpUrl += "change_pw";
+            break;
         default:
             httpUrl += "json";
             break;

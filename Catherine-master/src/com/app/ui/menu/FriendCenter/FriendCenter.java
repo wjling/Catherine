@@ -69,7 +69,7 @@ public class FriendCenter {
 	private int userId = -1;
 	private Handler uiHandler;
 	private myHandler fcHandler = new myHandler();
-	private static final int MSG_WHAT_ON_UPDATE_LIST = -1;
+	public static final int MSG_WHAT_ON_UPDATE_LIST = -1;
 	
 	ArrayList<FriendStruct> friends;
 	ArrayList<HashMap<String, Object>> functionsList = new ArrayList<HashMap<String,Object>>();
@@ -183,7 +183,7 @@ public class FriendCenter {
             else if (arg2 == 1) 
             {
                 Intent intent2 = new Intent();
-                intent2.setClass(context, FriendNotification.class);
+                intent2.setClass(context, NotificationCenter.class);
                 intent2.putExtra("userId", userId);
                 context.startActivity(intent2);
             }
@@ -250,6 +250,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 	
 	public void showFriendList()
 	{
+	    imageUtil.getInstance().unregisterHandler("FriendCenter");
 	    friendList.clear();
         int[] alpha_counter = new int[26];
         TableFriends tf = new TableFriends(context);
@@ -279,18 +280,6 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
                     map.put("fid",fs.fid);
                     friendList.add(map);
                      
-                    new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            // TODO Auto-generated method stub
-                             if (!imageUtil.fileExist(fs.fid))
-                             {
-                                 retrieve_avatar(fs.fid);
-                             }
-                        }
-                       
-                    }).start();
             }
         }
         
@@ -308,6 +297,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
         }).start();
 			
 		friendListAdapter.notifyDataSetChanged();
+		imageUtil.getInstance().registerHandler(fcHandler, "FriendCenter");
 		
 //		friendListAdapter = new AdapterForFriendList(this, friendList, 
 //				R.layout.friend_list_item, 
@@ -396,44 +386,6 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 		}
 	}
 	
-    public void retrieve_avatar(int uid)
-    {
-        JSONObject params = new JSONObject();
-        try
-        {
-            params.put("id", uid);
-            params.put("operation", 0);
-            new HttpSender().Httppost(OperationCode.GET_AVATAR, params, fcHandler);
-        } catch (JSONException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    
-    public void writeAvatar(String str)
-    {
-        JSONObject returnJson;
-        try {
-            returnJson = new JSONObject(str );
-            if (returnJson.getInt("cmd") == ReturnCode.NORMAL_REPLY)
-            {
-                String returnStr = returnJson.getString("avatar");  
-                byte[] temp = imageUtil.String2Bytes(returnStr);
-                if(temp!=null)
-                {
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);
-                    imageUtil.savePhoto(returnJson.getInt("id"), bitmap);
-                }
-            }
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        Message msg = fcHandler.obtainMessage(MSG_WHAT_ON_UPDATE_LIST);
-        msg.sendToTarget();
-
-    }
 	
 	public static class PinYinComparator implements Comparator<HashMap<String,Object>>
 	{
@@ -497,15 +449,6 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 				sychronizeFriendsList(msg);
 //				showFriendList();
 				break;
-			case OperationCode.GET_AVATAR:
-                final String final_mes = msg.obj.toString();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                    writeAvatar(final_mes);
-                }
-                }).start();
-                break;
             case MSG_WHAT_ON_UPDATE_LIST:
                 friendListAdapter.notifyDataSetChanged();
                 break;

@@ -77,7 +77,7 @@ public class MyEvents {
 	private Vector<Integer> allEventIDList = new Vector<Integer>();
 	private Vector<Integer> requestEventIDList = new Vector<Integer>();
 	private int requestIndex = 0;
-	private imageUtil forImageUtil = new imageUtil();
+	private imageUtil forImageUtil;
 	
 	//My Events 
 	private static final int MSG_WHAT_ON_LOAD_DATA = -3;
@@ -209,7 +209,7 @@ public class MyEvents {
 				new int[]{R.id.activityTitle, R.id.day, R.id.monthAndYear, R.id.time, R.id.location, R.id.launcher, R.id.remark, R.id.participantsNum},
 				screenWidth,
 				new int[]{R.id.user1, R.id.user2, R.id.user3, R.id.user4},
-				forImageUtil
+				imageUtil.getInstance()
 		);
 		
 		myEventsListView.setAdapter(myEventsAdapter);
@@ -497,7 +497,7 @@ public class MyEvents {
 										                //记得要在子线程中写文件
 										                imageUtil.savePhoto(avatarForUserId, bitmap);
 //										                forImageUtil.putBitmapInMap(avatarForUserId, bitmap);
-										                forImageUtil.addBitmapToMemoryCache(avatarForUserId, bitmap);
+										                imageUtil.getInstance().addBitmapToMemoryCache(avatarForUserId, bitmap);
 //										                myEventsAdapter.notifyDataSetChanged();
 										                Log.e("myevents", "image arrive : " + avatarForUserId);
 										            }

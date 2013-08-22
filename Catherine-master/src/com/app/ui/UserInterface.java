@@ -64,7 +64,6 @@ GestureDetector.OnGestureListener
 	private static final int MSG_WHAT_GET_MORE_DONE = -6;
 	
 	private Menu UI_Menu;
-	public static NotificationCenter notificationCenter;
 	private MyEvents UI_myEvents;
 	private FriendCenter UI_friendCenter;
 	private Settings UI_settings;
@@ -170,10 +169,8 @@ GestureDetector.OnGestureListener
 		initMyEvents();
 		initFriendsCenter();
 		initSettings();
-		initRelativeActivityPage();    // add by luo
-		notificationCenter = new NotificationCenter(this, this.UI_friendCenter,uiHandler, userId);
-//		notificationCenter.getNotifications();
-	}
+		initRelativeActivityPage();    // add by luo	
+		}
 	private OnClickListener ui_ButtonClickListener = new OnClickListener() {
 		
 		@Override
@@ -329,7 +326,6 @@ GestureDetector.OnGestureListener
 		// TODO Auto-generated method stub
 		mScrollX = 0;
 		isScrolling = false;
-		
 		UI_myEvents.myEventsListView.onTouchEvent(arg0);		
 		return true;
 	}
@@ -412,9 +408,7 @@ GestureDetector.OnGestureListener
 
 	@Override
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
-			float arg3) {
-		
-		UI_myEvents.myEventsListView.setClickable(false);  
+			float arg3) {  
 		// TODO Auto-generated method stub
 //		Log.i("myUI","onScroll: arg2:"+arg2+", arg3: "+arg3);
 		if(Math.abs(arg2) >= Math.abs(arg3))
@@ -558,7 +552,6 @@ GestureDetector.OnGestureListener
 					addActivityBtn.setVisibility(View.GONE);
 					addFriendBtn.setVisibility(View.VISIBLE);
 					UI_friendCenter.showFriendList();
-//					notificationCenter.init();
 					break;
 				case R.id.ui_menu_update:
 					addActivityBtn.setVisibility(View.GONE);
@@ -632,9 +625,19 @@ GestureDetector.OnGestureListener
                   
               }).start();
 	      }
-	      else {
-	          Toast.makeText(this, "请重新选择头像", Toast.LENGTH_SHORT);
-	      }
+	      else if (requestCode == UI_settings.CASE_PHOTO || requestCode == UI_settings.CASE_CAMERA)
+	      {
+              Toast.makeText(this, "请重新选择头像", Toast.LENGTH_SHORT).show();
+          }
+	      else if (requestCode == UI_settings.CASE_CHANGE_PW && resultCode == RESULT_OK)
+          {
+	          Toast.makeText(this, "修改密码成功", Toast.LENGTH_SHORT).show();
+          }
+//	      else {
+//              Toast.makeText(this, "未知错误", Toast.LENGTH_SHORT).show();
+//          }
+	      
+	      super.onActivityResult(requestCode, resultCode, data);
 	 }
 	
 

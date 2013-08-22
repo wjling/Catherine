@@ -36,7 +36,7 @@ public class RelativeEvents
 	private int userId;
 	private int screenWidth;
 	private View relativeEventsView;
-	private imageUtil forImageUtil = new imageUtil();
+	private imageUtil forImageUtil;
 	private cardAdapter relativeEventsAdapter;
 	private ArrayList<HashMap<String, Object>> addActivityRequests = new ArrayList<HashMap<String,Object>>();
 	
@@ -70,7 +70,7 @@ public class RelativeEvents
 				new int[]{R.id.activityTitle, R.id.day, R.id.monthAndYear, R.id.time, R.id.location, R.id.launcher, R.id.remark, R.id.participantsNum},
 				screenWidth,
 				new int[]{R.id.user1, R.id.user2, R.id.user3, R.id.user4},
-				forImageUtil
+				forImageUtil.getInstance()
 		);
 		
 		relativeActivityLV.setAdapter(relativeEventsAdapter);
