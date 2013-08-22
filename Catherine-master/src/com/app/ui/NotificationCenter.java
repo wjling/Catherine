@@ -17,6 +17,7 @@ import com.app.localDataBase.notificationObject;
 import com.app.ui.menu.FriendCenter.FriendCenter;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
+import com.app.utils.imageUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,6 +29,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -42,6 +44,8 @@ public class NotificationCenter extends Activity{
 	private ArrayList<notificationObject> messageList;
 	private int userId;
 	private ListView notificationListView;
+	private myHandler mHandler;
+	private MessagaAdapter messagaAdapter;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +62,11 @@ public class NotificationCenter extends Activity{
 	{
 	    notificationListView = (ListView)this.findViewById(R.id.notification_list);
 	    getNotificationFromDB();
-	    MessagaAdapter messagaAdapter = new MessagaAdapter(this, messageList, userId);
+	    messagaAdapter = new MessagaAdapter(this, messageList, userId);
 	    notificationListView.setAdapter(messagaAdapter);
 	    notificationListView.setDivider(getResources().getDrawable(R.drawable.settings_sep3));
+	    mHandler = new myHandler();
+	    imageUtil.getInstance().registerHandler(mHandler, "NotificationCenter");
 	}
 	
 	
@@ -84,5 +90,42 @@ public class NotificationCenter extends Activity{
 		messageList.addAll(responseIntoActivityList);
 		
 	}
+	
+	@Override
+	public void onBackPressed() {
+	    // TODO Auto-generated method stub
+	    imageUtil.getInstance().unregisterHandler("NotificationCenter");
+	    super.onBackPressed();
+	}
+
+//	@Override
+//	public boolean onKeyDown(int keyCode, KeyEvent event) {
+//    	// TODO Auto-generated method stub
+////    	if(keyCode==KeyEvent.KEYCODE_BACK){
+////    	    imageUtil.getInstance().unregisterHandler("NotificationCenter");
+////    	}
+//	    return super.onKeyUp(keyCode, event);
+//	}
+	
+    public class myHandler extends Handler
+    {
+        public myHandler() {
+            // TODO Auto-generated constructor stub
+        }
+        
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            super.handleMessage(msg);
+            switch(msg.what)
+            {
+            case FriendCenter.MSG_WHAT_ON_UPDATE_LIST:
+                messagaAdapter.notifyDataSetChanged();
+                break;
+            default: 
+                break;
+            }
+        }
+    }
 
 }

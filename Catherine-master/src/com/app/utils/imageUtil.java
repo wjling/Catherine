@@ -2,14 +2,25 @@ package com.app.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.app.adapters.MessagaAdapter;
+import com.app.catherine.R;
+import com.app.ui.menu.FriendCenter.FriendCenter;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 
 import android.support.v4.util.LruCache;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 
 public class imageUtil 
@@ -18,11 +29,14 @@ public class imageUtil
 	private final static String IMAGE_PATH = Environment.getExternalStorageDirectory() + "/Catherine/Avatar/";
 //	private HashMap<Integer, Bitmap> imageMap = new HashMap<Integer, Bitmap>();
 	
+	private volatile static imageUtil uniqueInstance = null;
 	private LruCache<Integer, Bitmap> mMemoryCache;
 	private int maxMemory;
 	private int cacheSize;
+	private myHandler mHandler;
+	private Handler fcHandler, ncHandler;
 	
-	public imageUtil()
+	private imageUtil()
 	{
 		//get max available vm memory
 		maxMemory = (int )(Runtime.getRuntime().maxMemory() / 1024);
@@ -37,7 +51,23 @@ public class imageUtil
 //				return bitmap.getByteCount() / 1024;
 			}
 		};
+		mHandler = new myHandler();
+		fcHandler = null;
+		ncHandler = null;
 	}
+	
+    
+    public static imageUtil getInstance(){
+        if(uniqueInstance == null){
+            synchronized(imageUtil.class) {
+                if(uniqueInstance == null) {
+                    uniqueInstance = new imageUtil();
+                }
+            }
+        }
+        
+        return uniqueInstance;       
+    }
 	
 	 public static byte[] String2Bytes(String imgStr) 
     {
@@ -191,8 +221,10 @@ public class imageUtil
 			if( fileExist(uid)  )
 			{
 				Bitmap bitmap = getLocalBitmapBy(uid);
-				if( bitmap!=null )
+				if( bitmap!=null ) {
 					mMemoryCache.put(uid, bitmap);
+					return true;
+				}
 			}
 				
 			return false;
@@ -200,4 +232,114 @@ public class imageUtil
 		else 
 			return true;
 	}
+	
+	public Bitmap getAvatar(int uid)
+	{
+	    if (imageExistInCache(uid))
+	    {
+	        return getBitmapFromMemCache(uid);
+	    }
+	    else {
+	        retrieve_avatar(uid);
+	        return null;
+	    }
+	}
+	
+	private void retrieve_avatar(int uid)
+    {
+        JSONObject params = new JSONObject();
+        try
+        {
+            params.put("id", uid);
+            params.put("operation", 0);
+            new HttpSender().Httppost(OperationCode.GET_AVATAR, params, mHandler);
+        } catch (JSONException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+	
+	private void writeAvatar(String str)
+    {
+        JSONObject returnJson;
+        try {
+            returnJson = new JSONObject(str );
+            if (returnJson.getInt("cmd") == ReturnCode.NORMAL_REPLY)
+            {
+                String returnStr = returnJson.getString("avatar");  
+                byte[] temp = String2Bytes(returnStr);
+                if(temp!=null)
+                {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(temp, 0, temp.length);
+                    savePhoto(returnJson.getInt("id"), bitmap);
+                    notifyChanged();
+                }
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+	
+	public void registerHandler(Handler handler, String className)
+	{
+	    if (className.equals("FriendCenter")) {
+	        this.fcHandler = handler;
+	    }
+	    else if (className.equals("NotificationCenter")) {
+	        this.ncHandler = handler;
+	    }
+	}
+	
+	private void notifyChanged()
+	{
+	    if (null != fcHandler)
+	    {
+	        Message msg = fcHandler.obtainMessage(FriendCenter.MSG_WHAT_ON_UPDATE_LIST);
+	        msg.sendToTarget();
+	    }
+	    if (null != ncHandler)
+	    {
+	        Message msg = ncHandler.obtainMessage(FriendCenter.MSG_WHAT_ON_UPDATE_LIST);
+            msg.sendToTarget();
+	    }
+	}
+	
+	public void unregisterHandler(String className) {
+	    if (className.equals("FriendCenter")) {
+	        fcHandler = null;
+	    }
+	    else if (className.equals("NotificationCenter")) {
+            this.ncHandler = null;
+        }
+	}
+	
+    public class myHandler extends Handler
+    {
+        public myHandler() {
+            // TODO Auto-generated constructor stub
+        }
+        
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            super.handleMessage(msg);
+            switch(msg.what)
+            {
+            case OperationCode.GET_AVATAR:
+                final String final_mes = msg.obj.toString();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                    writeAvatar(final_mes);
+                    }
+                }).start();
+                break;
+            default: 
+                break;
+            }
+        }
+    }
 }

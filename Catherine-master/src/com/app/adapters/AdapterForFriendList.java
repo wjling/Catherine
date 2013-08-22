@@ -117,9 +117,10 @@ public class AdapterForFriendList extends BaseAdapter{
 			case R.id.friend_list_item_avatar:
 			    if (fid > 0)
 			    {
-			        if (imageUtil.fileExist(fid))
+			        Bitmap avatar_bitmap = imageUtil.getInstance().getAvatar(fid);
+			        if (null != avatar_bitmap)
                     {
-                        viewHolder.avatar.setImageBitmap(imageUtil.getLocalBitmapBy(fid));
+                        viewHolder.avatar.setImageBitmap(avatar_bitmap);
                     }
                     else 
                     {

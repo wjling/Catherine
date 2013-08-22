@@ -35,6 +35,7 @@ import com.app.localDataBase.NotificationTableAdapter;
 import com.app.localDataBase.TableFriends;
 import com.app.localDataBase.notificationObject;
 import com.app.ui.UserInterface;
+import com.app.ui.menu.FriendCenter.FriendCenter;
 import com.app.utils.HttpSender;
 import com.app.utils.OperationCode;
 import com.app.utils.ReturnCode;
@@ -54,10 +55,10 @@ public class MessagaAdapter extends BaseAdapter{
             int uid)
     {
         this.context = context;
-        mInflater = LayoutInflater.from(context);
+        this.mInflater = LayoutInflater.from(context);
         this.list = list;
         this.userId = uid;
-        mHandler = new myHandler();
+        this.mHandler = new myHandler();
     }
     
     @Override
@@ -180,9 +181,10 @@ public class MessagaAdapter extends BaseAdapter{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        if (imageUtil.fileExist(fid))
+        Bitmap avatar_bmp = imageUtil.getInstance().getAvatar(fid);
+        if (null != avatar_bmp)
         {
-            viewHolder.avatar.setImageBitmap(imageUtil.getLocalBitmapBy(fid));
+            viewHolder.avatar.setImageBitmap(avatar_bmp);
         }
         else 
         {
