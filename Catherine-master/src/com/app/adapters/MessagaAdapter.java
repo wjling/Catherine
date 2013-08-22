@@ -98,15 +98,16 @@ public class MessagaAdapter extends BaseAdapter{
         try {
             jo = new JSONObject(item.msg);
             type = jo.getInt("cmd");
-            fid = jo.getInt("id");
             
             switch (type) {
             case ReturnCode.ADD_FRIEND_NOTIFICATION:
                 layoutID = R.layout.friend_requests;
+                fid = jo.getInt("id");
                 noticeString = context.getResources().getString(R.string.request_for_friend);
                 break;
             case ReturnCode.ADD_FRIEND_RESULT:
                 layoutID = R.layout.friend_requests;
+                fid = jo.getInt("id");
                 if (jo.getBoolean("result")) {
                     noticeString = context.getResources().getString(R.string.pass_friend_request);
                 }
@@ -116,6 +117,7 @@ public class MessagaAdapter extends BaseAdapter{
                 break;
             case ReturnCode.EVENT_INVITE_RESPONSE:
                 layoutID = R.layout.friend_requests;
+                fid = jo.getInt("id");
                 event_id = jo.getInt("event_id");
                 if (jo.getBoolean("result")) {
                     noticeString = context.getResources().getString(R.string.pass_event_invitation) + " [ " + jo.getString("subject") + " ] ";
@@ -126,11 +128,13 @@ public class MessagaAdapter extends BaseAdapter{
                 break;
             case ReturnCode.REQUEST_EVENT:
                 layoutID = R.layout.friend_requests;
+                fid = jo.getInt("id");
                 event_id = jo.getInt("event_id");
                 noticeString = context.getResources().getString(R.string.request_for_event) + " [ " + jo.getString("subject") + " ] ";
                 break;
             case ReturnCode.REQUEST_EVENT_RESPONSE:
                 layoutID = R.layout.friend_requests;
+                fid = jo.getInt("launcher_id");
                 event_id = jo.getInt("event_id");
                 if (jo.getBoolean("result")) {
                     noticeString = context.getResources().getString(R.string.pass_event_request) + " [ " + jo.getString("subject") + " ] ";

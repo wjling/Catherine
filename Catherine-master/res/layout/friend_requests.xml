@@ -32,9 +32,10 @@
             android:id="@+id/valication_result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/nc_avatar"
+            android:layout_below="@id/friend_name"
             android:layout_toRightOf="@+id/nc_avatar"
             android:paddingLeft="10dp"
+            android:paddingTop="2dp"
             android:text=""
             android:textColor="#aaaaaa"
             android:textSize="15sp" />
