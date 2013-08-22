@@ -153,28 +153,28 @@ public class AdapterForFriendList extends BaseAdapter{
 					break;
 			}
 		}
-		if (fid > 0)
-		{
-    		OnClickListener deleteBtnListener = new OnClickListener() {
-    			
-    			@Override
-    			public void onClick(View v) {
-    				// TODO Auto-generated method stub
-    				String uid = list.get(pos).get("uid").toString();
-    				String fid = list.get(pos).get("fid").toString();
-    				TableFriends tf = new TableFriends(context);
-    				tf.delete(uid,fid);
-    				list.remove(pos);
-    				AdapterForFriendList.this.notifyDataSetChanged();
-    			}
-    		};
-    		viewHolder.deleteBtn.setOnClickListener(deleteBtnListener);
-    		viewHolder.deleteBtn.setVisibility(View.VISIBLE);
-		}
-		else {
-		    viewHolder.deleteBtn.setVisibility(View.GONE);
-        }
-		
+//		if (fid > 0)
+//		{
+//    		OnClickListener deleteBtnListener = new OnClickListener() {
+//    			
+//    			@Override
+//    			public void onClick(View v) {
+//    				// TODO Auto-generated method stub
+//    				String uid = list.get(pos).get("uid").toString();
+//    				String fid = list.get(pos).get("fid").toString();
+//    				TableFriends tf = new TableFriends(context);
+//    				tf.delete(uid,fid);
+//    				list.remove(pos);
+//    				AdapterForFriendList.this.notifyDataSetChanged();
+//    			}
+//    		};
+//    		viewHolder.deleteBtn.setOnClickListener(deleteBtnListener);
+//    		viewHolder.deleteBtn.setVisibility(View.VISIBLE);
+//		}
+//		else {
+//		    viewHolder.deleteBtn.setVisibility(View.GONE);
+//        }
+		viewHolder.deleteBtn.setVisibility(View.GONE);
 		
 		return convertView;
 	}

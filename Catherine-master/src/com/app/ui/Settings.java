@@ -686,6 +686,7 @@ public class Settings {
                     e.printStackTrace();
                 }
                 setImage(imageStr);
+                imageUtil.getInstance().changeCacheImage(userId);
                 break;
             case OperationCode.GET_USER_INFO:
                 try {

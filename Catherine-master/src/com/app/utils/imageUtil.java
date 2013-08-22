@@ -316,6 +316,13 @@ public class imageUtil
         }
 	}
 	
+	public void changeCacheImage(int uid)
+	{
+	    if (null != mMemoryCache.get(uid)) {
+	        mMemoryCache.put(uid, getLocalBitmapBy(uid));
+	    }
+	}
+	
     public class myHandler extends Handler
     {
         public myHandler() {
