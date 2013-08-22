@@ -1,6 +1,7 @@
 package com.app.ui;
 
 import com.app.catherine.R;
+import com.app.ui.menu.RelativeEvents.RelativeEvents;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -77,7 +78,12 @@ public class Menu {
 	      return settingsView;
 	  }
 	
-//	public View get
+	
+	//add by luo
+	public View getPrivateView()
+	{
+		return privateEventsView;
+	}
 	
 	public void setMenu()
 	{
@@ -146,6 +152,7 @@ public class Menu {
 				currentUI = privateEventsView;
 				ui_content.removeAllViews();
 				ui_content.addView(currentUI);
+				
 //				Toast.makeText(context, "Private Events", Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.ui_menu_recommendedevents:

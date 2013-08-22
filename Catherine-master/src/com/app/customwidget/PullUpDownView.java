@@ -225,7 +225,7 @@ public class PullUpDownView extends LinearLayout implements onScrollListViewList
 		addView(myListView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		
 		PullUpDownView.LayoutParams params = (PullUpDownView.LayoutParams) myListView.getLayoutParams();
-		params.setMargins(8, 0, 8, 0);
+		params.setMargins(8, 8, 8, 0);
 		myListView.setLayoutParams(params);
 		this.setBackgroundColor( 0xffe0f0f0 );
 		
