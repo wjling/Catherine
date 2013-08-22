@@ -252,6 +252,7 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 	{
 	    imageUtil.getInstance().unregisterHandler("FriendCenter");
 	    friendList.clear();
+	    friendListAdapter.notifyDataSetChanged();
         int[] alpha_counter = new int[26];
         TableFriends tf = new TableFriends(context);
         friends = tf.getAllFriends(userId+"");
