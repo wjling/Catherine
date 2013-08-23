@@ -230,7 +230,14 @@ public class CommentPage extends Activity{
 						}
 					}
 					int size = a_comment.replies.size();
-					a_comment.reply_sequence = Integer.parseInt(a_comment.replies.get(size-1).get("comment_id").toString());
+					if(size > 0)
+					{
+						a_comment.reply_sequence = Integer.parseInt(a_comment.replies.get(size-1).get("comment_id").toString());
+					}
+					else
+					{
+						a_comment.reply_sequence = 0;
+					}
 					Log.i(TAG, "a comment: "+ a_comment.toString());
 					commentList.add(a_comment);
 					
