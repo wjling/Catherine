@@ -3,6 +3,7 @@ package com.app.localDataBase;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -89,6 +90,7 @@ public class TableNote {
 		return true;
 	}
 	
+	@SuppressLint("NewApi")
 	public NoteStruct query(String note_id)
 	{
 		SQLiteDatabase db = myHelper.getReadableDatabase();

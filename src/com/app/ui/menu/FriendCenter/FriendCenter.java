@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.app.adapters.AdapterForFriendList;
 import com.app.addFriendPack.searchFriend;
 import com.app.catherine.R;
+import com.app.comment.CommentPage;
 import com.app.localDataBase.FriendStruct;
 import com.app.localDataBase.TableFriends;
 import com.app.ui.NotificationCenter;
@@ -147,10 +148,11 @@ OnClickListener editTextOnClickListener = new OnClickListener() {
 			switch(v.getId())
 			{
 			case R.id.menu_friend_center_recommendfriendBtn:
-//				Intent intent1 = new Intent();
-//				intent1.setClass(context, searchFriend.class);
-//				intent1.putExtra("userId", userId);
-//				context.startActivity(intent1);
+				Intent intent1 = new Intent();
+				intent1.setClass(context, CommentPage.class);
+				intent1.putExtra("userId", userId);
+				intent1.putExtra("eventId", 79);
+				context.startActivity(intent1);
 				break;
 			case R.id.menu_friend_center_notificationBtn:
 				Intent intent2 = new Intent();

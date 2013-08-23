@@ -30,6 +30,7 @@
 
 package com.codebutler.android_websockets;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.io.*;
@@ -333,7 +334,8 @@ public class HybiParser {
         return (int) i;
     }
 
-    private byte[] slice(byte[] array, int start) {
+    @SuppressLint("NewApi")
+	private byte[] slice(byte[] array, int start) {
         return Arrays.copyOfRange(array, start, array.length);
     }
 
