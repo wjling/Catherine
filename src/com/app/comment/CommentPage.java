@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class CommentPage extends Activity{
 	
@@ -74,6 +75,8 @@ public class CommentPage extends Activity{
 		footerView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.pulldown_footer, null);
 		footerTextView = (TextView) footerView.findViewById(R.id.pulldown_footer_text);
 		footerTextView.setText("点击查看更多");
+//		footerView.setOnClickListener(buttonsOnClickListener);
+		footerTextView.setOnClickListener(buttonsOnClickListener);
 		
 		
 		commentAdapter = new AdapterForComment(this, commentList, 
@@ -93,6 +96,7 @@ public class CommentPage extends Activity{
 		@Override
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
+			Log.i(TAG, "click has been detected, view id is: "+v.getId());
 			switch(v.getId())
 			{
 			case R.id.comment_page_addcommentBtn:
@@ -101,6 +105,7 @@ public class CommentPage extends Activity{
 			case R.id.comment_page_backBtn:
 				break;
 			case R.id.pulldown_footer_text:
+				Log.i(TAG, "get more comments");
 				onGetComments();
 				break;
 				default: break;
@@ -410,17 +415,25 @@ public class CommentPage extends Activity{
 				try {
 					JSONObject response = new JSONObject(msg.obj.toString());
 					int type = response.getInt("type");
-					if(type == 0)
+					int sequence = response.getInt("sequence");
+					if( sequence >= 0)
 					{
-						Log.i(TAG, "获取的comments： "+ msg.obj.toString());
-						getCommentsDone(msg);
+						if(type == 0)
+						{
+							Log.i(TAG, "获取的comments： "+ msg.obj.toString());
+							getCommentsDone(msg);
+						}
+						else
+						{
+							Log.i(TAG, "获取的replies： "+ msg.obj.toString());
+							getMoreRepliesDone(msg);
+						}
+						commentAdapter.notifyDataSetChanged();
 					}
 					else
 					{
-						Log.i(TAG, "获取的replies： "+ msg.obj.toString());
-						getMoreRepliesDone(msg);
+						Toast.makeText(CommentPage.this, "没有更多评论了", Toast.LENGTH_SHORT).show();
 					}
-					commentAdapter.notifyDataSetChanged();
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
