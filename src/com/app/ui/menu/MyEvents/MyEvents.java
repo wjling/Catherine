@@ -168,7 +168,8 @@ public class MyEvents {
 				R.layout.activity_item, 
 				new String[]{"title", "day", "monthAndYear","time", "location", "launcher", "remark", "participantsNum"}, 
 				new int[]{R.id.activityTitle, R.id.day, R.id.monthAndYear, R.id.time, R.id.location, R.id.launcher, R.id.remark, R.id.participantsNum},
-				screenWidth 
+				screenWidth,
+				userId
 		);
 		
 		myEventsListView.setAdapter(myEventsAdapter);
@@ -178,8 +179,10 @@ public class MyEvents {
 	//add by luo
 	private void getActivityFrom( String str)
 	{
+		Log.i("MyEvents", "Get an activity: "+str);
 		JSONObject eventInforJson;
 		String subject="主题", time="", location="未定", launcher="谁发起的?", remark="没有备注哦oo";
+		int event_id = -1;
 		int member_count = 0;
 		String year="0000", month="00", day="00", hour="00", minute="00", second="00";
 		
@@ -190,6 +193,7 @@ public class MyEvents {
 			location = eventInforJson.optString("location");
 			launcher = eventInforJson.optString("launcher");
 			remark = eventInforJson.optString("remark");
+			event_id = eventInforJson.optInt("event_id");
 			member_count  = eventInforJson.optInt("member_count");
 		}
 		catch (JSONException e) {
@@ -217,6 +221,7 @@ public class MyEvents {
 		map.put("launcher", "by " + launcher);
 		map.put("remark", remark);
 		map.put("participantsNum", member_count+"");
+		map.put("event_id", event_id);
 		myEventsList.add(map);		
 	}
 	

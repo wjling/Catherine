@@ -7,10 +7,12 @@ import java.util.Map;
 
 import com.app.addActivityPack.CircularImage;
 import com.app.catherine.R;
+import com.app.comment.CommentPage;
 
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ public class cardAdapter extends BaseAdapter
 	private String from[];
 	private int to[];	
 	private int screenW;
+	private int userId = -1;
 	
 	public cardAdapter() {
 		// TODO Auto-generated constructor stub
@@ -41,7 +44,7 @@ public class cardAdapter extends BaseAdapter
 	}
 	
 	public cardAdapter(Context context, ArrayList<HashMap<String, Object>> list, int resource,
-			String []from, int []to, int screenW) {
+			String []from, int []to, int screenW, int userId) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.mInflater = LayoutInflater.from(context);
@@ -50,6 +53,7 @@ public class cardAdapter extends BaseAdapter
 		this.from = from;
 		this.to = to;
 		this.screenW = screenW;
+		this.userId = userId;
 		
 //		init();
 	}
@@ -97,7 +101,7 @@ public class cardAdapter extends BaseAdapter
 			view = mInflater.inflate(resource, null);
 		}
 		
-		init(view);
+		init(view, position);
 		
 		//set text or set something else about the view
 		for (int i = 0; i < from.length; i++) 
@@ -109,7 +113,7 @@ public class cardAdapter extends BaseAdapter
 		return view;
 	}
 	
-	private void init(View view)
+	private void init(View view, int position)
 	{
 		CircularImage join = (CircularImage)view.findViewById(R.id.joinBtn);
 		join.setImageResource(R.drawable.join);
@@ -126,8 +130,13 @@ public class cardAdapter extends BaseAdapter
 		SetContentWidth(view, activityInfoAllView);
 		
 		join.setOnClickListener(BtnListener);
-		view.findViewById(R.id.comment_btn).setOnClickListener(BtnListener);
-		view.findViewById(R.id.takephoto_btn).setOnClickListener(BtnListener);
+		View comment_btn = view.findViewById(R.id.comment_btn);
+		View takephoto_btn = view.findViewById(R.id.takephoto_btn);
+		comment_btn.setTag(position);
+		comment_btn.setOnClickListener(BtnListener);
+		takephoto_btn.setOnClickListener(BtnListener);
+//		view.findViewById(R.id.comment_btn).setOnClickListener(BtnListener);
+//		view.findViewById(R.id.takephoto_btn).setOnClickListener(BtnListener);
 	}
 	
 	private OnClickListener BtnListener = new OnClickListener()
@@ -142,6 +151,14 @@ public class cardAdapter extends BaseAdapter
 				break;
 			case R.id.comment_btn:
 				Toast.makeText(context, "comment", Toast.LENGTH_SHORT).show();
+				int position = (Integer) v.getTag();
+				HashMap<String, Object> activity = list.get(position);
+				int event_id = Integer.parseInt(activity.get("event_id").toString());
+				Intent intent = new Intent();
+				intent.putExtra("userId", userId);
+				intent.putExtra("eventId", event_id);
+				intent.setClass(context, CommentPage.class);
+				context.startActivity(intent);
 				break;
 			case R.id.takephoto_btn:
 				Toast.makeText(context, "take photo", Toast.LENGTH_SHORT).show();
